@@ -592,9 +592,10 @@ function Biography() {
                 </motion.div>
               </AnimatePresence>
               <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute left-4 bottom-4 text-[10px] uppercase tracking-[0.4em] text-bone/80">
-                Foto · Robert Eldrim
-              </div>
+            </div>
+            <div className="mt-3 flex justify-between text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
+              <span>Foto: Robert Eldrim</span>
+              <span>Smink: Sara Zetterström - Mua</span>
             </div>
           </div>
         </div>
@@ -711,7 +712,10 @@ function FilmReel() {
           ))}
         </div>
 
-        <div className="absolute left-6 top-1/2 z-10 -translate-y-1/2 md:left-12 hidden md:block">
+        {/* Dark barrier on the left to fade out images as they approach the text */}
+        <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden md:block" />
+
+        <div className="absolute left-6 top-1/2 z-30 -translate-y-1/2 md:left-12 hidden md:block">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-3">{t.reel.act}</div>
           <div className="font-display text-5xl md:text-6xl text-bone leading-none">{t.reel.title[0]}<br/>{t.reel.title[1]}</div>
           <div className="mt-4 text-xs text-bone/40 max-w-[180px]">{t.reel.hint}</div>
@@ -720,7 +724,7 @@ function FilmReel() {
         <motion.div
           ref={trackRef}
           style={{ x }}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform"
+          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
         >
           {IMG.portfolio.map((src, i) => (
             <div key={src} className="relative shrink-0" style={{ width: "min(34vw, 460px)", aspectRatio: "3/4" }}>
@@ -826,7 +830,7 @@ function Credits() {
           </div>
         </div>
 
-        <ul className="mt-14 border-t border-bone/10">
+        <ul className="mt-14 border-t border-bone/20">
           <AnimatePresence initial={false}>
             {rows.map((c, i) => (
               <motion.li
@@ -836,7 +840,7 @@ function Credits() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.5, delay: i * 0.03 }}
-                className="group relative border-b border-bone/10"
+                className="group relative border-b border-bone/20 transition-colors duration-300 hover:border-bone/45"
               >
                 <a
                   href={c.url ?? "#credits"}
@@ -844,25 +848,25 @@ function Credits() {
                   rel={c.url ? "noreferrer" : undefined}
                   onClick={(e) => { if (!c.url) e.preventDefault(); }}
                   data-hover
-                  className="grid grid-cols-12 items-baseline gap-4 py-7 transition-colors hover:bg-bone/[0.02]"
+                  className="grid grid-cols-12 items-baseline gap-4 py-7 transition-colors hover:bg-bone/[0.06] duration-300"
                 >
-                  <div className="col-span-2 md:col-span-1 font-mono text-xs text-ember/70">{c.year}</div>
+                  <div className="col-span-2 md:col-span-1 font-mono text-xs text-ember/70 group-hover:text-ember transition-colors duration-300">{c.year}</div>
                   <div className="col-span-7 md:col-span-5">
-                    <div className="font-display text-2xl md:text-3xl text-bone group-hover:italic transition-all">
+                    <div className="font-display text-2xl md:text-3xl text-bone transition-all">
                       {c.title}
                     </div>
-                    <div className="mt-1 text-xs text-bone/50">{c.role[lang]}</div>
+                    <div className="mt-1 text-xs text-bone/50 group-hover:text-bone/80 transition-colors duration-300">{c.role[lang]}</div>
                   </div>
-                  <div className="hidden md:block md:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/50">
+                  <div className="hidden md:block md:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/50 group-hover:text-bone/85 transition-colors duration-300">
                     {c.category[lang]}
                   </div>
-                  <div className="hidden md:block md:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/50">
+                  <div className="hidden md:block md:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/50 group-hover:text-bone/85 transition-colors duration-300">
                     {c.network}
                   </div>
                   <div className="col-span-3 md:col-span-1 flex justify-end">
                     <ArrowUpRight size={18} className="text-bone/30 transition-all group-hover:text-ember group-hover:rotate-45" />
                   </div>
-                  <div className="col-span-12 text-xs text-bone/40 md:hidden">{c.network} · {c.category[lang]}</div>
+                  <div className="col-span-12 text-xs text-bone/40 md:hidden group-hover:text-bone/70 transition-colors duration-300">{c.network} · {c.category[lang]}</div>
                 </a>
               </motion.li>
             ))}
@@ -1069,8 +1073,11 @@ function Footer() {
     <footer className="relative border-t border-bone/10 px-6 py-14 md:px-12">
       <div className="mx-auto max-w-7xl flex flex-col md:flex-row md:items-end justify-between gap-10">
         <div>
-          <div className="font-display text-3xl md:text-4xl text-bone leading-none">Therese Järvheden</div>
-          <div className="mt-2 text-[10px] uppercase tracking-[0.4em] text-bone/40">{t.footer.role}</div>
+          <div className="font-display text-2xl md:text-3xl tracking-[0.32em] uppercase text-bone flex items-center gap-2">
+            <span className="italic font-light">Therese</span>
+            <span>Järvheden</span>
+          </div>
+          <div className="mt-3 text-[10px] uppercase tracking-[0.4em] text-bone/40">{t.footer.role}</div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-xs text-bone/50">
           <div>
@@ -1086,7 +1093,7 @@ function Footer() {
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-[0.35em] text-bone/30 mb-2">{t.footer.photo}</div>
-            <a href="http://medljus.se/" target="_blank" rel="noreferrer" className="hover:text-ember transition-colors">Robert Eldrim — Medljus</a>
+            <span className="text-bone/50">Robert Eldrim</span>
           </div>
         </div>
       </div>
