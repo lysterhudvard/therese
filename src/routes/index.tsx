@@ -8,7 +8,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Mail, ArrowUpRight, Play, Send, Check } from "lucide-react";
+import { Mail, ArrowUpRight, Play, Send, Check, Pause, Volume2, VolumeX, X } from "lucide-react";
 
 const Instagram = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -129,7 +129,7 @@ type Lang = "sv" | "en";
 
 const I18N = {
   sv: {
-    nav: { bio: "Biografi", reel: "Showreel", credits: "Meriter", voice: "Röst", contact: "Kontakt" },
+    nav: { bio: "Biografi", portfolio: "Portfolio", credits: "Meriter", voice: "Röst", contact: "Kontakt" },
     hero: { act: "Akt I — Nu aktuell", line: '"En våldsam kärlek" — SVT dramadokumentär.', role: "Skådespelerska", base: "Malmö · Stockholm", scroll: "scrolla" },
     bio: {
       act: "Akt II — Biografi",
@@ -148,7 +148,7 @@ const I18N = {
       p3: ["Drama är något som Therese känner extra starkt för. Vi har sett henne bland annat i Beck-filmen ", "Utan uppsåt", ", där hon gästspelade rollen som läraren ", "Nora", "."],
       facts: [["Bas", "Malmö / Stockholm"], ["Dialekt", "Skånsk · Rikssvenska"], ["Språk", "Svenska · Engelska"]] as [string, string][],
     },
-    reel: { act: "Akt III", title: ["Film", "Showreel"], hint: "Scrolla för att rulla bandet." },
+    portfolio: { act: "Akt III", title: ["Portfolio", "Bilder"], hint: "Scrolla för att se bilder." },
     credits: {
       act: "Akt IV — Meriter",
       heading: ["Roller & ", "Meriter"],
@@ -181,7 +181,7 @@ const I18N = {
     lang: { label: "Språk", sv: "Svenska", en: "English" },
   },
   en: {
-    nav: { bio: "Biography", reel: "Reel", credits: "Credits", voice: "Voice", contact: "Contact" },
+    nav: { bio: "Biography", portfolio: "Portfolio", credits: "Credits", voice: "Voice", contact: "Contact" },
     hero: { act: "Act I — Now Playing", line: '"En våldsam kärlek" — SVT documentary drama.', role: "Actress", base: "Malmö · Stockholm", scroll: "scroll" },
     bio: {
       act: "Act II — Biography",
@@ -200,7 +200,7 @@ const I18N = {
       p3: ["Drama is something Therese feels especially strongly about. We have seen her in the Beck film ", "Utan uppsåt", ", where she guest-starred as the teacher ", "Nora", "."],
       facts: [["Base", "Malmö / Stockholm"], ["Dialect", "Scanian · Standard Swedish"], ["Languages", "Swedish · English"]] as [string, string][],
     },
-    reel: { act: "Act III", title: ["Film", "Reel"], hint: "Scroll to roll the reel." },
+    portfolio: { act: "Act III", title: ["Portfolio", "Images"], hint: "Scroll to view images." },
     credits: {
       act: "Act IV — Credits",
       heading: ["Performance ", "Credits"],
@@ -253,11 +253,46 @@ type Credit = {
   network: string;
   url?: string;
   img: string;
+  commentary?: {
+    url: string;
+    duration: string;
+    svText: string;
+    enText: string;
+  };
 };
 
 const CREDITS: Credit[] = [
-  { year: "2024", title: "En våldsam kärlek", role: { sv: "Ensemble — en av fyra kvinnor", en: "Ensemble — one of four women" }, type: "TV", category: { sv: "Drama", en: "Drama" }, network: "SVT", url: "https://www.svtplay.se/en-valdsam-karlek", img: IMG.hero },
-  { year: "2023", title: "Beck — Utan uppsåt", role: { sv: "Nora (lärare)", en: "Nora (teacher)" }, type: "Film", category: { sv: "Drama", en: "Drama" }, network: "Filmlance / C More", img: IMG.bioA },
+  {
+    year: "2024",
+    title: "En våldsam kärlek",
+    role: { sv: "Ensemble — en av fyra kvinnor", en: "Ensemble — one of four women" },
+    type: "TV",
+    category: { sv: "Drama", en: "Drama" },
+    network: "SVT",
+    url: "https://www.svtplay.se/en-valdsam-karlek",
+    img: IMG.hero,
+    commentary: {
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      duration: "0:15",
+      svText: "Det var en emotionellt utmanande roll, men oerhört viktig att berätta för att uppmärksamma kvinnofrid och våld i nära relationer.",
+      enText: "It was an emotionally challenging role, but incredibly important to tell to draw attention to domestic abuse and relationship violence."
+    }
+  },
+  {
+    year: "2023",
+    title: "Beck — Utan uppsåt",
+    role: { sv: "Nora (lärare)", en: "Nora (teacher)" },
+    type: "Film",
+    category: { sv: "Drama", en: "Drama" },
+    network: "Filmlance / C More",
+    img: IMG.bioA,
+    commentary: {
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      duration: "0:12",
+      svText: "Att spela Nora i Beck var fantastiskt. Hon bär på en tyst intensitet som gör varje blick laddad.",
+      enText: "Playing Nora in Beck was fantastic. She carries a quiet intensity that makes every look charged."
+    }
+  },
   { year: "2021", title: "Karatefylla", role: { sv: "Återkommande roll", en: "Recurring role" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.feature },
   { year: "2020", title: "Jävla klåpare", role: { sv: "Återkommande roll", en: "Recurring role" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[3] },
   { year: "2019", title: "Anna Blomberg show", role: { sv: "Sketch ensemble", en: "Sketch ensemble" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[5] },
@@ -284,7 +319,7 @@ const REVIEW_QUOTES_EN = [
 
 const MOOD_DATA = {
   Dramatic: { image: IMG.hero, weight: 300 },
-  Comedic: { image: IMG.bioA, weight: 500 },
+  Comedic: { image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000044-20e3320e36/Thess0564_highres.jpg?ph=a6c2528650", weight: 500 },
   Classical: { image: IMG.feature, weight: 400 },
 } as const;
 
@@ -395,7 +430,7 @@ function Nav({ heroDone }: { heroDone: boolean }) {
 
   const links = [
     { id: "bio", label: t.nav.bio },
-    { id: "reel", label: t.nav.reel },
+    { id: "portfolio", label: t.nav.portfolio },
     { id: "credits", label: t.nav.credits },
     { id: "voice", label: t.nav.voice },
     { id: "contact", label: t.nav.contact },
@@ -678,8 +713,8 @@ function Biography() {
   );
 }
 
-/* ---------- Film reel ---------- */
-function FilmReel() {
+/* ---------- Portfolio ---------- */
+function Portfolio() {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -699,7 +734,7 @@ function FilmReel() {
   const x = useTransform(scrollYProgress, [0, 1], [0, -maxX]);
 
   return (
-    <section id="reel" ref={ref} className="relative" style={{ height: "320vh" }}>
+    <section id="portfolio" ref={ref} className="relative" style={{ height: "320vh" }}>
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-ink">
         <div className="absolute inset-x-0 top-0 z-20 flex h-6 items-center gap-3 overflow-hidden px-2">
           {Array.from({ length: 60 }).map((_, i) => (
@@ -716,9 +751,9 @@ function FilmReel() {
         <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden md:block" />
 
         <div className="absolute left-6 top-1/2 z-30 -translate-y-1/2 md:left-12 hidden md:block">
-          <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-3">{t.reel.act}</div>
-          <div className="font-display text-5xl md:text-6xl text-bone leading-none">{t.reel.title[0]}<br/>{t.reel.title[1]}</div>
-          <div className="mt-4 text-xs text-bone/40 max-w-[180px]">{t.reel.hint}</div>
+          <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-1.5">{t.portfolio.act}</div>
+          <div className="font-display text-5xl md:text-6xl text-bone leading-none">{t.portfolio.title[0]}<br/>{t.portfolio.title[1]}</div>
+          <div className="mt-4 text-xs text-bone/40 max-w-[180px]">{t.portfolio.hint}</div>
         </div>
 
         <motion.div
@@ -741,8 +776,8 @@ function FilmReel() {
 
         <div className="md:hidden absolute inset-0 flex flex-col">
           <div className="px-6 pt-16 pb-4">
-            <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.reel.act}</div>
-            <h3 className="mt-2 font-display text-4xl text-bone leading-none">{t.reel.title[0]} {t.reel.title[1]}</h3>
+            <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.portfolio.act}</div>
+            <h3 className="mt-2 font-display text-4xl text-bone leading-none">{t.portfolio.title[0]} {t.portfolio.title[1]}</h3>
           </div>
           <div className="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar">
             <div className="flex items-center gap-4 px-6 h-full">
@@ -791,7 +826,13 @@ function ParallaxQuotes() {
 }
 
 /* ---------- Credits ---------- */
-function Credits() {
+function Credits({
+  activeCommentaryUrl,
+  onPlayCommentary,
+}: {
+  activeCommentaryUrl?: string;
+  onPlayCommentary?: (c: { title: string; role: string; url: string; text: string } | null) => void;
+}) {
   const { lang, t } = useT();
   const [filter, setFilter] = useState<FilterKey>("Alla");
   const rows = useMemo(
@@ -852,8 +893,48 @@ function Credits() {
                 >
                   <div className="col-span-2 md:col-span-1 font-mono text-xs text-ember/70 group-hover:text-ember transition-colors duration-300">{c.year}</div>
                   <div className="col-span-7 md:col-span-5">
-                    <div className="font-display text-2xl md:text-3xl text-bone transition-all">
-                      {c.title}
+                    <div className="font-display text-2xl md:text-3xl text-bone transition-all flex flex-wrap items-center gap-3">
+                      <span>{c.title}</span>
+                      {c.commentary && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const comm = c.commentary;
+                            if (!comm) return;
+                            if (onPlayCommentary) {
+                              if (activeCommentaryUrl === comm.url) {
+                                onPlayCommentary(null);
+                              } else {
+                                onPlayCommentary({
+                                  title: c.title,
+                                  role: c.role[lang],
+                                  url: comm.url,
+                                  text: lang === "sv" ? comm.svText : comm.enText,
+                                });
+                              }
+                            }
+                          }}
+                          data-hover
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border transition-all duration-300 font-mono text-[9px] uppercase tracking-wider ${
+                            activeCommentaryUrl === c.commentary.url
+                              ? "bg-ember border-ember text-ink font-semibold"
+                              : "border-bone/20 text-bone/60 hover:text-ember hover:border-ember/40 bg-bone/[0.03]"
+                          }`}
+                        >
+                          <span className="relative flex h-1.5 w-1.5 shrink-0">
+                            {activeCommentaryUrl === c.commentary.url ? (
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ink opacity-75"></span>
+                            ) : null}
+                            <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${activeCommentaryUrl === c.commentary.url ? "bg-ink" : "bg-ember"}`}></span>
+                          </span>
+                          <span>
+                            {activeCommentaryUrl === c.commentary.url
+                              ? (lang === "sv" ? "Spelar" : "Playing")
+                              : (lang === "sv" ? "Kommentar" : "Commentary")}
+                          </span>
+                        </button>
+                      )}
                     </div>
                     <div className="mt-1 text-xs text-bone/50 group-hover:text-bone/80 transition-colors duration-300">{c.role[lang]}</div>
                   </div>
@@ -1026,6 +1107,166 @@ function Contact() {
   );
 }
 
+/* ---------- Commentary Player ---------- */
+function CommentaryPlayer({
+  title,
+  role,
+  url,
+  text,
+  onClose,
+}: {
+  title: string;
+  role: string;
+  url: string;
+  text: string;
+  onClose: () => void;
+}) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [muted, setMuted] = useState(false);
+
+  useEffect(() => {
+    setPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    
+    if (audioRef.current) {
+      audioRef.current.load();
+      audioRef.current.play().then(() => {
+        setPlaying(true);
+      }).catch(() => {
+        setPlaying(false);
+      });
+    }
+  }, [url]);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (playing) {
+      audioRef.current.pause();
+      setPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setPlaying(true);
+      });
+    }
+  };
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !muted;
+    setMuted(!muted);
+  };
+
+  const onTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const onLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration || 15);
+    }
+  };
+
+  const onEnded = () => {
+    setPlaying(false);
+    setCurrentTime(0);
+  };
+
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setCurrentTime(val);
+    if (audioRef.current) {
+      audioRef.current.currentTime = val;
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ y: 80, opacity: 0, scale: 0.95 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: 80, opacity: 0, scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] w-[92vw] max-w-lg bg-ink/95 border border-bone/15 backdrop-blur-xl px-5 py-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-3 font-mono"
+    >
+      <audio
+        ref={audioRef}
+        src={url}
+        onTimeUpdate={onTimeUpdate}
+        onLoadedMetadata={onLoadedMetadata}
+        onEnded={onEnded}
+      />
+      
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-2">
+          <div className="relative flex h-2 w-2">
+            <span className={`relative inline-flex rounded-full h-2 w-2 bg-ember ${playing ? "animate-pulse" : ""}`} />
+          </div>
+          <span className="text-[10px] uppercase tracking-wider text-ember">Director's Commentary</span>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-bone/45 hover:text-bone transition-colors p-1"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="bg-bone/[0.04] border border-bone/5 p-3 rounded-lg flex flex-col gap-1.5">
+        <div className="text-[11px] text-bone font-semibold truncate">
+          {title} <span className="text-bone/40 font-normal">— {role}</span>
+        </div>
+        <p className="text-[11px] text-bone/70 leading-relaxed italic border-t border-bone/5 pt-1.5 select-none">
+          "{text}"
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3 mt-1">
+        <button
+          onClick={togglePlay}
+          className="h-8 w-8 rounded-full bg-ember hover:bg-bone text-ink hover:text-ink transition-colors flex items-center justify-center shrink-0 shadow-lg"
+        >
+          {playing ? <Pause size={13} fill="currentColor" /> : <Play size={13} fill="currentColor" className="translate-x-[0.5px]" />}
+        </button>
+
+        <div className="flex-1 flex items-center gap-2">
+          <span className="text-[9px] text-bone/50 w-8">{formatTime(currentTime)}</span>
+          <input
+            type="range"
+            min={0}
+            max={duration || 100}
+            value={currentTime}
+            onChange={handleSliderChange}
+            className="flex-1 h-1 bg-bone/15 rounded-lg appearance-none cursor-pointer accent-ember focus:outline-none"
+            style={{
+              background: `linear-gradient(to right, #D88C5A 0%, #D88C5A ${((currentTime / (duration || 1)) * 100).toFixed(1)}%, rgba(220, 218, 209, 0.15) ${((currentTime / (duration || 1)) * 100).toFixed(1)}%, rgba(220, 218, 209, 0.15) 100%)`
+            }}
+          />
+          <span className="text-[9px] text-bone/50 w-8 text-right">{formatTime(duration)}</span>
+        </div>
+
+        <button
+          onClick={toggleMute}
+          className="text-bone/55 hover:text-ember transition-colors p-1"
+        >
+          {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 function Field({
   label, id, value, onChange, type = "text", textarea,
 }: { label: string; id: string; value: string; onChange: (v: string) => void; type?: string; textarea?: boolean }) {
@@ -1109,15 +1350,16 @@ function Footer() {
 function Page() {
   const [heroDone, setHeroDone] = useState(false);
   const [lang, setLangState] = useState<Lang>("sv");
-  const [isInReel, setIsInReel] = useState(false);
+  const [isInPortfolio, setIsInPortfolio] = useState(false);
+  const [activeCommentary, setActiveCommentary] = useState<{ title: string; role: string; url: string; text: string } | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const el = document.getElementById("reel");
+    const el = document.getElementById("portfolio");
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInReel(entry.isIntersecting);
+        setIsInPortfolio(entry.isIntersecting);
       },
       {
         rootMargin: "-10% 0px -10% 0px",
@@ -1156,23 +1398,38 @@ function Page() {
         <div
           className="pointer-events-none fixed inset-x-0 top-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"
           style={{
-            transform: isInReel ? "translateY(0)" : "translateY(-100%)",
+            transform: isInPortfolio ? "translateY(0)" : "translateY(-100%)",
           }}
         />
         <div
           className="pointer-events-none fixed inset-x-0 bottom-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"
           style={{
-            transform: isInReel ? "translateY(0)" : "translateY(100%)",
+            transform: isInPortfolio ? "translateY(0)" : "translateY(100%)",
           }}
         />
 
         <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
         <Biography />
-        <FilmReel />
-        <Credits />
+        <Portfolio />
+        <Credits
+          activeCommentaryUrl={activeCommentary?.url}
+          onPlayCommentary={setActiveCommentary}
+        />
         <Voice />
         <Contact />
         <Footer />
+
+        <AnimatePresence>
+          {activeCommentary && (
+            <CommentaryPlayer
+              title={activeCommentary.title}
+              role={activeCommentary.role}
+              url={activeCommentary.url}
+              text={activeCommentary.text}
+              onClose={() => setActiveCommentary(null)}
+            />
+          )}
+        </AnimatePresence>
       </main>
     </LangContext.Provider>
   );
