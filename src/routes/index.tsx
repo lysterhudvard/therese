@@ -23,6 +23,72 @@ const Facebook = ({ size = 16 }: { size?: number }) => (
   </svg>
 );
 
+/* ---------- Spotlight Image Component for Point 2 ---------- */
+function SpotlightImage({
+  src,
+  alt,
+  className = "",
+  style = {},
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const maskRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const mask = maskRef.current;
+    if (!container || !mask) return;
+
+    // Set initial mask state out of view
+    mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+    mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      mask.style.webkitMaskImage = `radial-gradient(circle 300px at ${x}px ${y}px, black 10%, transparent 80%)`;
+      mask.style.maskImage = `radial-gradient(circle 300px at ${x}px ${y}px, black 10%, transparent 80%)`;
+    };
+
+    const onMouseLeave = () => {
+      mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+    };
+
+    container.addEventListener("mousemove", onMouseMove);
+    container.addEventListener("mouseleave", onMouseLeave);
+
+    return () => {
+      container.removeEventListener("mousemove", onMouseMove);
+      container.removeEventListener("mouseleave", onMouseLeave);
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} className={`relative overflow-hidden ${className}`} style={style}>
+      {/* Background: Desaturated & Darkened */}
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-cover filter grayscale brightness-[0.22] transition-all duration-500"
+      />
+      {/* Foreground: Fully colored under spotlight mask */}
+      <img
+        ref={maskRef}
+        src={src}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-all duration-300"
+      />
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -63,7 +129,7 @@ type Lang = "sv" | "en";
 
 const I18N = {
   sv: {
-    nav: { bio: "Biografi", reel: "Reel", credits: "Meriter", voice: "Röst", contact: "Kontakt" },
+    nav: { bio: "Biografi", reel: "Showreel", credits: "Meriter", voice: "Röst", contact: "Kontakt" },
     hero: { act: "Akt I — Nu aktuell", line: '"En våldsam kärlek" — SVT dramadokumentär.', role: "Skådespelerska", base: "Malmö · Stockholm", scroll: "scrolla" },
     bio: {
       act: "Akt II — Biografi",
@@ -82,10 +148,10 @@ const I18N = {
       p3: ["Drama är något som Therese känner extra starkt för. Vi har sett henne bland annat i Beck-filmen ", "Utan uppsåt", ", där hon gästspelade rollen som läraren ", "Nora", "."],
       facts: [["Bas", "Malmö / Stockholm"], ["Dialekt", "Skånsk · Rikssvenska"], ["Språk", "Svenska · Engelska"]] as [string, string][],
     },
-    reel: { act: "Akt III", title: ["Film", "Reel"], hint: "Scrolla för att rulla bandet." },
+    reel: { act: "Akt III", title: ["Film", "Showreel"], hint: "Scrolla för att rulla bandet." },
     credits: {
       act: "Akt IV — Meriter",
-      heading: ["Performance ", "Credits"],
+      heading: ["Roller & ", "Meriter"],
       filters: { Alla: "Alla", Film: "Film", TV: "TV", Theater: "Teater", Voice: "Röst" } as Record<FilterKey, string>,
     },
     voice: {
@@ -93,7 +159,7 @@ const I18N = {
       heading: ["En ", "skånsk", " röst — varm, rå, omedelbar."],
       body: ["Therese har använts flitigt för sin skånska röst i många radio- och TV-reklamer. Hon har även dubbat rösten till mamman i barnserien ", "Familjen Valentin", "."],
       cta: "Boka röst",
-      demo: "Demo via mail",
+      demo: "Demo via e-post",
     },
     contact: {
       act: "Akt VI — Kontakt",
@@ -261,8 +327,7 @@ function Spotlight() {
         style={{ x: sx, y: sy }}
       >
         <motion.div
-          animate={{ scale: enlarged ? 6 : 1, opacity: enlarged ? 0.85 : 1 }}
-          transition={{ type: "spring", stiffness: 220, damping: 22 }}
+          animate={{ scale: 1, opacity: 1 }}
           className="-translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{ width: 14, height: 14, background: "var(--color-bone)", mixBlendMode: "difference" }}
         />
@@ -271,6 +336,8 @@ function Spotlight() {
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[80] will-change-transform"
         style={{ x: sx, y: sy }}
+        animate={{ opacity: enlarged ? 0 : 1 }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
       >
         <div
           className="-translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -315,6 +382,17 @@ function LangSwitch({ className = "" }: { className?: string }) {
 function Nav({ heroDone }: { heroDone: boolean }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 100);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const links = [
     { id: "bio", label: t.nav.bio },
     { id: "reel", label: t.nav.reel },
@@ -322,25 +400,37 @@ function Nav({ heroDone }: { heroDone: boolean }) {
     { id: "voice", label: t.nav.voice },
     { id: "contact", label: t.nav.contact },
   ];
+
   const go = (id: string) => {
     setOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
   return (
-    <header className="fixed inset-x-0 top-0 z-[70] mix-blend-difference">
-      <div className="flex items-center justify-between px-6 py-5 md:px-10">
-        <motion.button
-          onClick={() => go("top")}
-          initial={false}
-          animate={{ opacity: heroDone ? 1 : 0, y: heroDone ? 0 : -8 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display text-[15px] tracking-[0.32em] uppercase text-bone"
-        >
-          Therese&nbsp;Järvheden
-        </motion.button>
+    <header
+      className={`fixed inset-x-0 top-0 z-[70] transition-all duration-700 ease-in-out ${
+        scrolled
+          ? "bg-ink border-b border-bone/10"
+          : "bg-transparent"
+      }`}
+    >
+      <div className={`flex items-center justify-between px-6 md:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-3.5" : "py-5"}`}>
+        {heroDone ? (
+          <motion.button
+            layoutId="header-logo"
+            onClick={() => go("top")}
+            className="font-display text-[14px] md:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5"
+            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
+          >
+            <span className="italic font-light">Therese</span>
+            <span>Järvheden</span>
+          </motion.button>
+        ) : (
+          <div className="w-[150px]" />
+        )}
         <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
           {links.map((l) => (
-            <button key={l.id} onClick={() => go(l.id)} className="hover:text-bone transition-colors">
+            <button key={l.id} onClick={() => go(l.id)} className="hover:text-bone transition-colors px-3 py-1.5 rounded-sm">
               {l.label}
             </button>
           ))}
@@ -382,7 +472,7 @@ function Nav({ heroDone }: { heroDone: boolean }) {
 }
 
 /* ---------- Hero ---------- */
-function Hero({ onDone }: { onDone: () => void }) {
+function Hero({ onDone, heroDone }: { onDone: () => void; heroDone: boolean }) {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -422,23 +512,24 @@ function Hero({ onDone }: { onDone: () => void }) {
         className="absolute inset-x-0 bottom-0 z-30 h-1/2 bg-ink"
       />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.9, duration: 0.6 }}
-        className="absolute inset-0 z-40 flex items-center justify-center px-6"
-      >
-        <motion.h1
-          initial={{ scale: 1, y: 0 }}
-          animate={{ scale: 0.18, y: "-44vh" }}
-          transition={{ delay: 1.4, duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display text-bone text-center leading-[0.92] tracking-tight"
-          style={{ fontSize: "clamp(3.2rem, 13vw, 11rem)", fontWeight: 400 }}
+      {!heroDone && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.6 }}
+          className="absolute inset-0 z-40 flex items-center justify-center px-6"
         >
-          <span className="block italic font-light">Therese</span>
-          <span className="block">Järvheden</span>
-        </motion.h1>
-      </motion.div>
+          <motion.h1
+            layoutId="header-logo"
+            className="font-display text-bone text-center tracking-[0.32em] uppercase flex items-center justify-center gap-3 whitespace-nowrap"
+            style={{ fontSize: "clamp(1.1rem, 4vw, 3.2rem)" }}
+            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
+          >
+            <span className="italic font-light">Therese</span>
+            <span>Järvheden</span>
+          </motion.h1>
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -485,18 +576,22 @@ function Biography() {
           <div className="sticky top-28">
             <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.div
                   key={mood}
-                  src={data.image}
-                  alt={`Therese Järvheden — ${mood}`}
                   initial={{ opacity: 0, scale: 1.06 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+                  className="absolute inset-0 h-full w-full"
+                >
+                  <SpotlightImage
+                    src={data.image}
+                    alt={`Therese Järvheden — ${mood}`}
+                    className="h-full w-full"
+                  />
+                </motion.div>
               </AnimatePresence>
-              <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
               <div className="absolute left-4 bottom-4 text-[10px] uppercase tracking-[0.4em] text-bone/80">
                 Foto · Robert Eldrim
               </div>
@@ -695,7 +790,6 @@ function ParallaxQuotes() {
 function Credits() {
   const { lang, t } = useT();
   const [filter, setFilter] = useState<FilterKey>("Alla");
-  const [hover, setHover] = useState<{ src: string; x: number; y: number } | null>(null);
   const rows = useMemo(
     () => (filter === "Alla" ? CREDITS : CREDITS.filter((c) => c.type === filter)),
     [filter],
@@ -742,8 +836,6 @@ function Credits() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.5, delay: i * 0.03 }}
-                onMouseMove={(e) => setHover({ src: c.img, x: e.clientX, y: e.clientY })}
-                onMouseLeave={() => setHover(null)}
                 className="group relative border-b border-bone/10"
               >
                 <a
@@ -777,23 +869,6 @@ function Credits() {
           </AnimatePresence>
         </ul>
       </div>
-
-      <AnimatePresence>
-        {hover && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
-            style={{ left: hover.x + 24, top: hover.y - 80 }}
-            className="pointer-events-none fixed z-[60] hidden md:block"
-          >
-            <div className="relative h-44 w-32 overflow-hidden border border-bone/10 shadow-2xl">
-              <img src={hover.src} alt="" className="h-full w-full object-cover" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
@@ -804,9 +879,9 @@ function Voice() {
   return (
     <section id="voice" className="relative overflow-hidden bg-ink">
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="relative h-[60svh] md:h-[90svh]">
-          <img src={IMG.voice} alt="Therese — röst" className="h-full w-full object-cover" loading="lazy" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r" />
+        <div className="relative h-[60svh] md:h-[90svh] overflow-hidden">
+          <SpotlightImage src={IMG.voice} alt="Therese — röst" className="h-full w-full" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r pointer-events-none" />
         </div>
         <div className="flex flex-col justify-center px-6 py-20 md:px-16 md:py-32">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.voice.act}</div>
@@ -857,7 +932,7 @@ function Contact() {
               <a
                 href="mailto:jonas@schultzbergagency.com"
                 data-hover
-                className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors"
+                className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
               >
                 <Mail size={20} /> jonas@schultzbergagency.com
               </a>
@@ -868,16 +943,16 @@ function Contact() {
               <a
                 href="mailto:theresejarvheden@gmail.com"
                 data-hover
-                className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors"
+                className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
               >
                 <Mail size={20} /> theresejarvheden@gmail.com
               </a>
             </div>
             <div className="flex items-center gap-5 pt-4">
-              <a href="https://www.instagram.com/theresejarvheden/" target="_blank" rel="noreferrer" data-hover className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors">
+              <a href="https://www.instagram.com/theresejarvheden/" target="_blank" rel="noreferrer" data-hover className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5">
                 <Instagram size={16} /> Instagram
               </a>
-              <a href="https://www.facebook.com/therese.jarvhedenfdpersson" target="_blank" rel="noreferrer" data-hover className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors">
+              <a href="https://www.facebook.com/therese.jarvhedenfdpersson" target="_blank" rel="noreferrer" data-hover className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5">
                 <Facebook size={16} /> Facebook
               </a>
             </div>
@@ -1027,6 +1102,24 @@ function Footer() {
 function Page() {
   const [heroDone, setHeroDone] = useState(false);
   const [lang, setLangState] = useState<Lang>("sv");
+  const [isInReel, setIsInReel] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const el = document.getElementById("reel");
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInReel(entry.isIntersecting);
+      },
+      {
+        rootMargin: "-10% 0px -10% 0px",
+        threshold: 0.05,
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1051,7 +1144,22 @@ function Page() {
       <main className="relative bg-stage text-bone selection:bg-ember selection:text-ink">
         <Spotlight />
         <Nav heroDone={heroDone} />
-        <Hero onDone={() => setHeroDone(true)} />
+        
+        {/* Cinematic Anamorphic Scope Bars (Point 1) */}
+        <div
+          className="pointer-events-none fixed inset-x-0 top-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"
+          style={{
+            transform: isInReel ? "translateY(0)" : "translateY(-100%)",
+          }}
+        />
+        <div
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"
+          style={{
+            transform: isInReel ? "translateY(0)" : "translateY(100%)",
+          }}
+        />
+
+        <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
         <Biography />
         <FilmReel />
         <Credits />

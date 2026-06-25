@@ -87,6 +87,15 @@
   @media (pointer: coarse) {
     html, body { cursor: auto; }
   }
+
+  a, button, [data-hover] {
+    transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+
+  a:hover, button:hover, [data-hover]:hover {
+    background-color: color-mix(in oklch, var(--color-ember) 12%, transparent);
+    box-shadow: 0 0 20px color-mix(in oklch, var(--color-ember) 12%, transparent);
+  }
 }
 
 @utility font-display {
