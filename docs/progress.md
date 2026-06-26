@@ -43,3 +43,13 @@ This document tracks completed features, animation systems, layout updates, and 
 * Shifted the logo/name *Therese Järvheden* 8px further to the left on mobile screen sizes (`pl-4` vs `px-6`) to prevent overlap and ensure optimal spacing relative to the language switcher on large mobile devices.
 * Added scroll-reactive behavior to the language switcher. As the user scrolls down, the switcher smoothly animates out of view (reducing opacity, scale, and width to 0), and morphs back to full visibility when scrolled back to the top.
 
+### 8. Modularization & Codebase Cleanliness (400 Line Rule Compliance)
+* Fully decomposed the previously monolithic `src/routes/index.tsx` (~1760 lines) into isolated, single-responsibility modules:
+  * Localization logic extracted to `src/hooks/use-t.tsx`.
+  * Navigation bar logic extracted to `src/components/Nav.tsx`.
+  * Spotlight & image elements moved to `src/components/ui/SpotlightImage.tsx`, `src/components/ui/Spotlight.tsx`, `src/components/ui/CommentaryPlayer.tsx`, and `src/components/ui/Field.tsx`.
+  * Core sections extracted to `src/components/sections/` (`Hero.tsx`, `Biography.tsx`, `Portfolio.tsx`, `Credits.tsx`, `Voice.tsx`, `Contact.tsx`, and `Footer.tsx`).
+* Main page routing file reduced to **320 lines of clean, readable code**, complying fully with the repository-wide 400-line constraint.
+* Type compile safety confirmed green across the entire modular layout.
+
+
