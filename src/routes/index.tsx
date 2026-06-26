@@ -527,26 +527,33 @@ function Nav({ heroDone }: { heroDone: boolean }) {
         ) : (
           <div className="w-[150px]" />
         )}
-        <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
-          {links.map((l) => (
-            <button key={l.id} onClick={() => go(l.id)} className="hover:text-bone transition-colors px-3 py-1.5 rounded-sm">
-              {l.label}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: heroDone ? 1 : 0 }}
+          transition={{ duration: 0.5 }}
+          className={`flex items-center ${!heroDone ? "pointer-events-none" : ""}`}
+        >
+          <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
+            {links.map((l) => (
+              <button key={l.id} onClick={() => go(l.id)} className="hover:text-bone transition-colors px-3 py-1.5 rounded-sm">
+                {l.label}
+              </button>
+            ))}
+            <LangSwitch className="ml-2" />
+          </nav>
+          <div className="flex items-center gap-3 md:hidden">
+            <LangSwitch />
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="flex flex-col gap-1.5 text-bone"
+              aria-label="Menu"
+            >
+              <span className={`block h-px w-7 bg-bone transition-transform ${open ? "translate-y-[6px] rotate-45" : ""}`} />
+              <span className={`block h-px w-7 bg-bone transition-opacity ${open ? "opacity-0" : ""}`} />
+              <span className={`block h-px w-7 bg-bone transition-transform ${open ? "-translate-y-[6px] -rotate-45" : ""}`} />
             </button>
-          ))}
-          <LangSwitch className="ml-2" />
-        </nav>
-        <div className="flex items-center gap-3 md:hidden">
-          <LangSwitch />
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="flex flex-col gap-1.5 text-bone"
-            aria-label="Menu"
-          >
-            <span className={`block h-px w-7 bg-bone transition-transform ${open ? "translate-y-[6px] rotate-45" : ""}`} />
-            <span className={`block h-px w-7 bg-bone transition-opacity ${open ? "opacity-0" : ""}`} />
-            <span className={`block h-px w-7 bg-bone transition-transform ${open ? "-translate-y-[6px] -rotate-45" : ""}`} />
-          </button>
-        </div>
+          </div>
+        </motion.div>
       </div>
       <AnimatePresence>
         {open && (
