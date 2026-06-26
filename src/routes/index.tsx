@@ -13,10 +13,6 @@ import { Voice } from "../components/sections/Voice";
 import { Contact } from "../components/sections/Contact";
 import { Footer } from "../components/sections/Footer";
 
-
-
-
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -51,7 +47,6 @@ export const IMG = {
     "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000046-2484224845/Thess1078_lowres.jpg?ph=a6c2528650",
   ],
 };
-
 
 
 export type Credit = {
@@ -198,7 +193,6 @@ export const MOOD_DATA = {
 
 export type Mood = keyof typeof MOOD_DATA;
 export type FilterKey = "Alla" | "Film" | "TV" | "Theater" | "Voice";
-
 
 /* ---------- Page ---------- */
 function Page() {
