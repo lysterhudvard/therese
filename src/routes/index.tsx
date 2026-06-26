@@ -829,7 +829,7 @@ function Biography() {
             </div>
             <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
               <span>Foto: Robert Eldrim</span>
-              <span>Smink: Sara Zetterström - Mua</span>
+              <span>Smink: Sara Zetterström</span>
             </div>
           </div>
         </div>
@@ -1522,7 +1522,7 @@ function Footer() {
     { label: "INSTAGRAM", value: "@theresejarvheden", href: "https://www.instagram.com/theresejarvheden/" },
     { label: "FACEBOOK", value: "Therese Järvheden", href: "https://www.facebook.com/therese.jarvhedenfdpersson" },
     { label: t.footer.photo, value: "Robert Eldrim", href: "https://www.instagram.com/roberteldrim/" },
-    { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström - Mua" },
+    { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström" },
     { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" }
   ];
 

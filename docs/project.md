@@ -65,3 +65,9 @@ Any updates to the current TanStack Start implementation must keep the final Ast
 3. **Optimized LCP (Above-the-Fold Assets):** Hero image assets must load eagerly and receive high-priority fetching. Avoid using client-side React hydration to render critical text above the fold.
 4. **Real HTML for CV Data:** Maintain tabular and list layouts for credits instead of embedding images of CV PDFs. Crawler and AI engines must be able to parse text details directly.
 5. **Stable Asset URLs & SEO Alt Tags:** Images must utilize clean, keyword-rich filenames and descriptive alt text (e.g., `therese-jarvheden-headshot-2025.jpg` rather than CDN-hashed URLs).
+
+---
+
+## 5. Technical Progress & Issue Resolutions
+* For detailed documentation on completed features, act divisions, and navigation lifecycle, see [progress.md](progress.md).
+* For detailed documentation on layout shifts, touchscreen fixes, scroll lock resolution, and structural swaps, see [fixes.md](fixes.md).
