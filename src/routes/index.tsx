@@ -200,24 +200,6 @@ export type Mood = keyof typeof MOOD_DATA;
 export type FilterKey = "Alla" | "Film" | "TV" | "Theater" | "Voice";
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* ---------- Page ---------- */
 function Page() {
   const [heroDone, setHeroDone] = useState(false);
