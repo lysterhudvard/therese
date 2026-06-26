@@ -44,29 +44,66 @@ function SpotlightImage({
     const mask = maskRef.current;
     if (!container || !mask) return;
 
-    // Set initial mask state out of view
-    mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
-    mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+    let isMouseActive = false;
+
+    // Set initial mask state centered
+    const initRect = container.getBoundingClientRect();
+    const initX = initRect.width ? initRect.width / 2 : 150;
+    const initY = initRect.height ? initRect.height / 2 : 200;
+    mask.style.webkitMaskImage = `radial-gradient(circle 250px at ${initX}px ${initY}px, black 10%, transparent 80%)`;
+    mask.style.maskImage = `radial-gradient(circle 250px at ${initX}px ${initY}px, black 10%, transparent 80%)`;
+
+    const updateScrollSpotlight = () => {
+      if (isMouseActive) return;
+      const rect = container.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      if (rect.top < viewportHeight && rect.bottom > 0) {
+        // Calculate scroll progress through the viewport (0 to 1)
+        const totalDist = viewportHeight + rect.height;
+        const currentDist = viewportHeight - rect.top;
+        const progress = Math.max(0, Math.min(1, currentDist / totalDist));
+        
+        // Glide x from -50px to width + 50px
+        const x = -50 + progress * (rect.width + 100);
+        // Smooth sine wave for y to glide up and down like a searchlight
+        const y = rect.height * (0.35 + Math.sin(progress * Math.PI * 1.5) * 0.22);
+        
+        // Smaller circle on mobile
+        const radius = window.innerWidth < 768 ? 160 : 250;
+        
+        mask.style.webkitMaskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
+        mask.style.maskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
+      }
+    };
 
     const onMouseMove = (e: MouseEvent) => {
+      isMouseActive = true;
       const rect = container.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      mask.style.webkitMaskImage = `radial-gradient(circle 300px at ${x}px ${y}px, black 10%, transparent 80%)`;
-      mask.style.maskImage = `radial-gradient(circle 300px at ${x}px ${y}px, black 10%, transparent 80%)`;
+      const radius = window.innerWidth < 768 ? 160 : 300;
+      mask.style.webkitMaskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
+      mask.style.maskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
     };
 
     const onMouseLeave = () => {
-      mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
-      mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      isMouseActive = false;
+      updateScrollSpotlight();
     };
 
     container.addEventListener("mousemove", onMouseMove);
     container.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("scroll", updateScrollSpotlight);
+    window.addEventListener("resize", updateScrollSpotlight);
+
+    // Initial run
+    setTimeout(updateScrollSpotlight, 100);
 
     return () => {
       container.removeEventListener("mousemove", onMouseMove);
       container.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("scroll", updateScrollSpotlight);
+      window.removeEventListener("resize", updateScrollSpotlight);
     };
   }, []);
 
@@ -175,9 +212,11 @@ const I18N = {
       again: "Skicka ytterligare ett meddelande",
     },
     footer: {
+      act: "Akt XII — Ridåfall",
+      title: "Föreställningens Slutscen",
       role: "Skådespelerska · Röst",
       agent: "Agent", social: "Sociala medier", photo: "Foto",
-      end: "Ridå · Föreställningens slut",
+      end: "Slut på föreställningen",
     },
     lang: { label: "Språk", sv: "Svenska", en: "English" },
   },
@@ -227,6 +266,8 @@ const I18N = {
       again: "Send another message",
     },
     footer: {
+      act: "Act XII — Curtain Fall",
+      title: "End of Performance",
       role: "Actress · Voice",
       agent: "Agent", social: "Social", photo: "Photo",
       end: "Curtain · End of Performance",
@@ -678,34 +719,6 @@ function Biography() {
   return (
     <section id="bio" className="relative px-6 py-28 md:px-12 md:py-40">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 md:grid-cols-12">
-        <div className="md:col-span-5">
-          <div className="sticky top-28">
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={mood}
-                  initial={{ opacity: 0, scale: 1.06 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-0 h-full w-full"
-                >
-                  <SpotlightImage
-                    src={data.image}
-                    alt={`Therese Järvheden — ${mood}`}
-                    className="h-full w-full"
-                  />
-                </motion.div>
-              </AnimatePresence>
-              <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
-            </div>
-            <div className="mt-3 flex justify-between text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
-              <span>Foto: Robert Eldrim</span>
-              <span>Smink: Sara Zetterström - Mua</span>
-            </div>
-          </div>
-        </div>
-
         <div className="md:col-span-7">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.bio.act}</div>
           <h2
@@ -779,6 +792,34 @@ function Biography() {
             ))}
           </dl>
         </div>
+
+        <div className="md:col-span-5 md:order-first">
+          <div className="sticky top-28">
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={mood}
+                  initial={{ opacity: 0, scale: 1.06 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 h-full w-full"
+                >
+                  <SpotlightImage
+                    src={data.image}
+                    alt={`Therese Järvheden — ${mood}`}
+                    className="h-full w-full"
+                  />
+                </motion.div>
+              </AnimatePresence>
+              <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
+            </div>
+            <div className="mt-3 flex justify-between text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
+              <span>Foto: Robert Eldrim</span>
+              <span>Smink: Sara Zetterström - Mua</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -805,8 +846,8 @@ function Portfolio() {
   const x = useTransform(scrollYProgress, [0, 1], [0, -maxX]);
 
   return (
-    <section id="portfolio" ref={ref} className="relative" style={{ height: "320vh" }}>
-      <div className="sticky top-0 h-[100svh] w-full overflow-hidden bg-ink">
+    <section id="portfolio" ref={ref} className="relative h-auto md:h-[320vh]">
+      <div className="relative md:sticky top-0 h-auto md:h-[100svh] w-full overflow-hidden bg-ink">
         <div className="absolute inset-x-0 top-0 z-20 flex h-6 items-center gap-3 overflow-hidden px-2">
           {Array.from({ length: 60 }).map((_, i) => (
             <div key={i} className="h-3 w-7 shrink-0 rounded-sm bg-stage" />
@@ -845,17 +886,18 @@ function Portfolio() {
           ))}
         </motion.div>
 
-        <div className="md:hidden absolute inset-0 flex flex-col">
-          <div className="px-6 pt-16 pb-4">
+        {/* Mobile / Tablet layout - natural height, does not lock page scrolling */}
+        <div className="md:hidden relative z-10 flex flex-col py-16">
+          <div className="px-6 pb-6">
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.portfolio.act}</div>
             <h3 className="mt-2 font-display text-4xl text-bone leading-none">{t.portfolio.title[0]} {t.portfolio.title[1]}</h3>
           </div>
-          <div className="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar">
-            <div className="flex items-center gap-4 px-6 h-full">
+          <div className="w-full overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-4 px-6">
               {IMG.portfolio.map((src, i) => (
-                <div key={src} className="relative shrink-0 h-[70%]" style={{ aspectRatio: "3/4" }}>
-                  <img src={src} alt={`Portfolio ${i + 1}`} loading="lazy" className="h-full w-full object-cover" />
-                  <div className="absolute left-2 top-2 font-mono text-[10px] text-bone/70">
+                <div key={src} className="relative shrink-0 w-[240px] aspect-[3/4]">
+                  <img src={src} alt={`Portfolio ${i + 1}`} loading="lazy" className="h-full w-full object-cover rounded shadow-lg" />
+                  <div className="absolute left-2 top-2 font-mono text-[10px] text-bone/70 bg-black/40 px-1.5 py-0.5 rounded">
                     {String(i + 1).padStart(2, "0")}
                   </div>
                 </div>
@@ -1086,10 +1128,6 @@ function Voice() {
   return (
     <section id="voice" className="relative overflow-hidden bg-ink">
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="relative h-[60svh] md:h-[90svh] overflow-hidden">
-          <SpotlightImage src={IMG.voice} alt="Therese — röst" className="h-full w-full" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r pointer-events-none" />
-        </div>
         <div className="flex flex-col justify-center px-6 py-20 md:px-16 md:py-32">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.voice.act}</div>
           <h2 className="mt-4 font-display text-5xl md:text-6xl text-bone leading-[0.95]">
@@ -1109,6 +1147,10 @@ function Voice() {
             </button>
             <div className="text-[10px] uppercase tracking-[0.3em] text-bone/40">{t.voice.demo}</div>
           </div>
+        </div>
+        <div className="relative h-[60svh] md:h-[90svh] overflow-hidden md:order-first">
+          <SpotlightImage src={IMG.voice} alt="Therese — röst" className="h-full w-full" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r pointer-events-none" />
         </div>
       </div>
     </section>
@@ -1488,10 +1530,13 @@ function Footer() {
 
       {/* Title / Curtain Call */}
       <div className="text-center mb-10 z-10">
-        <div className="font-display text-3xl md:text-4xl tracking-[0.32em] uppercase text-bone">
-          <span className="italic font-light">Therese</span> Järvheden
+        <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-2">{t.footer.act}</div>
+        <div className="font-display text-3xl md:text-5xl tracking-[0.25em] uppercase text-bone leading-[1.1]">
+          {t.footer.title}
         </div>
-        <div className="mt-2 text-[10px] uppercase tracking-[0.40em] text-ember">{t.footer.role}</div>
+        <div className="mt-4 text-[10px] uppercase tracking-[0.35em] text-bone/50">
+          <span className="italic font-light">Therese</span> Järvheden — {t.footer.role}
+        </div>
       </div>
 
       <div className="w-full max-w-lg z-10 flex flex-col items-center relative min-h-[380px]">
