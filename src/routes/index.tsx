@@ -44,17 +44,26 @@ function SpotlightImage({
     const mask = maskRef.current;
     if (!container || !mask) return;
 
-    let isMouseActive = false;
+    // Detect if the device has a fine pointer (mouse / desktop)
+    const isFinePointer = window.matchMedia("(pointer: fine)").matches;
 
-    // Set initial mask state centered
-    const initRect = container.getBoundingClientRect();
-    const initX = initRect.width ? initRect.width / 2 : 150;
-    const initY = initRect.height ? initRect.height / 2 : 200;
-    mask.style.webkitMaskImage = `radial-gradient(circle 250px at ${initX}px ${initY}px, black 10%, transparent 80%)`;
-    mask.style.maskImage = `radial-gradient(circle 250px at ${initX}px ${initY}px, black 10%, transparent 80%)`;
+    // Set initial mask state
+    const rect = container.getBoundingClientRect();
+    if (isFinePointer) {
+      // Desktop: initially hidden offscreen
+      mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+    } else {
+      // Mobile/Tablet: initially centered
+      const initX = rect.width ? rect.width / 2 : 150;
+      const initY = rect.height ? rect.height / 2 : 200;
+      mask.style.webkitMaskImage = `radial-gradient(circle 160px at ${initX}px ${initY}px, black 10%, transparent 80%)`;
+      mask.style.maskImage = `radial-gradient(circle 160px at ${initX}px ${initY}px, black 10%, transparent 80%)`;
+    }
 
     const updateScrollSpotlight = () => {
-      if (isMouseActive) return;
+      if (isFinePointer) return; // Never auto-glide on desktop
+      
       const rect = container.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       if (rect.top < viewportHeight && rect.bottom > 0) {
@@ -68,8 +77,7 @@ function SpotlightImage({
         // Smooth sine wave for y to glide up and down like a searchlight
         const y = rect.height * (0.35 + Math.sin(progress * Math.PI * 1.5) * 0.22);
         
-        // Smaller circle on mobile
-        const radius = window.innerWidth < 768 ? 160 : 250;
+        const radius = 160;
         
         mask.style.webkitMaskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
         mask.style.maskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
@@ -77,33 +85,38 @@ function SpotlightImage({
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      isMouseActive = true;
+      if (!isFinePointer) return;
       const rect = container.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      const radius = window.innerWidth < 768 ? 160 : 300;
-      mask.style.webkitMaskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
-      mask.style.maskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
+      mask.style.webkitMaskImage = `radial-gradient(circle 300px at ${x}px ${y}px, black 10%, transparent 80%)`;
+      mask.style.maskImage = `radial-gradient(circle 300px at ${x}px ${y}px, black 10%, transparent 80%)`;
     };
 
     const onMouseLeave = () => {
-      isMouseActive = false;
-      updateScrollSpotlight();
+      if (!isFinePointer) return;
+      mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
     };
 
-    container.addEventListener("mousemove", onMouseMove);
-    container.addEventListener("mouseleave", onMouseLeave);
-    window.addEventListener("scroll", updateScrollSpotlight);
-    window.addEventListener("resize", updateScrollSpotlight);
-
-    // Initial run
-    setTimeout(updateScrollSpotlight, 100);
+    if (isFinePointer) {
+      container.addEventListener("mousemove", onMouseMove);
+      container.addEventListener("mouseleave", onMouseLeave);
+    } else {
+      window.addEventListener("scroll", updateScrollSpotlight);
+      window.addEventListener("resize", updateScrollSpotlight);
+      // Initial run
+      setTimeout(updateScrollSpotlight, 100);
+    }
 
     return () => {
-      container.removeEventListener("mousemove", onMouseMove);
-      container.removeEventListener("mouseleave", onMouseLeave);
-      window.removeEventListener("scroll", updateScrollSpotlight);
-      window.removeEventListener("resize", updateScrollSpotlight);
+      if (isFinePointer) {
+        container.removeEventListener("mousemove", onMouseMove);
+        container.removeEventListener("mouseleave", onMouseLeave);
+      } else {
+        window.removeEventListener("scroll", updateScrollSpotlight);
+        window.removeEventListener("resize", updateScrollSpotlight);
+      }
     };
   }, []);
 
