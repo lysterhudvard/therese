@@ -7,6 +7,7 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  useInView,
 } from "framer-motion";
 import { Mail, ArrowUpRight, Play, Send, Check, Pause, Volume2, VolumeX, X } from "lucide-react";
 
@@ -259,6 +260,13 @@ type Credit = {
     svText: string;
     enText: string;
   };
+  script?: {
+    scene: string;
+    dialogue: {
+      char: string;
+      line: { sv: string; en: string };
+    };
+  };
 };
 
 const CREDITS: Credit[] = [
@@ -276,6 +284,16 @@ const CREDITS: Credit[] = [
       duration: "0:15",
       svText: "Det var en emotionellt utmanande roll, men oerhört viktig att berätta för att uppmärksamma kvinnofrid och våld i nära relationer.",
       enText: "It was an emotionally challenging role, but incredibly important to tell to draw attention to domestic abuse and relationship violence."
+    },
+    script: {
+      scene: "SCENE 4 - INT. APARTMENT - NIGHT",
+      dialogue: {
+        char: "THERESE",
+        line: {
+          sv: "Vi måste prata om det här. Vi kan inte låtsas som ingenting längre.",
+          en: "We need to talk about this. We can't pretend it's nothing anymore."
+        }
+      }
     }
   },
   {
@@ -291,10 +309,56 @@ const CREDITS: Credit[] = [
       duration: "0:12",
       svText: "Att spela Nora i Beck var fantastiskt. Hon bär på en tyst intensitet som gör varje blick laddad.",
       enText: "Playing Nora in Beck was fantastic. She carries a quiet intensity that makes every look charged."
+    },
+    script: {
+      scene: "SCENE 17 - INT. CLASSROOM - DAY",
+      dialogue: {
+        char: "NORA",
+        line: {
+          sv: "Alla slår upp sidan fyrtiotvå. Vi har inte mycket tid kvar.",
+          en: "Everyone open to page forty-two. We don't have much time left."
+        }
+      }
     }
   },
-  { year: "2021", title: "Karatefylla", role: { sv: "Återkommande roll", en: "Recurring role" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.feature },
-  { year: "2020", title: "Jävla klåpare", role: { sv: "Återkommande roll", en: "Recurring role" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[3] },
+  {
+    year: "2021",
+    title: "Karatefylla",
+    role: { sv: "Återkommande roll", en: "Recurring role" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.feature,
+    script: {
+      scene: "SCENE 8 - INT. BAR - NIGHT",
+      dialogue: {
+        char: "TJEJEN",
+        line: {
+          sv: "Ska du ha en stor stark eller ska du bara stå där och titta?",
+          en: "Are you having a big beer or are you just going to stand there and watch?"
+        }
+      }
+    }
+  },
+  {
+    year: "2020",
+    title: "Jävla klåpare",
+    role: { sv: "Återkommande roll", en: "Recurring role" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.portfolio[3],
+    script: {
+      scene: "SCENE 12 - INT. OFFICE - DAY",
+      dialogue: {
+        char: "KUNDEN",
+        line: {
+          sv: "Det här är helt oacceptabelt. Vem är ansvarig här?",
+          en: "This is completely unacceptable. Who is in charge here?"
+        }
+      }
+    }
+  },
   { year: "2019", title: "Anna Blomberg show", role: { sv: "Sketch ensemble", en: "Sketch ensemble" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[5] },
   { year: "2018", title: "Jobbtjuven", role: { sv: "Återkommande roll", en: "Recurring role" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[7] },
   { year: "—", title: "Familjen Valentin", role: { sv: "Mamman (röst, dubb)", en: "The mother (voice, dub)" }, type: "Voice", category: { sv: "Animation", en: "Animation" }, network: "Barnkanalen", img: IMG.voice },
@@ -835,6 +899,9 @@ function Credits({
 }) {
   const { lang, t } = useT();
   const [filter, setFilter] = useState<FilterKey>("Alla");
+  const [hoveredCredit, setHoveredCredit] = useState<Credit | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
   const rows = useMemo(
     () => (filter === "Alla" ? CREDITS : CREDITS.filter((c) => c.type === filter)),
     [filter],
@@ -888,6 +955,9 @@ function Credits({
                   target={c.url ? "_blank" : undefined}
                   rel={c.url ? "noreferrer" : undefined}
                   onClick={(e) => { if (!c.url) e.preventDefault(); }}
+                  onMouseEnter={() => setHoveredCredit(c)}
+                  onMouseLeave={() => setHoveredCredit(null)}
+                  onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
                   data-hover
                   className="grid grid-cols-12 items-baseline gap-4 py-7 transition-colors hover:bg-bone/[0.06] duration-300"
                 >
@@ -954,6 +1024,51 @@ function Credits({
           </AnimatePresence>
         </ul>
       </div>
+
+      <AnimatePresence>
+        {hoveredCredit && hoveredCredit.img && hoveredCredit.script && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="pointer-events-none fixed z-[100] w-64 overflow-hidden rounded-lg border border-bone/20 bg-ink shadow-[0_20px_50px_rgba(0,0,0,0.8)] hidden md:block"
+            style={{
+              left: mousePos.x + 20,
+              top: mousePos.y + 20,
+            }}
+          >
+            <div className="relative aspect-[3/4] w-full bg-stage">
+              <img
+                src={hoveredCredit.img}
+                alt={hoveredCredit.title}
+                className="h-full w-full object-cover opacity-35 filter grayscale"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/80 to-transparent pointer-events-none" />
+              
+              <div className="absolute inset-0 p-4 flex flex-col justify-between font-mono text-[10px] text-bone/90 select-none">
+                <div>
+                  <div className="border-b border-bone/10 pb-1 mb-2 text-ember text-[8px] uppercase tracking-wider">
+                    {lang === "sv" ? "Manussida" : "Script Excerpt"}
+                  </div>
+                  <div className="text-[9px] font-bold text-bone/50 mb-3 truncate">
+                    {hoveredCredit.script.scene}
+                  </div>
+                  <div className="text-[9px] uppercase tracking-widest text-ember font-bold mb-1.5">
+                    {hoveredCredit.script.dialogue.char}
+                  </div>
+                  <p className="leading-relaxed bg-ember/15 border-l-2 border-ember pl-2 py-1 text-[10px] text-bone italic">
+                    "{hoveredCredit.script.dialogue.line[lang]}"
+                  </p>
+                </div>
+                <div className="text-[8.5px] text-bone/35 text-right uppercase tracking-widest">
+                  Process · {hoveredCredit.title}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
@@ -1309,38 +1424,179 @@ function Field({
 
 /* ---------- Footer ---------- */
 function Footer() {
-  const { t } = useT();
+  const { lang, t } = useT();
+  const [isHovered, setIsHovered] = useState(false);
+  const [animatedIn, setAnimatedIn] = useState(false);
+  const [startScroll, setStartScroll] = useState(false);
+
+  const footerRef = useRef<HTMLElement>(null);
+  const isInView = useInView(footerRef, { once: false, amount: 0.15 });
+
+  useEffect(() => {
+    if (isInView) {
+      // Step 1: Wait 1.2s showing the big intro screen
+      const morphTimer = setTimeout(() => {
+        setAnimatedIn(true);
+      }, 1200);
+
+      // Step 2: Once it morphs, wait for transition to finish, then start scroll
+      const scrollTimer = setTimeout(() => {
+        setStartScroll(true);
+      }, 2000);
+
+      return () => {
+        clearTimeout(morphTimer);
+        clearTimeout(scrollTimer);
+      };
+    } else {
+      setAnimatedIn(false);
+      setStartScroll(false);
+    }
+  }, [isInView]);
+
+  const creditsList = [
+    { label: t.footer.agent, value: "Schultzberg Agency", href: "mailto:jonas@schultzbergagency.com" },
+    { label: lang === "sv" ? "KONTAKT" : "CONTACT", value: "theresejarvheden@gmail.com", href: "mailto:theresejarvheden@gmail.com" },
+    { label: "INSTAGRAM", value: "@theresejarvheden", href: "https://www.instagram.com/theresejarvheden/" },
+    { label: "FACEBOOK", value: "Therese Järvheden", href: "https://www.facebook.com/therese.jarvhedenfdpersson" },
+    { label: t.footer.photo, value: "Robert Eldrim", href: "https://www.instagram.com/roberteldrim/" },
+    { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström - Mua" },
+    { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" }
+  ];
+
   return (
-    <footer className="relative border-t border-bone/10 px-6 py-14 md:px-12">
-      <div className="mx-auto max-w-7xl flex flex-col md:flex-row md:items-end justify-between gap-10">
-        <div>
-          <div className="font-display text-2xl md:text-3xl tracking-[0.32em] uppercase text-bone flex items-center gap-2">
-            <span className="italic font-light">Therese</span>
-            <span>Järvheden</span>
-          </div>
-          <div className="mt-3 text-[10px] uppercase tracking-[0.4em] text-bone/40">{t.footer.role}</div>
+    <footer 
+      ref={footerRef}
+      className="relative border-t border-bone/10 bg-black/40 px-6 py-20 md:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[580px]"
+    >
+      {/* Film noise / scanlines effect */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+        style={{
+          backgroundImage: "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+          backgroundSize: "100% 4px",
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-ink via-transparent to-ink pointer-events-none" />
+
+      {/* Title / Curtain Call */}
+      <div className="text-center mb-10 z-10">
+        <div className="font-display text-3xl md:text-4xl tracking-[0.32em] uppercase text-bone">
+          <span className="italic font-light">Therese</span> Järvheden
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-xs text-bone/50">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.35em] text-bone/30 mb-2">{t.footer.agent}</div>
-            <a href="mailto:jonas@schultzbergagency.com" className="hover:text-ember transition-colors">Schultzberg Agency</a>
+        <div className="mt-2 text-[10px] uppercase tracking-[0.40em] text-ember">{t.footer.role}</div>
+      </div>
+
+      <div className="w-full max-w-lg z-10 flex flex-col items-center relative min-h-[380px]">
+        {/* Intro/Morphing Screen & Layout Transition */}
+        {!animatedIn ? (
+          <div className="w-full flex justify-center py-8 z-30">
+            <motion.div 
+              layoutId="post-credits-reel"
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              className="relative w-64 h-40 md:w-80 md:h-52 bg-stage/95 border border-bone/20 rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+            >
+              <img 
+                src={IMG.portfolio[0]} 
+                alt="Post-Credits Scene" 
+                className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
+              <div 
+                className="absolute inset-0 opacity-[0.08] pointer-events-none" 
+                style={{
+                  backgroundImage: "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+                  backgroundSize: "100% 4px",
+                }}
+              />
+            </motion.div>
           </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.35em] text-bone/30 mb-2">{t.footer.social}</div>
-            <div className="flex flex-col gap-1">
-              <a href="https://www.instagram.com/theresejarvheden/" target="_blank" rel="noreferrer" className="hover:text-ember transition-colors">Instagram</a>
-              <a href="https://www.facebook.com/therese.jarvhedenfdpersson" target="_blank" rel="noreferrer" className="hover:text-ember transition-colors">Facebook</a>
-            </div>
+        ) : (
+          /* Mini screen mode - positioned directly above the scrolling box on the right */
+          <div className="w-full flex justify-end mb-3 z-30 pr-1">
+            <motion.div 
+              layoutId="post-credits-reel"
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              className="relative w-28 h-20 bg-stage/90 border border-bone/15 rounded overflow-hidden shadow-2xl"
+            >
+              <img 
+                src={IMG.portfolio[0]} 
+                alt="Post-Credits Scene" 
+                className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
+              <div 
+                className="absolute inset-0 opacity-[0.08] pointer-events-none" 
+                style={{
+                  backgroundImage: "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+                  backgroundSize: "100% 4px",
+                }}
+              />
+            </motion.div>
           </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.35em] text-bone/30 mb-2">{t.footer.photo}</div>
-            <span className="text-bone/50">Robert Eldrim</span>
-          </div>
+        )}
+
+        {/* Scrolling Credits container */}
+        <div className="w-full h-[240px] relative overflow-hidden z-10 border-y border-bone/5">
+          <AnimatePresence>
+            {startScroll && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="absolute inset-0 py-4"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <motion.div
+                  animate={{
+                    y: isHovered ? "0%" : ["40%", "-100%"]
+                  }}
+                  transition={{
+                    y: {
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      duration: 26,
+                      ease: "linear"
+                    }
+                  }}
+                  className="flex flex-col items-center gap-8 text-center font-mono select-none"
+                >
+                  {creditsList.map((item, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-bone/45 mb-1">{item.label}</span>
+                      {item.href ? (
+                        <a 
+                          href={item.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          data-hover
+                          className="text-sm md:text-base uppercase tracking-widest text-bone hover:text-ember transition-colors cursor-pointer pointer-events-auto"
+                        >
+                          {item.value}
+                        </a>
+                      ) : (
+                        <span className="text-sm md:text-base uppercase tracking-widest text-bone/70">
+                          {item.value}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/35 mt-6">
+                    {t.footer.end}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl mt-12 flex flex-col md:flex-row justify-between gap-4 text-[10px] uppercase tracking-[0.35em] text-bone/30">
+
+      {/* Bottom metadata row */}
+      <div className="relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/30 z-10">
         <div>© {new Date().getFullYear()} Therese Järvheden</div>
-        <div>{t.footer.end}</div>
+        <div>ALL CREDITS DIRECTED BY THERESE JÄRVHEDEN</div>
       </div>
     </footer>
   );
