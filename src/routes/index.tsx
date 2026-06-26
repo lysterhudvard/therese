@@ -226,10 +226,10 @@ const I18N = {
     },
     footer: {
       act: "Akt XII — Ridåfall",
-      title: "Slut på föreställningen",
+      title: "Slut på showen",
       role: "Skådespelerska · Röst",
       agent: "Agent", social: "Sociala medier", photo: "Foto",
-      end: "Slut på föreställningen",
+      end: "SLUT",
     },
     lang: { label: "Språk", sv: "Svenska", en: "English" },
   },
@@ -280,10 +280,10 @@ const I18N = {
     },
     footer: {
       act: "Act XII — Curtain Fall",
-      title: "End of Performance",
+      title: "End of Show",
       role: "Actress · Voice",
       agent: "Agent", social: "Social", photo: "Photo",
-      end: "Curtain · End of Performance",
+      end: "THE END",
     },
     lang: { label: "Language", sv: "Svenska", en: "English" },
   },
@@ -827,7 +827,7 @@ function Biography() {
               </AnimatePresence>
               <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
             </div>
-            <div className="mt-3 flex justify-between text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
+            <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
               <span>Foto: Robert Eldrim</span>
               <span>Smink: Sara Zetterström - Mua</span>
             </div>
@@ -1548,7 +1548,15 @@ function Footer() {
           {t.footer.title}
         </div>
         <div className="mt-4 text-[10px] uppercase tracking-[0.35em] text-bone/50">
-          <span className="italic font-light">Therese</span> Järvheden — {t.footer.role}
+          <span className="italic font-light">Therese</span> Järvheden — {lang === "sv" ? (
+            <>
+              Skådespelerska<span className="hidden md:inline"> · Röst</span>
+            </>
+          ) : (
+            <>
+              Actress<span className="hidden md:inline"> · Voice</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -1648,7 +1656,7 @@ function Footer() {
                     </div>
                   ))}
                   
-                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/35 mt-6">
+                  <div className="text-sm md:text-base font-display uppercase tracking-[0.4em] text-bone mt-8 font-semibold">
                     {t.footer.end}
                   </div>
                 </motion.div>
