@@ -37,3 +37,9 @@ This document tracks completed features, animation systems, layout updates, and 
 * Configured a vertical scrolling credits roll in the footer.
 * Implemented a mini "post-credits" video reel card in the bottom-right corner that triggers once the user reaches the footer.
 * Adjusted scroll timing, increased text size, changed the Swedish title to *"Slut på showen"*, and enhanced the final credits loop word to display a bold, white **"SLUT" / "THE END"**.
+
+### 7. Responsive Navigation Header and Auto-Hiding Language Switcher
+* Refactored navigation header and language switcher out of `src/routes/index.tsx` into modular files (`src/components/Nav.tsx` and `src/hooks/use-t.tsx`) to enforce codebase constraints (<400 lines per file).
+* Shifted the logo/name *Therese Järvheden* 8px further to the left on mobile screen sizes (`pl-4` vs `px-6`) to prevent overlap and ensure optimal spacing relative to the language switcher on large mobile devices.
+* Added scroll-reactive behavior to the language switcher. As the user scrolls down, the switcher smoothly animates out of view (reducing opacity, scale, and width to 0), and morphs back to full visibility when scrolled back to the top.
+
