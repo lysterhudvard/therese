@@ -213,7 +213,7 @@ const I18N = {
     },
     footer: {
       act: "Akt XII — Ridåfall",
-      title: "Föreställningens Slutscen",
+      title: "Slut på föreställningen",
       role: "Skådespelerska · Röst",
       agent: "Agent", social: "Sociala medier", photo: "Foto",
       end: "Slut på föreställningen",
