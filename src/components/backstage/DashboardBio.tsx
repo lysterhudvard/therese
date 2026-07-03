@@ -46,9 +46,9 @@ export function DashboardBio() {
   const [languagesEn, setLanguagesEn] = useState("Swedish · English");
 
   // Biography Section Images
-  const [dramaticImage, setDramaticImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650");
-  const [comedicImage, setComedicImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000015-689df689e2/Thess0903_lowres.jpg?ph=a6c2528650");
-  const [classicalImage, setClassicalImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000032-c5f44c5f47/Thess0972_bw_highres.jpg?ph=a6c2528650");
+  const [dramaticImage, setDramaticImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650");
+  const [comedicImage, setComedicImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650");
+  const [classicalImage, setClassicalImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650");
 
   // FAQs List for AEO Schema
   const [faqs, setFaqs] = useState<FAQItem[]>([
@@ -137,10 +137,10 @@ export function DashboardBio() {
         if (data.languages_sv) setLanguagesSv(data.languages_sv);
         if (data.languages_en) setLanguagesEn(data.languages_en);
         
-        if (data.faqs && Array.isArray(data.faqs)) {
+        if (data.faqs && Array.isArray(data.faqs) && data.faqs.length > 0) {
           setFaqs(data.faqs as FAQItem[]);
         }
-        if (data.review_quotes && Array.isArray(data.review_quotes)) {
+        if (data.review_quotes && Array.isArray(data.review_quotes) && data.review_quotes.length > 0) {
           setReviewQuotes(data.review_quotes as ReviewQuoteItem[]);
         }
         if (data.mood_images) {
@@ -228,8 +228,7 @@ export function DashboardBio() {
       classical: classicalImage,
     };
 
-    const { error } = await supabase.from("biography").upsert({
-      id: "main",
+    const { error } = await supabase.from("biography").update({
       quote_sv: quoteSv,
       quote_en: quoteEn,
       quote_comedic_sv: quoteComedicSv,
@@ -251,20 +250,19 @@ export function DashboardBio() {
       faqs: faqs,
       review_quotes: reviewQuotes,
       mood_images: moodImagesPayload,
-    });
+    }).eq('id', 'main');
 
     if (error) {
-      console.warn("Full biography upsert failed, trying core upsert fallback:", error.message);
+      console.warn("Full biography update failed, trying core update fallback:", error.message);
       
-      const { error: coreError } = await supabase.from("biography").upsert({
-        id: "main",
+      const { error: coreError } = await supabase.from("biography").update({
         quote_sv: quoteSv,
         quote_en: quoteEn,
         dialects_sv: dialectsSv,
         dialects_en: dialectsEn,
         languages_sv: languagesSv,
         languages_en: languagesEn,
-      });
+      }).eq('id', 'main');
 
       setIsSaving(false);
       if (coreError) {

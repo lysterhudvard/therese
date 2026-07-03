@@ -257,6 +257,7 @@ export function DashboardCredits() {
   };
 
   return (
+    <>
     <form onSubmit={handleSave} className="space-y-8 max-w-7xl">
       <div className="border-b border-bone/10 pb-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -510,13 +511,23 @@ export function DashboardCredits() {
                           <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
                             Ljudfil (URL)
                           </label>
-                          <input
-                            type="text"
-                            value={c.commentary_url || ""}
-                            onChange={(e) => updateCredit(c.id, "commentary_url", e.target.value)}
-                            placeholder="https://exempel.se/ljud.mp3"
-                            className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                          />
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={c.commentary_url || ""}
+                              onChange={(e) => updateCredit(c.id, "commentary_url", e.target.value)}
+                              placeholder="https://exempel.se/ljud.mp3"
+                              className="flex-1 bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setActivePickerId(c.id)}
+                              className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
+                              title="Välj från mediebibliotek"
+                            >
+                              <Music size={12} />
+                            </button>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
@@ -669,5 +680,17 @@ export function DashboardCredits() {
         </button>
       </div>
     </form>
+    
+    <MediaPickerModal
+      isOpen={activePickerId !== null}
+      onClose={() => setActivePickerId(null)}
+      onSelect={(url) => {
+        if (activePickerId) {
+          updateCredit(activePickerId, "commentary_url", url);
+        }
+      }}
+      typeFilter="audio"
+    />
+    </>
   );
 }
