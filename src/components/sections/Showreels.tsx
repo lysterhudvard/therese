@@ -60,9 +60,23 @@ export function Showreels() {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [isEnlarged, setIsEnlarged] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Lock scroll bar when enlarged
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (isEnlarged) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isEnlarged]);
 
   // Parallax / Scroll Exit Effects
   const { scrollYProgress } = useScroll({
@@ -142,14 +156,6 @@ export function Showreels() {
     setProgress(100);
   };
 
-  // Quick fullscreen request
-  const requestFullscreen = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.requestFullscreen) {
-      videoRef.current.requestFullscreen();
-    }
-  };
-
   return (
     <section
       id="showreels"
@@ -181,116 +187,193 @@ export function Showreels() {
           </p>
         </div>
 
-        {/* Cinematic Main Theater Player Container (Standard Widescreen 16:9 for perfect fit) */}
-        <div className="relative mx-auto max-w-[960px] aspect-[16/9] bg-stage/20 border border-bone/10 shadow-2xl rounded-sm group overflow-hidden">
-          {activeVideo.youtubeId ? (
-            <iframe
-              src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=0&rel=0&modestbranding=1&controls=1`}
-              className="w-full h-full border-0 absolute inset-0 z-10"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
-            <video
-              ref={videoRef}
-              src={activeVideo.url}
-              poster={activeVideo.poster}
-              onClick={togglePlay}
-              onTimeUpdate={handleTimeUpdate}
-              onLoadedMetadata={handleLoadedMetadata}
-              onEnded={handleEnded}
-              playsInline
-              className="w-full h-full object-cover select-none cursor-pointer"
-            />
-          )}
+        {/* Cinematic Theater Mode Toggle link */}
+        <div className="flex justify-end max-w-[960px] mx-auto mb-3">
+          <button
+            onClick={() => setIsEnlarged(!isEnlarged)}
+            className="flex items-center gap-2 font-mono text-[9px] tracking-widest text-bone/50 hover:text-ember transition-colors uppercase"
+          >
+            <Maximize2 size={10} />
+            {isEnlarged
+              ? lang === "sv"
+                ? "Stäng teaterläge"
+                : "Exit Theater Mode"
+              : lang === "sv"
+                ? "Aktivera teaterläge"
+                : "Enter Theater Mode"}
+          </button>
+        </div>
 
-          {/* Film Grain overlay */}
-          <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02] z-20" />
+        {/* Cinematic Main Theater Player Wrapper */}
+        <div className="relative mx-auto max-w-[960px] aspect-[16/9]">
+          {/* Reservation space layout placeholder when enlarged */}
+          {isEnlarged && <div className="w-full h-full bg-transparent" />}
 
-          {/* Letterbox widescreen shadow lines */}
-          <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-ink/90 to-transparent pointer-events-none z-20" />
-          <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-ink/90 to-transparent pointer-events-none z-20" />
-
-          {/* TECHNICAL MONITOR OVERLAY */}
-          <div className="absolute top-4 left-6 pointer-events-none flex flex-col font-mono text-[9px] tracking-wider text-bone/60 space-y-0.5 z-20">
-            <div>REEL // {activeVideo.genre}</div>
-            <div className="text-[8px] text-bone/40">{activeVideo.specs}</div>
-          </div>
-          <div className="absolute top-4 right-6 pointer-events-none font-mono text-[9px] tracking-widest text-bone/60 flex items-center gap-2 z-20">
-            <span className="w-1.5 h-1.5 rounded-full bg-ember animate-pulse" />
-            LIVE REC
-          </div>
-
-          {/* Render play button and controls ONLY if it's not a YouTube video (as YouTube handles its own controls natively) */}
-          {!activeVideo.youtubeId && (
-            <>
-              {/* Big Center Play Button Overlay */}
-              <AnimatePresence>
-                {!isPlaying && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    onClick={togglePlay}
-                    className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-stage/80 backdrop-blur-sm border border-bone/20 flex items-center justify-center text-ember shadow-lg hover:scale-105 hover:bg-stage transition-transform z-20 group-hover:scale-105"
-                  >
-                    <Play size={24} fill="currentColor" className="ml-1" />
-                  </motion.button>
-                )}
-              </AnimatePresence>
-
-              {/* CUSTOM CINEMA PLAYER CONTROLS */}
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex flex-col gap-3">
-                {/* Timeline Progress Bar */}
-                <div
-                  onClick={handleSeek}
-                  className="relative w-full h-1 bg-bone/20 rounded-full cursor-pointer group/timeline hover:h-1.5 transition-all"
-                >
-                  <div
-                    className="absolute top-0 left-0 h-full bg-ember rounded-full"
-                    style={{ width: `${progress}%` }}
-                  />
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-bone opacity-0 group-hover/timeline:opacity-100 transition-opacity"
-                    style={{ left: `calc(${progress}% - 5px)` }}
-                  />
-                </div>
-
-                {/* Panel Buttons */}
-                <div className="flex items-center justify-between text-bone/80 text-xs">
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={togglePlay}
-                      className="hover:text-ember transition-colors"
-                      aria-label={isPlaying ? "Pause" : "Play"}
-                    >
-                      {isPlaying ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
-                    </button>
-                    <button
-                      onClick={toggleMute}
-                      className="hover:text-ember transition-colors"
-                      aria-label={isMuted ? "Unmute" : "Mute"}
-                    >
-                      {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-                    </button>
-                    <span className="font-mono text-[10px]">
-                      {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={requestFullscreen}
-                      className="hover:text-ember transition-colors"
-                      aria-label="Fullscreen"
-                    >
-                      <Maximize2 size={14} />
-                    </button>
-                  </div>
-                </div>
+          <motion.div
+            layout
+            transition={{ duration: 1.4, ease: [0.25, 1, 0.5, 1] }}
+            className={
+              isEnlarged
+                ? "fixed inset-0 z-[100] bg-black/98 backdrop-blur-md flex flex-col items-center justify-center p-6 md:p-12 cursor-zoom-out"
+                : "absolute inset-0 bg-stage/20 border border-bone/10 shadow-2xl rounded-sm group overflow-hidden"
+            }
+            onClick={() => {
+              if (isEnlarged) setIsEnlarged(false);
+            }}
+          >
+            {/* Enlarged Mode Title Info */}
+            {isEnlarged && (
+              <div className="absolute top-6 left-6 md:left-12 font-mono text-[9px] tracking-[0.4em] text-bone/40 select-none uppercase">
+                {lang === "sv"
+                  ? "Teaterläge // Klicka utanför för att stänga"
+                  : "Theater Mode // Click outside to exit"}
               </div>
-            </>
-          )}
+            )}
+
+            {/* Custom Close Button for mobile ease of use */}
+            {isEnlarged && (
+              <button
+                onClick={() => setIsEnlarged(false)}
+                className="absolute top-4 right-4 z-[110] text-bone/40 hover:text-bone p-2 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Close"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
+
+            {/* Widescreen Screen Canvas */}
+            <div
+              className={
+                isEnlarged
+                  ? "relative w-full max-w-[1200px] aspect-[16/9] border border-bone/15 shadow-[0_0_80px_rgba(0,0,0,0.85)] rounded-sm overflow-hidden cursor-default"
+                  : "w-full h-full relative overflow-hidden"
+              }
+              onClick={(e) => {
+                if (isEnlarged) e.stopPropagation(); // Stop close when clicking internal video space
+              }}
+            >
+              {activeVideo.youtubeId ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=${isEnlarged ? 1 : 0}&rel=0&modestbranding=1&controls=1`}
+                  className="w-full h-full border-0 absolute inset-0 z-10"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  ref={videoRef}
+                  src={activeVideo.url}
+                  poster={activeVideo.poster}
+                  onClick={togglePlay}
+                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onEnded={handleEnded}
+                  playsInline
+                  className="w-full h-full object-cover select-none cursor-pointer"
+                />
+              )}
+
+              {/* Film Grain overlay */}
+              <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02] z-20" />
+
+              {/* Letterbox widescreen shadow lines */}
+              <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-ink/90 to-transparent pointer-events-none z-20" />
+              <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-ink/90 to-transparent pointer-events-none z-20" />
+
+              {/* TECHNICAL MONITOR OVERLAY */}
+              <div className="absolute top-4 left-6 pointer-events-none flex flex-col font-mono text-[9px] tracking-wider text-bone/60 space-y-0.5 z-20">
+                <div>REEL // {activeVideo.genre}</div>
+                <div className="text-[8px] text-bone/40">{activeVideo.specs}</div>
+              </div>
+              <div className="absolute top-4 right-6 pointer-events-none font-mono text-[9px] tracking-widest text-bone/60 flex items-center gap-2 z-20">
+                <span className="w-1.5 h-1.5 rounded-full bg-ember animate-pulse" />
+                LIVE REC
+              </div>
+
+              {/* Render controls/overlays only if it's not a YouTube video */}
+              {!activeVideo.youtubeId && (
+                <>
+                  {/* Big Center Play Button Overlay */}
+                  <AnimatePresence>
+                    {!isPlaying && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        onClick={togglePlay}
+                        className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-stage/80 backdrop-blur-sm border border-bone/20 flex items-center justify-center text-ember shadow-lg hover:scale-105 hover:bg-stage transition-transform z-20 group-hover:scale-105"
+                      >
+                        <Play size={24} fill="currentColor" className="ml-1" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+
+                  {/* CUSTOM CINEMA PLAYER CONTROLS */}
+                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex flex-col gap-3">
+                    {/* Timeline Progress Bar */}
+                    <div
+                      onClick={handleSeek}
+                      className="relative w-full h-1 bg-bone/20 rounded-full cursor-pointer group/timeline hover:h-1.5 transition-all"
+                    >
+                      <div
+                        className="absolute top-0 left-0 h-full bg-ember rounded-full"
+                        style={{ width: `${progress}%` }}
+                      />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-bone opacity-0 group-hover/timeline:opacity-100 transition-opacity"
+                        style={{ left: `calc(${progress}% - 5px)` }}
+                      />
+                    </div>
+
+                    {/* Panel Buttons */}
+                    <div className="flex items-center justify-between text-bone/80 text-xs">
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={togglePlay}
+                          className="hover:text-ember transition-colors"
+                          aria-label={isPlaying ? "Pause" : "Play"}
+                        >
+                          {isPlaying ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
+                        </button>
+                        <button
+                          onClick={toggleMute}
+                          className="hover:text-ember transition-colors"
+                          aria-label={isMuted ? "Unmute" : "Mute"}
+                        >
+                          {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                        </button>
+                        <span className="font-mono text-[10px]">
+                          {formatTime(currentTime)} / {formatTime(duration)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => setIsEnlarged(true)}
+                          className="hover:text-ember transition-colors"
+                          aria-label="Enlarge Screen"
+                        >
+                          <Maximize2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
         </div>
 
         {/* Thumbnails Selector Row */}
