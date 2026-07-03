@@ -7,6 +7,7 @@ export const I18N = {
     nav: {
       bio: "Biografi",
       portfolio: "Portfolio",
+      showreels: "Showreels",
       credits: "Meriter",
       voice: "Röst",
       contact: "Kontakt",
@@ -108,6 +109,7 @@ export const I18N = {
     nav: {
       bio: "Biography",
       portfolio: "Portfolio",
+      showreels: "Showreels",
       credits: "Credits",
       voice: "Voice",
       contact: "Contact",

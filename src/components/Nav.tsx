@@ -46,6 +46,7 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
   const links = [
     { id: "bio", label: t.nav.bio },
     { id: "portfolio", label: t.nav.portfolio },
+    { id: "showreels", label: t.nav.showreels },
     { id: "credits", label: t.nav.credits },
     { id: "voice", label: t.nav.voice },
     { id: "contact", label: t.nav.contact },

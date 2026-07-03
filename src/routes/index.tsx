@@ -8,6 +8,7 @@ import { CommentaryPlayer } from "../components/ui/CommentaryPlayer";
 import { Hero } from "../components/sections/Hero";
 import { Biography } from "../components/sections/Biography";
 import { Portfolio } from "../components/sections/Portfolio";
+import { Showreels } from "../components/sections/Showreels";
 import { Credits } from "../components/sections/Credits";
 import { Voice } from "../components/sections/Voice";
 import { Contact } from "../components/sections/Contact";
@@ -324,6 +325,7 @@ function Page() {
         <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
         <Biography />
         <Portfolio />
+        <Showreels />
         <Credits
           activeCommentaryUrl={activeCommentary?.url}
           onPlayCommentary={setActiveCommentary}
