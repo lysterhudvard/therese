@@ -15,11 +15,16 @@ The goal of this project is to build a premium portfolio and casting portal for 
 - **Styling:** Tailwind CSS v4.0 (with new `@theme` configuration and `@utility` rules in `src/styles.css`)
 - **Animation:** Framer Motion (for cinematic transitions, spotlight cursors, and parallax effects)
 - **Icons:** Lucide React
+- **Backend/Database:** Supabase (PostgreSQL, Storage buckets, Row Level Security)
 
 ### Current Codebase Map
 
 - `src/routes/__root.tsx`: The root shell, HTML scaffolding, metadata/viewport settings, Google Fonts integration (Cormorant Garamond + Inter Tight).
-- `src/routes/index.tsx`: The primary single-page landing component. It holds all copy translations (Swedish and English), portfolio media assets, credit tables, and components (Spotlight, Hero, Biography, FilmReel, Credits, Voice, Contact, Footer).
+- `src/routes/index.tsx`: The primary single-page landing component. It fetches from the live database on mount, merges translations dynamically, updates SEO tags, and distributes dynamic data to page sections.
+- `src/routes/backstage.tsx`: The route gate for the backstage CMS admin panel.
+- `src/components/backstage/`: Subcomponents for admin CRUD pages (`BackstageDashboard.tsx`, `DashboardHero.tsx`, `DashboardBio.tsx`, `DashboardPortfolio.tsx`, `DashboardCredits.tsx`, `DashboardSeo.tsx`, `DashboardMedia.tsx`).
+- `src/lib/supabase.ts`: Database client instantiation and connection helpers.
+- `src/lib/supabase-sync.ts`: Automated data seeder that syncs static local assets up to Supabase if the tables are empty or manually forced.
 - `src/styles.css`: Standard styling variables (oklch colors), custom Tailwind v4 configurations, utility classes (film-grain, cursor defaults, no-scrollbar).
 - `src/lib/lovable-error-reporting.ts` & others: Diagnostics and error boundaries designed to integrate with the Lovable development environment.
 

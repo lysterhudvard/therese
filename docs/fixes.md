@@ -52,3 +52,23 @@ This document details critical bugs, layout errors, and interaction blocks found
   Skådespelerska<span className="hidden md:inline"> · Röst</span>
   ```
   This truncates the subtitle to a single-line string on mobile devices while displaying the full text on tablets and desktops.
+
+## 7. Backstage Admin Panel Cursor Disappearance
+- **Symptom:** While navigating backstage, the cursor disappeared entirely when hovering over non-link sections or empty card areas.
+- **Root Cause:** A global custom stylesheet rule `cursor: none` hid the default pointer across all routes, only displaying the spotlight searchlight follower (which is hidden on CMS panels).
+- **Resolution:** Applied inline CSS overrides to inputs, text fields, selects, textareas, and buttons under the backstage route, restoring native browser text indicator bars and hand pointers for standard admin form usability.
+
+## 8. Database Query Crash on Empty Tables
+- **Symptom:** Calling `.single()` on newly connected tables failed, throwing unhandled exceptions and crashing client rendering because the database was empty.
+- **Root Cause:** Supabase client `.single()` throws an error when exactly one row is not returned.
+- **Resolution:** Swapped database requests to use `.maybeSingle()` which returns `null` safely, enabling component rendering layers to load fallback assets without throwing errors.
+
+## 9. Supabase Storage Bucket Missing Exception
+- **Symptom:** Portfolio image uploads failed with a cryptic bucket error when the user tried to load headshots before creating the public `portfolio` storage container.
+- **Root Cause:** The bucket didn't exist in the remote Supabase project.
+- **Resolution:** Caught bucket errors explicitly and updated dashboard feedback to instruct the user to create the public `portfolio` bucket in their console, while leaving raw text URL fields as immediate override options.
+
+## 10. Credits Upsert Foreign Key / Deletion Conflicts
+- **Symptom:** Saving credit rows threw integrity errors when deleting some items while adding or modifying others.
+- **Root Cause:** Performing upsert lists asynchronously simultaneously with deletion queries caused layout key index collisions.
+- **Resolution:** Rewrote save functions to await deletion transactions first before running upsert listings, preserving database indexes and row orders.

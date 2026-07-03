@@ -4,7 +4,8 @@ import { DashboardBio } from "./DashboardBio";
 import { DashboardPortfolio } from "./DashboardPortfolio";
 import { DashboardCredits } from "./DashboardCredits";
 import { DashboardSeo } from "./DashboardSeo";
-import { LogOut, Home, Star, User, Image, List, Settings, Database, RefreshCw, AlertCircle } from "lucide-react";
+import { DashboardMedia } from "./DashboardMedia";
+import { LogOut, Home, Star, User, Image, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { checkDatabaseSeeded, seedDatabaseWithCurrentContent } from "../../lib/supabase-sync";
@@ -13,7 +14,7 @@ interface BackstageDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = "hero" | "bio" | "portfolio" | "credits" | "seo";
+type TabType = "hero" | "bio" | "portfolio" | "credits" | "seo" | "media";
 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
@@ -59,6 +60,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
     { id: "portfolio", label: "Akt III: Galleri", icon: Image },
     { id: "credits", label: "Akt IV: Meriter", icon: List },
     { id: "seo", label: "Akt V: SEO", icon: Settings },
+    { id: "media", label: "Mediebibliotek", icon: FolderOpen },
   ];
 
   const handleLogout = () => {
@@ -81,6 +83,8 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
         return <DashboardCredits />;
       case "seo":
         return <DashboardSeo />;
+      case "media":
+        return <DashboardMedia />;
       default:
         return <DashboardHero />;
     }

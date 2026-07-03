@@ -573,6 +573,53 @@ function Page() {
         <Contact />
         <Footer />
 
+        {/* Dynamic JSON-LD structured data for SEO/AEO search optimization */}
+        {dbData && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify([
+                {
+                  "@context": "https://schema.org",
+                  "@type": "Person",
+                  "name": "Therese Järvheden",
+                  "jobTitle": lang === "sv" ? "Skådespelerska" : "Actress",
+                  "description": lang === "sv" ? dbData.seo?.description_sv : dbData.seo?.description_en,
+                  "image": dbData.portfolioImages?.[0] || IMG.hero,
+                  "url": "https://theresejarvheden.se",
+                  "knowsLanguage": ["sv", "en"],
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Malmö",
+                    "addressCountry": "SE"
+                  },
+                  "sponsor": {
+                    "@type": "Organization",
+                    "name": "Schultzberg Agency",
+                    "url": "https://schultzbergagency.com"
+                  }
+                },
+                ...(dbData.biography?.faqs && Array.isArray(dbData.biography.faqs) && dbData.biography.faqs.length > 0
+                  ? [
+                      {
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        "mainEntity": dbData.biography.faqs.map((faq: any) => ({
+                          "@type": "Question",
+                          "name": lang === "sv" ? faq.q_sv : faq.q_en,
+                          "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": lang === "sv" ? faq.a_sv : faq.a_en
+                          }
+                        }))
+                      }
+                    ]
+                  : [])
+              ])
+            }}
+          />
+        )}
+
         <AnimatePresence>
           {activeCommentary && (
             <CommentaryPlayer

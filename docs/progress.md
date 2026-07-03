@@ -83,3 +83,23 @@ This document tracks completed features, animation systems, layout updates, and 
 
 - **Custom Spotlight Suppression:** Wrapped the backstage route rendering tree in a `data-no-spotlight` container. This tells the global cinematic `Spotlight` follower to hide, avoiding visual double-cursor noise in the admin panel.
 - **Native Browser Cursor Restoration:** Implemented an inline CSS style override block specifically targeting backstage child elements (inputs, textareas, buttons, select menus, containers). This overrides the global `html, body { cursor: none; }` rules, restoring the native cursor, I-beam text editing indicators, and standard hand pointers over clickable CMS buttons.
+
+### 13. Phase 3 — Live Database CMS Integration
+- **Database Schema & SQL Migrations:** Created migrations to set up PostgreSQL tables matching site modules, including supporting columns for manual override sync flags and JSONB structures.
+- **CMS Form Connection:** Rewrote all backstage dashboards (`Hero`, `Biography`, `Portfolio`, `Credits`, `SEO`) to execute real-time read and write operations.
+- **Storage Bucket Support:** Configured the file upload controller to write headshots and SEO og-images to the Supabase `portfolio` bucket. Added exception fallbacks notifying the user to create the public bucket in their console, while offering a text field input fallback.
+- **Force Sync System:** Added a **"Tvinga Synk till DB"** button in the backstage sidebar, triggering an automated seed function to write/override default site assets inside the database.
+
+### 14. Phase 4 — Dynamic Landing Page Hookup
+- **Dynamic Routing Controller:** Wired `src/routes/index.tsx` to pull data from Supabase on component mount, with a complete fallback to static assets if database tables are unpopulated.
+- **Dynamic Translation Merger:** Built an in-memory dictionary merger that merges translated database fields dynamically into the localized translation dictionary (`t` object), maintaining standard translation bindings.
+- **SEO Tag Management Injection:** Implemented a runtime observer that dynamically synchronizes the document tab title, description metadata tag, and Open Graph image tags with values configured in backstage.
+- **Automatic Current Production Hero Sync:** Configured the Hero title line to automatically fetch and format text from the merit item marked as `is_current_production` in the credits table when auto-sync is enabled.
+- **Clean Section Props:** Refactored Biography, Portfolio, Showreels, and Credits components to consume dynamic data sets via props, confirming a compiler-checked green build.
+
+### 15. Backstage Media Library (Mediebibliotek)
+- **Direct Storage Lists:** Added a new backstage dashboard module (`DashboardMedia.tsx`) that lists all uploaded files (images and videos) directly inside the Supabase `portfolio` storage hink.
+- **Upload Controls**: Built drag-and-drop/local file picker controls supporting both local image files and video files.
+- **Dynamic Clipboard Utility**: Added a copy helper to easily copy public URLs for any image or video asset.
+- **Immediate Portfolio Push**: Added a "Plus/Add to Portfolio" quick trigger that inserts the image record directly into `portfolio_images` with descriptive alt tags.
+- **External URL Link Manager**: Integrated URL link registers to save external images/showreels from direct paths.
