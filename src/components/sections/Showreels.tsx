@@ -23,8 +23,7 @@ const VIDEOS: VideoItem[] = [
     sub: { sv: "Therese Järvheden — Skådespelerska", en: "Therese Järvheden — Actress" },
     vimeoId: "1206764752",
     url: "https://assets.mixkit.co/videos/preview/mixkit-dramatic-female-portrait-in-dark-room-41655-large.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
+    poster: "https://img.youtube.com/vi/J9_4XQiQtNk/maxresdefault.jpg",
     genre: "SHOWREEL",
     specs: "16:9 // HD // 25 FPS",
     glow: "rgba(235, 94, 40, 0.18)", // Ember/orange glow
@@ -242,7 +241,7 @@ export function Showreels() {
         </div>
 
         {/* Cinematic Main Theater Player Wrapper */}
-        <div className="relative mx-auto max-w-[960px] aspect-[16/9]">
+        <div id="showreels-theater" className="relative mx-auto max-w-[960px] aspect-[16/9]">
           {/* Reservation space layout placeholder when enlarged */}
           {isEnlarged && <div className="w-full h-full bg-transparent" />}
 
@@ -303,12 +302,20 @@ export function Showreels() {
             >
               {/* Media rendering selector (Wait until transition complete before mounting player) */}
               {isEnlarged && !isTransitionComplete ? (
-                // Static poster image displayed during layout scale-up
-                <img
-                  src={activeVideo.poster}
-                  alt="Preparing screen..."
-                  className="w-full h-full object-cover select-none"
-                />
+                // Static poster image with gradual darkening overlay displayed during layout scale-up
+                <div className="w-full h-full relative overflow-hidden">
+                  <img
+                    src={activeVideo.poster}
+                    alt="Preparing screen..."
+                    className="w-full h-full object-cover select-none"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.85 }}
+                    transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-0 bg-black pointer-events-none"
+                  />
+                </div>
               ) : isEnlarged && isTransitionComplete ? (
                 // Video starts playing only after layout scale-up is completed
                 <motion.div

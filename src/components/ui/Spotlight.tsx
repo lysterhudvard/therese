@@ -7,6 +7,7 @@ export function Spotlight() {
   const sx = useSpring(x, { stiffness: 320, damping: 32, mass: 0.4 });
   const sy = useSpring(y, { stiffness: 320, damping: 32, mass: 0.4 });
   const [enlarged, setEnlarged] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [coarse, setCoarse] = useState(false);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export function Spotlight() {
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       setEnlarged(!!t?.closest("a, button, [data-hover]"));
+      setHidden(!!t?.closest("iframe, video, #showreels-theater, [data-no-spotlight]"));
     };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseover", onOver);
@@ -39,7 +41,8 @@ export function Spotlight() {
         style={{ x: sx, y: sy }}
       >
         <motion.div
-          animate={{ scale: 1, opacity: 1 }}
+          animate={{ scale: 1, opacity: hidden ? 0 : 1 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
           className="-translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
             width: 14,
@@ -53,7 +56,7 @@ export function Spotlight() {
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[80] will-change-transform"
         style={{ x: sx, y: sy }}
-        animate={{ opacity: enlarged ? 0 : 1 }}
+        animate={{ opacity: enlarged || hidden ? 0 : 1 }}
         transition={{ duration: 0.25, ease: "easeInOut" }}
       >
         <div
