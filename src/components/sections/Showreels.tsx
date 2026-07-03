@@ -322,19 +322,26 @@ export function Showreels() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8 }}
-                  className="w-full h-full absolute inset-0 z-10"
+                  className="w-full h-full absolute inset-0 z-10 bg-stage/20"
                 >
+                  {/* Poster image in the background while player loads */}
+                  <img
+                    src={activeVideo.poster}
+                    alt=""
+                    className="w-full h-full object-cover select-none absolute inset-0 z-0"
+                  />
+
                   {activeVideo.vimeoId ? (
                     <iframe
-                      src={`https://player.vimeo.com/video/${activeVideo.vimeoId}?autoplay=1&muted=0&badge=0&autopause=0`}
-                      className="w-full h-full border-0 absolute inset-0 z-10"
+                      src={`https://player.vimeo.com/video/${activeVideo.vimeoId}?autoplay=1&muted=0&badge=0&autopause=0&transparent=1`}
+                      className="w-full h-full border-0 absolute inset-0 z-10 bg-transparent"
                       allow="autoplay; fullscreen; picture-in-picture"
                       allowFullScreen
                     />
                   ) : activeVideo.youtubeId ? (
                     <iframe
                       src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
-                      className="w-full h-full border-0 absolute inset-0 z-10"
+                      className="w-full h-full border-0 absolute inset-0 z-10 bg-transparent"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
@@ -348,7 +355,7 @@ export function Showreels() {
                       onLoadedMetadata={handleLoadedMetadata}
                       onEnded={handleEnded}
                       playsInline
-                      className="w-full h-full object-cover select-none cursor-pointer"
+                      className="w-full h-full object-cover select-none cursor-pointer relative z-10"
                     />
                   )}
                 </motion.div>
