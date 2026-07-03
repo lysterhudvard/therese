@@ -320,7 +320,7 @@ function Page() {
         const [bioRes, credsRes, reelsRes, seoRes, portRes] = await Promise.all([
           supabase.from("biography").select("*").eq("id", "main").maybeSingle(),
           supabase.from("credits").select("*").order("sort_order", { ascending: true }),
-          supabase.from("showreels").select("*").order("id", { ascending: true }),
+          supabase.from("showreels").select("*").order("sort_order", { ascending: true }),
           supabase.from("seo_settings").select("*").eq("id", "main").maybeSingle(),
           supabase.from("portfolio_images").select("*").order("sort_order", { ascending: true })
         ]);
@@ -467,10 +467,10 @@ function Page() {
     if (dbData?.biography) {
       const bio = dbData.biography;
       
-      // 1. Hero text (either static hero_line, or sync'ed from active production)
-      let heroLine = lang === "sv" ? bio.hero_line_sv : bio.hero_line_en;
+      // 1. Hero text (either static hero_text, or sync'ed from active production)
+      let heroLine = lang === "sv" ? bio.hero_text_sv : bio.hero_text_en;
       
-      if (bio.sync_hero_text && dbData.credits && dbData.credits.length > 0) {
+      if (bio.is_automated && dbData.credits && dbData.credits.length > 0) {
         // Find current production credit
         const currentProd = dbData.credits.find((c) => c.is_current_production);
         if (currentProd) {
@@ -508,7 +508,16 @@ function Page() {
       }
       
       // Facts
-      if (bio.facts) {
+      if (bio.dialects_sv || bio.languages_sv) {
+        const dialects = lang === "sv" ? bio.dialects_sv : bio.dialects_en;
+        const languages = lang === "sv" ? bio.languages_sv : bio.languages_en;
+        
+        base.bio.facts = [
+          [lang === "sv" ? "Bas" : "Base", "Malmö / Stockholm"],
+          [lang === "sv" ? "Dialekt" : "Dialect", dialects || ""],
+          [lang === "sv" ? "Språk" : "Language", languages || ""],
+        ];
+      } else if (bio.facts) {
         try {
           const parsedFacts = typeof bio.facts === "string" ? JSON.parse(bio.facts) : bio.facts;
           if (Array.isArray(parsedFacts)) {
@@ -524,7 +533,7 @@ function Page() {
       }
 
       // Dialogues/mood lines
-      const dramaticQuote = lang === "sv" ? bio.quote_dramatic_sv : bio.quote_dramatic_en;
+      const dramaticQuote = lang === "sv" ? (bio.quote_sv || bio.quote_dramatic_sv) : (bio.quote_en || bio.quote_dramatic_en);
       if (dramaticQuote) base.bio.lines.Dramatic = dramaticQuote;
       
       const comedicQuote = lang === "sv" ? bio.quote_comedic_sv : bio.quote_comedic_en;
@@ -582,7 +591,7 @@ function Page() {
         />
 
         <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
-        <Biography moodData={mergedMoodData} />
+        <Biography moodData={mergedMoodData} faqs={dbData?.biography?.faqs} />
         <Portfolio images={dbData?.portfolioImages} />
         <Showreels videos={dbData?.showreels} />
         <Credits
@@ -593,7 +602,7 @@ function Page() {
         />
         <Voice />
         <Contact />
-        <Footer />
+        <Footer bioData={dbData?.biography} />
 
         {/* Dynamic JSON-LD structured data for SEO/AEO search optimization */}
         {dbData && (

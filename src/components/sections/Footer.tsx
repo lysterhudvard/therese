@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { IMG } from "../../routes/index";
 
-export function Footer() {
+export function Footer({ bioData }: { bioData?: any }) {
   const { lang, t } = useT();
   const [animatedIn, setAnimatedIn] = useState(false);
   const [startScroll, setStartScroll] = useState(false);
@@ -33,39 +33,52 @@ export function Footer() {
     }
   }, [isInView]);
 
-  const creditsList = [
-    {
-      label: t.footer.agent,
-      value: "Schultzberg Agency",
-      href: "mailto:jonas@schultzbergagency.com",
-    },
-    {
-      label: lang === "sv" ? "KONTAKT" : "CONTACT",
-      value: "theresejarvheden@gmail.com",
-      href: "mailto:theresejarvheden@gmail.com",
-    },
-    {
-      label: "INSTAGRAM",
-      value: "@theresejarvheden",
-      href: "https://www.instagram.com/theresejarvheden/",
-    },
-    {
-      label: "FACEBOOK",
-      value: "Therese Järvheden",
-      href: "https://www.facebook.com/therese.jarvhedenfdpersson",
-    },
-    {
-      label: t.footer.photo,
-      value: "Robert Eldrim",
-      href: "https://www.instagram.com/roberteldrim/",
-    },
-    { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström" },
-    { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" },
-    {
-      label: lang === "sv" ? "PRODUCENT HEMSIDA" : "WEBSITE PRODUCER",
-      value: "Sirin Öngörür",
-    },
-  ];
+  const footerImage = bioData?.footer_image || IMG.portfolio[0];
+  const footerEnd = (lang === "sv" ? bioData?.footer_end_sv : bioData?.footer_end_en) || t.footer.end;
+
+  const creditsList = useMemo(() => {
+    if (bioData?.footer_credits && Array.isArray(bioData?.footer_credits) && bioData.footer_credits.length > 0) {
+      return bioData.footer_credits.map((item: any) => ({
+        label: lang === "sv" ? item.label_sv : item.label_en,
+        value: lang === "sv" ? item.value_sv : item.value_en,
+        href: item.href || undefined,
+      }));
+    }
+
+    return [
+      {
+        label: t.footer.agent,
+        value: "Schultzberg Agency",
+        href: "mailto:jonas@schultzbergagency.com",
+      },
+      {
+        label: lang === "sv" ? "KONTAKT" : "CONTACT",
+        value: "theresejarvheden@gmail.com",
+        href: "mailto:theresejarvheden@gmail.com",
+      },
+      {
+        label: "INSTAGRAM",
+        value: "@theresejarvheden",
+        href: "https://www.instagram.com/theresejarvheden/",
+      },
+      {
+        label: "FACEBOOK",
+        value: "Therese Järvheden",
+        href: "https://www.facebook.com/therese.jarvhedenfdpersson",
+      },
+      {
+        label: t.footer.photo,
+        value: "Robert Eldrim",
+        href: "https://www.instagram.com/roberteldrim/",
+      },
+      { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström" },
+      { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" },
+      {
+        label: lang === "sv" ? "PRODUCENT HEMSIDA" : "WEBSITE PRODUCER",
+        value: "Sirin Öngörür",
+      },
+    ];
+  }, [bioData, lang, t]);
 
   return (
     <footer
@@ -112,7 +125,7 @@ export function Footer() {
               className="relative w-64 h-40 md:w-80 md:h-52 bg-stage/95 border border-bone/20 rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
             >
               <img
-                src={IMG.portfolio[0]}
+                src={footerImage}
                 alt="Post-Credits Scene"
                 className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
               />
@@ -136,7 +149,7 @@ export function Footer() {
               className="relative w-28 h-20 bg-stage/90 border border-bone/15 rounded overflow-hidden shadow-2xl"
             >
               <img
-                src={IMG.portfolio[0]}
+                src={footerImage}
                 alt="Post-Credits Scene"
                 className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
               />
@@ -176,7 +189,7 @@ export function Footer() {
                 className="absolute inset-0 py-4 pointer-events-auto"
               >
                 <div className="credit-scroll-container flex flex-col items-center gap-8 text-center font-mono select-none">
-                  {creditsList.map((item, index) => (
+                  {creditsList.map((item: { label: string; value: string; href?: string }, index: number) => (
                     <div key={index} className="flex flex-col items-center">
                       <span className="text-[10px] uppercase tracking-[0.3em] text-bone/45 mb-1">
                         {item.label}
@@ -200,7 +213,7 @@ export function Footer() {
                   ))}
 
                   <div className="text-sm md:text-base font-display uppercase tracking-[0.4em] text-bone mt-8 font-semibold">
-                    {t.footer.end}
+                    {footerEnd}
                   </div>
                 </div>
               </motion.div>

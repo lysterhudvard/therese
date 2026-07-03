@@ -56,12 +56,14 @@ export function DashboardHero() {
       return;
     }
 
-    const { error } = await supabase.from("biography").upsert({
-      id: "main",
-      hero_text_sv: currentTextSv,
-      hero_text_en: currentTextEn,
-      is_automated: isAutomated,
-    });
+    const { error } = await supabase
+      .from("biography")
+      .update({
+        hero_text_sv: currentTextSv,
+        hero_text_en: currentTextEn,
+        is_automated: isAutomated,
+      })
+      .eq("id", "main");
 
     setIsSaving(false);
     if (error) {

@@ -7,7 +7,9 @@ import { DashboardCredits } from "./DashboardCredits";
 import { DashboardVoice } from "./DashboardVoice";
 import { DashboardSeo } from "./DashboardSeo";
 import { DashboardMedia } from "./DashboardMedia";
-import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2 } from "lucide-react";
+import { DashboardContact } from "./DashboardContact";
+import { DashboardCurtain } from "./DashboardCurtain";
+import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2, Mail, Film } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { checkDatabaseSeeded, seedDatabaseWithCurrentContent } from "../../lib/supabase-sync";
@@ -17,7 +19,7 @@ interface BackstageDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "seo" | "media";
+type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "contact" | "curtain" | "seo" | "media";
 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
@@ -64,6 +66,8 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
     { id: "showreels", label: "Akt IV: Showreels", icon: Video },
     { id: "credits", label: "Akt V: Meriter", icon: List },
     { id: "voice", label: "Akt VI: Röst", icon: Volume2 },
+    { id: "contact", label: "Akt VII: Kontaktinfo", icon: Mail },
+    { id: "curtain", label: "Akt VIII: Ridåfall", icon: Film },
     { id: "seo", label: "SEO & Inställningar", icon: Settings },
     { id: "media", label: "Mediebibliotek", icon: FolderOpen },
   ];
@@ -90,6 +94,10 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
         return <DashboardCredits />;
       case "voice":
         return <DashboardVoice />;
+      case "contact":
+        return <DashboardContact />;
+      case "curtain":
+        return <DashboardCurtain />;
       case "seo":
         return <DashboardSeo />;
       case "media":

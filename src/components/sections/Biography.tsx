@@ -1,13 +1,28 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
 import { MOOD_DATA, type Mood } from "../../routes/index";
 
-export function Biography({ moodData = MOOD_DATA }: { moodData?: typeof MOOD_DATA }) {
-  const { t } = useT();
+interface FAQItem {
+  id: string;
+  q: { sv: string; en: string };
+  a: { sv: string; en: string };
+}
+
+export function Biography({ moodData = MOOD_DATA, faqs }: { moodData?: typeof MOOD_DATA; faqs?: FAQItem[] }) {
+  const { t, lang } = useT();
   const [mood, setMood] = useState<Mood>("Dramatic");
   const data = moodData[mood];
+
+  const activeFaqs = useMemo(() => {
+    if (!faqs || !Array.isArray(faqs)) return [];
+    return faqs.filter(faq => {
+      const q = lang === "sv" ? faq.q?.sv : faq.q?.en;
+      const a = lang === "sv" ? faq.a?.sv : faq.a?.en;
+      return q?.trim() && a?.trim();
+    });
+  }, [faqs, lang]);
 
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -139,7 +154,62 @@ export function Biography({ moodData = MOOD_DATA }: { moodData?: typeof MOOD_DAT
             </div>
           </div>
         </div>
+
+        {/* Accordion FAQ Section */}
+        {activeFaqs.length > 0 && (
+          <div className="mx-auto max-w-3xl mt-24 border-t border-bone/10 pt-16">
+            <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-6 font-mono text-center">
+              {lang === "sv" ? "Vanliga Frågor" : "Frequently Asked Questions"}
+            </div>
+            <h3 className="font-display text-2xl md:text-3xl text-bone text-center mb-10 uppercase tracking-widest">
+              FAQ
+            </h3>
+            
+            <div className="space-y-2">
+              {activeFaqs.map((faq) => {
+                const question = lang === "sv" ? faq.q.sv : faq.q.en;
+                const answer = lang === "sv" ? faq.a.sv : faq.a.en;
+                
+                return (
+                  <FAQAccordionItem key={faq.id} question={question} answer={answer} />
+                );
+              })}
+            </div>
+          </div>
+        )}
       </motion.div>
     </section>
+  );
+}
+
+function FAQAccordionItem({ question, answer }: { question: string; answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <div className="border-b border-bone/5 py-4">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left py-2 font-display text-lg text-bone hover:text-ember transition-colors focus:outline-none cursor-pointer"
+      >
+        <span>{question}</span>
+        <motion.span
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+          className="text-ember font-mono text-xs"
+        >
+          ▼
+        </motion.span>
+      </button>
+      <motion.div
+        initial={false}
+        animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="overflow-hidden"
+      >
+        <p className="py-2 text-sm text-bone/65 leading-relaxed font-sans">
+          {answer}
+        </p>
+      </motion.div>
+    </div>
   );
 }
