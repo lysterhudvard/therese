@@ -220,15 +220,30 @@ export function Contact() {
                         }
                         transition={{ duration: 0.6, ease: "easeOut" }}
                       >
-                        <div className="space-y-4">
-                          <div className="w-1/3 h-1.5 bg-bone/30 rounded-full" />
-                          <div className="w-full h-px bg-bone/20" />
-                          <div className="w-1/4 h-1.5 bg-bone/30 rounded-full" />
-                          <div className="w-full h-px bg-bone/20" />
-                          <div className="w-1/3 h-1.5 bg-bone/30 rounded-full" />
-                          <div className="w-full h-10 bg-bone/10 rounded-sm" />
+                        <div className="space-y-3 text-[9px] text-bone/80 font-sans text-left select-none leading-normal">
+                          <div>
+                            <span className="text-bone/40 uppercase tracking-widest text-[6px] block">
+                              {t.contact.fields.name}
+                            </span>
+                            <span className="truncate block font-medium mt-0.5">{form.name}</span>
+                          </div>
+                          <div>
+                            <span className="text-bone/40 uppercase tracking-widest text-[6px] block">
+                              {t.contact.fields.email}
+                            </span>
+                            <span className="truncate block font-medium mt-0.5">{form.email}</span>
+                          </div>
+                          <div>
+                            <span className="text-bone/40 uppercase tracking-widest text-[6px] block">
+                              {t.contact.fields.msg}
+                            </span>
+                            <span className="line-clamp-2 block mt-0.5 italic">{form.msg}</span>
+                          </div>
                         </div>
-                        <div className="w-1/3 h-6 bg-ember rounded-sm mt-3" />
+                        <div className="w-full border-t border-bone/10 pt-2 flex justify-between items-center text-[7px] text-bone/40 uppercase tracking-widest mt-1">
+                          <span>Therese Järvheden</span>
+                          <span className="text-ember font-medium">Skickat</span>
+                        </div>
                       </motion.div>
 
                       {/* TOP FLAP */}
