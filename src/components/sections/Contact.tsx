@@ -58,11 +58,11 @@ export function Contact() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("shrinking");
-    // Allow the envelope to rise and stay visible for reading
-    await new Promise((r) => setTimeout(r, 2200));
+    // Wait for the envelope to rise and settle
+    await new Promise((r) => setTimeout(r, 800));
     setStatus("dropping");
-    // Allow the slower slide-in animation to complete
-    await new Promise((r) => setTimeout(r, 1600));
+    // Wait for the slower slide-in animation to complete
+    await new Promise((r) => setTimeout(r, 1400));
     setStatus("closing");
     await new Promise((r) => setTimeout(r, 600));
     setStatus("flipping");
