@@ -9,6 +9,7 @@ interface VideoItem {
   sub: { sv: string; en: string };
   url?: string;
   youtubeId?: string;
+  vimeoId?: string;
   poster: string;
   genre: string;
   specs: string;
@@ -20,9 +21,10 @@ const VIDEOS: VideoItem[] = [
     id: "main-reel",
     title: { sv: "Huvudshowreel", en: "Main Showreel" },
     sub: { sv: "Therese Järvheden — Skådespelerska", en: "Therese Järvheden — Actress" },
-    youtubeId: "J9_4XQiQtNk",
+    vimeoId: "1206764752",
     url: "https://assets.mixkit.co/videos/preview/mixkit-dramatic-female-portrait-in-dark-room-41655-large.mp4",
-    poster: "https://img.youtube.com/vi/J9_4XQiQtNk/maxresdefault.jpg",
+    poster:
+      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
     genre: "SHOWREEL",
     specs: "16:9 // HD // 25 FPS",
     glow: "rgba(235, 94, 40, 0.18)", // Ember/orange glow
@@ -61,6 +63,7 @@ export function Showreels() {
   const [currentTime, setCurrentTime] = useState(0);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
+  const [isTransitionComplete, setIsTransitionComplete] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -76,6 +79,19 @@ export function Showreels() {
     return () => {
       document.body.style.overflow = "";
     };
+  }, [isEnlarged]);
+
+  // Handle transition completion delay
+  useEffect(() => {
+    if (isEnlarged) {
+      setIsTransitionComplete(false);
+      const timer = setTimeout(() => {
+        setIsTransitionComplete(true);
+      }, 2200); // Matches the Framer Motion transition duration (2.2s)
+      return () => clearTimeout(timer);
+    } else {
+      setIsTransitionComplete(false);
+    }
   }, [isEnlarged]);
 
   // Parallax / Scroll Exit Effects
@@ -95,6 +111,27 @@ export function Showreels() {
       videoRef.current.load();
     }
   }, [activeVideo]);
+
+  // Autoplay local HTML5 video only after transition is fully complete
+  useEffect(() => {
+    if (isTransitionComplete) {
+      if (!activeVideo.youtubeId && !activeVideo.vimeoId && videoRef.current) {
+        videoRef.current
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.log("Autoplay was prevented:", err);
+          });
+      }
+    } else {
+      if (videoRef.current) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  }, [isTransitionComplete, activeVideo]);
 
   // Video play/pause toggle
   const togglePlay = () => {
@@ -211,7 +248,7 @@ export function Showreels() {
 
           <motion.div
             layout
-            transition={{ duration: 1.4, ease: [0.25, 1, 0.5, 1] }}
+            transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }} // slower, high-end cinema expansion curve
             className={
               isEnlarged
                 ? "fixed inset-0 z-[100] bg-black/98 backdrop-blur-md flex flex-col items-center justify-center p-6 md:p-12 cursor-zoom-out"
@@ -253,36 +290,79 @@ export function Showreels() {
               </button>
             )}
 
-            {/* Widescreen Screen Canvas */}
+            {/* Widescreen Screen Canvas (wider cinema sizing: max-w-[1400px]) */}
             <div
               className={
                 isEnlarged
-                  ? "relative w-full max-w-[1200px] aspect-[16/9] border border-bone/15 shadow-[0_0_80px_rgba(0,0,0,0.85)] rounded-sm overflow-hidden cursor-default"
+                  ? "relative w-[94vw] max-w-[1400px] aspect-[16/9] border border-bone/15 shadow-[0_0_80px_rgba(0,0,0,0.85)] rounded-sm overflow-hidden cursor-default"
                   : "w-full h-full relative overflow-hidden"
               }
               onClick={(e) => {
                 if (isEnlarged) e.stopPropagation(); // Stop close when clicking internal video space
               }}
             >
-              {activeVideo.youtubeId ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=${isEnlarged ? 1 : 0}&rel=0&modestbranding=1&controls=1`}
-                  className="w-full h-full border-0 absolute inset-0 z-10"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+              {/* Media rendering selector (Wait until transition complete before mounting player) */}
+              {isEnlarged && !isTransitionComplete ? (
+                // Static poster image displayed during layout scale-up
+                <img
+                  src={activeVideo.poster}
+                  alt="Preparing screen..."
+                  className="w-full h-full object-cover select-none"
                 />
+              ) : isEnlarged && isTransitionComplete ? (
+                // Video starts playing only after layout scale-up is completed
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8 }}
+                  className="w-full h-full absolute inset-0 z-10"
+                >
+                  {activeVideo.vimeoId ? (
+                    <iframe
+                      src={`https://player.vimeo.com/video/${activeVideo.vimeoId}?autoplay=1&muted=0&badge=0&autopause=0`}
+                      className="w-full h-full border-0 absolute inset-0 z-10"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : activeVideo.youtubeId ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
+                      className="w-full h-full border-0 absolute inset-0 z-10"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      ref={videoRef}
+                      src={activeVideo.url}
+                      poster={activeVideo.poster}
+                      onClick={togglePlay}
+                      onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
+                      onEnded={handleEnded}
+                      playsInline
+                      className="w-full h-full object-cover select-none cursor-pointer"
+                    />
+                  )}
+                </motion.div>
               ) : (
-                <video
-                  ref={videoRef}
-                  src={activeVideo.url}
-                  poster={activeVideo.poster}
-                  onClick={togglePlay}
-                  onTimeUpdate={handleTimeUpdate}
-                  onLoadedMetadata={handleLoadedMetadata}
-                  onEnded={handleEnded}
-                  playsInline
-                  className="w-full h-full object-cover select-none cursor-pointer"
-                />
+                // Normal inline static poster view with custom play button
+                <div
+                  className="w-full h-full relative cursor-pointer"
+                  onClick={() => setIsEnlarged(true)}
+                >
+                  <img
+                    src={activeVideo.poster}
+                    alt={activeVideo.title[lang]}
+                    className="w-full h-full object-cover select-none"
+                  />
+                  {/* Glowing play symbol */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors">
+                    <div className="w-16 h-16 rounded-full bg-stage/80 backdrop-blur-sm border border-bone/20 flex items-center justify-center text-ember shadow-lg hover:scale-105 transition-transform">
+                      <Play size={24} fill="currentColor" className="ml-1" />
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* Film Grain overlay */}
@@ -302,8 +382,8 @@ export function Showreels() {
                 LIVE REC
               </div>
 
-              {/* Render controls/overlays only if it's not a YouTube video */}
-              {!activeVideo.youtubeId && (
+              {/* Render controls/overlays only if it's a local video and in active playing state */}
+              {!activeVideo.youtubeId && !activeVideo.vimeoId && !activeVideo.youtubeId && (
                 <>
                   {/* Big Center Play Button Overlay */}
                   <AnimatePresence>
