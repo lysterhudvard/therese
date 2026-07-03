@@ -241,12 +241,13 @@ export function Showreels() {
         </div>
 
         {/* Cinematic Main Theater Player Wrapper */}
-        <div id="showreels-theater" className="relative mx-auto max-w-[960px] aspect-[16/9]">
+        <div className="relative mx-auto max-w-[960px] aspect-[16/9]">
           {/* Reservation space layout placeholder when enlarged */}
           {isEnlarged && <div className="w-full h-full bg-transparent" />}
 
           <motion.div
             layout
+            data-no-spotlight
             transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }} // slower, high-end cinema expansion curve
             className={
               isEnlarged
@@ -302,8 +303,8 @@ export function Showreels() {
             >
               {/* Media rendering selector (Wait until transition complete before mounting player) */}
               {isEnlarged && !isTransitionComplete ? (
-                // Static poster image with gradual darkening overlay displayed during layout scale-up
-                <div className="w-full h-full relative overflow-hidden">
+                // Static poster image displayed during layout scale-up, gradually fading to black
+                <div className="w-full h-full relative">
                   <img
                     src={activeVideo.poster}
                     alt="Preparing screen..."
@@ -311,7 +312,7 @@ export function Showreels() {
                   />
                   <motion.div
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.85 }}
+                    animate={{ opacity: 1 }}
                     transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
                     className="absolute inset-0 bg-black pointer-events-none"
                   />
@@ -322,26 +323,19 @@ export function Showreels() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8 }}
-                  className="w-full h-full absolute inset-0 z-10 bg-stage/20"
+                  className="w-full h-full absolute inset-0 z-10"
                 >
-                  {/* Poster image in the background while player loads */}
-                  <img
-                    src={activeVideo.poster}
-                    alt=""
-                    className="w-full h-full object-cover select-none absolute inset-0 z-0"
-                  />
-
                   {activeVideo.vimeoId ? (
                     <iframe
-                      src={`https://player.vimeo.com/video/${activeVideo.vimeoId}?autoplay=1&muted=0&badge=0&autopause=0&transparent=1`}
-                      className="w-full h-full border-0 absolute inset-0 z-10 bg-transparent"
+                      src={`https://player.vimeo.com/video/${activeVideo.vimeoId}?autoplay=1&muted=0&badge=0&autopause=0`}
+                      className="w-full h-full border-0 absolute inset-0 z-10"
                       allow="autoplay; fullscreen; picture-in-picture"
                       allowFullScreen
                     />
                   ) : activeVideo.youtubeId ? (
                     <iframe
                       src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
-                      className="w-full h-full border-0 absolute inset-0 z-10 bg-transparent"
+                      className="w-full h-full border-0 absolute inset-0 z-10"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
@@ -355,7 +349,7 @@ export function Showreels() {
                       onLoadedMetadata={handleLoadedMetadata}
                       onEnded={handleEnded}
                       playsInline
-                      className="w-full h-full object-cover select-none cursor-pointer relative z-10"
+                      className="w-full h-full object-cover select-none cursor-pointer"
                     />
                   )}
                 </motion.div>
