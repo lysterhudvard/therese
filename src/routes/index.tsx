@@ -13,6 +13,8 @@ import { Credits } from "../components/sections/Credits";
 import { Voice } from "../components/sections/Voice";
 import { Contact } from "../components/sections/Contact";
 import { Footer } from "../components/sections/Footer";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { type VideoItem } from "../components/sections/ShowreelsData";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,6 +73,7 @@ export type Credit = {
   network: string;
   url?: string;
   img: string;
+  is_current_production?: boolean;
   commentary?: {
     url: string;
     duration: string;
@@ -267,6 +270,14 @@ function Page() {
     text: string;
   } | null>(null);
 
+  const [dbData, setDbData] = useState<{
+    biography: any;
+    credits: Credit[];
+    showreels: VideoItem[];
+    seo: any;
+    portfolioImages: string[];
+  } | null>(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const el = document.getElementById("portfolio");
@@ -300,7 +311,233 @@ function Page() {
     if (typeof document !== "undefined") document.documentElement.lang = lang;
   }, [lang]);
 
-  const ctx = useMemo(() => ({ lang, setLang, t: I18N[lang] as Dict }), [lang]);
+  // Load all live Supabase data
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
+    const loadAllData = async () => {
+      try {
+        const [bioRes, credsRes, reelsRes, seoRes, portRes] = await Promise.all([
+          supabase.from("biography").select("*").eq("id", "main").maybeSingle(),
+          supabase.from("credits").select("*").order("sort_order", { ascending: true }),
+          supabase.from("showreels").select("*").order("id", { ascending: true }),
+          supabase.from("seo_settings").select("*").eq("id", "main").maybeSingle(),
+          supabase.from("portfolio_images").select("*").order("sort_order", { ascending: true })
+        ]);
+
+        // Map credits
+        const mappedCredits = (credsRes.data || []).map((c: any): Credit => {
+          const credit: Credit = {
+            year: c.year || "—",
+            title: c.title || "",
+            role: { sv: c.role_sv || "", en: c.role_en || "" },
+            type: c.type as "TV" | "Film" | "Voice" | "Theater",
+            category: { sv: c.category_sv || "", en: c.category_en || "" },
+            network: c.network || "",
+            url: c.url || undefined,
+            img: c.img || "",
+            is_current_production: c.is_current_production
+          };
+          if (c.commentary_url) {
+            credit.commentary = {
+              url: c.commentary_url,
+              duration: c.commentary_duration || "0:10",
+              svText: c.commentary_sv || "",
+              enText: c.commentary_en || ""
+            };
+          }
+          if (c.script_scene) {
+            credit.script = {
+              scene: c.script_scene,
+              dialogue: {
+                char: c.script_char || "CHARACTER",
+                line: {
+                  sv: c.script_line_sv || "",
+                  en: c.script_line_en || ""
+                }
+              }
+            };
+          }
+          return credit;
+        });
+
+        // Map showreels
+        const mappedShowreels = (reelsRes.data || []).map((r: any): VideoItem => {
+          return {
+            id: r.id || String(r.sort_order),
+            title: { sv: r.title_sv || "", en: r.title_en || "" },
+            sub: { sv: r.sub_sv || "", en: r.sub_en || "" },
+            url: r.url || undefined,
+            vimeoId: r.vimeo_id || undefined,
+            youtubeId: r.youtube_id || undefined,
+            poster: r.poster || "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
+            genre: r.genre || "SHOWREEL",
+            specs: r.specs || "16:9 // HD",
+            glow: r.glow || "rgba(235, 94, 40, 0.15)"
+          };
+        });
+
+        // Map portfolio images
+        const mappedImages = (portRes.data || []).map((p: any) => p.url);
+
+        setDbData({
+          biography: bioRes.data,
+          credits: mappedCredits,
+          showreels: mappedShowreels,
+          seo: seoRes.data,
+          portfolioImages: mappedImages.length > 0 ? mappedImages : IMG.portfolio
+        });
+      } catch (e) {
+        console.error("Failed to load live Supabase data:", e);
+      }
+    };
+
+    loadAllData();
+  }, []);
+
+  // Dynamically update head tags for SEO optimization based on DB settings
+  useEffect(() => {
+    if (!dbData?.seo) return;
+    const seo = dbData.seo;
+    const title = lang === "sv" ? seo.title_sv : seo.title_en;
+    const desc = lang === "sv" ? seo.description_sv : seo.description_en;
+    if (title) {
+      document.title = title;
+    }
+    if (desc) {
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.setAttribute('name', 'description');
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute('content', desc);
+    }
+    if (seo.og_image) {
+      let metaOgImg = document.querySelector('meta[property="og:image"]');
+      if (!metaOgImg) {
+        metaOgImg = document.createElement('meta');
+        metaOgImg.setAttribute('property', 'og:image');
+        document.head.appendChild(metaOgImg);
+      }
+      metaOgImg.setAttribute('content', seo.og_image);
+    }
+  }, [dbData, lang]);
+
+  const reviewQuotes = useMemo(() => {
+    if (dbData?.biography?.review_quotes) {
+      try {
+        const parsed = typeof dbData.biography.review_quotes === "string"
+          ? JSON.parse(dbData.biography.review_quotes)
+          : dbData.biography.review_quotes;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((q: any) => lang === "sv" ? q.sv : q.en);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return lang === "sv" ? REVIEW_QUOTES_SV : REVIEW_QUOTES_EN;
+  }, [dbData, lang]);
+
+  const mergedMoodData = useMemo(() => {
+    const base = { ...MOOD_DATA };
+    if (dbData?.biography?.mood_images) {
+      try {
+        const parsed = typeof dbData.biography.mood_images === "string"
+          ? JSON.parse(dbData.biography.mood_images)
+          : dbData.biography.mood_images;
+        if (parsed) {
+          if (parsed.dramatic) base.Dramatic = { ...base.Dramatic, image: parsed.dramatic };
+          if (parsed.comedic) base.Comedic = { ...base.Comedic, image: parsed.comedic };
+          if (parsed.classical) base.Classical = { ...base.Classical, image: parsed.classical };
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return base;
+  }, [dbData]);
+
+  const mergedT = useMemo(() => {
+    // Start with static translations
+    const base = JSON.parse(JSON.stringify(I18N[lang]));
+    
+    // Override biography fields if available in database
+    if (dbData?.biography) {
+      const bio = dbData.biography;
+      
+      // 1. Hero text (either static hero_line, or sync'ed from active production)
+      let heroLine = lang === "sv" ? bio.hero_line_sv : bio.hero_line_en;
+      
+      if (bio.sync_hero_text && dbData.credits && dbData.credits.length > 0) {
+        // Find current production credit
+        const currentProd = dbData.credits.find((c) => c.is_current_production);
+        if (currentProd) {
+          const title = currentProd.title;
+          const role = lang === "sv" ? currentProd.role.sv : currentProd.role.en;
+          const details = currentProd.network || (lang === "sv" ? currentProd.category.sv : currentProd.category.en);
+          heroLine = `"${title}" — ${role} (${details}).`;
+        }
+      }
+      
+      if (heroLine) {
+        base.hero.line = heroLine;
+      }
+      
+      // 2. Biography headings and texts
+      const heading = lang === "sv" ? bio.heading_sv : bio.heading_en;
+      if (heading) {
+        base.bio.heading = [heading, "", ""];
+      }
+      
+      // Paragraphs
+      const p1 = lang === "sv" ? bio.paragraph1_sv : bio.paragraph1_en;
+      if (p1) {
+        base.bio.p1Post = p1;
+        base.bio.p1Pre = "";
+        base.bio.p1Link = "";
+      }
+      const p2 = lang === "sv" ? bio.paragraph2_sv : bio.paragraph2_en;
+      if (p2) {
+        base.bio.p2 = [p2, "", "", "", "", "", "", "", ""];
+      }
+      const p3 = lang === "sv" ? bio.paragraph3_sv : bio.paragraph3_en;
+      if (p3) {
+        base.bio.p3 = [p3, "", "", "", ""];
+      }
+      
+      // Facts
+      if (bio.facts) {
+        try {
+          const parsedFacts = typeof bio.facts === "string" ? JSON.parse(bio.facts) : bio.facts;
+          if (Array.isArray(parsedFacts)) {
+            base.bio.facts = parsedFacts.map((f: any) => {
+              const key = lang === "sv" ? f.key_sv : f.key_en;
+              const val = lang === "sv" ? f.val_sv : f.val_en;
+              return [key, val];
+            });
+          }
+        } catch (e) {
+          console.error("Failed to parse bio facts:", e);
+        }
+      }
+
+      // Dialogues/mood lines
+      const dramaticQuote = lang === "sv" ? bio.quote_dramatic_sv : bio.quote_dramatic_en;
+      if (dramaticQuote) base.bio.lines.Dramatic = dramaticQuote;
+      
+      const comedicQuote = lang === "sv" ? bio.quote_comedic_sv : bio.quote_comedic_en;
+      if (comedicQuote) base.bio.lines.Comedic = comedicQuote;
+      
+      const classicalQuote = lang === "sv" ? bio.quote_classical_sv : bio.quote_classical_en;
+      if (classicalQuote) base.bio.lines.Classical = classicalQuote;
+    }
+    
+    return base;
+  }, [dbData, lang]);
+
+  const ctx = useMemo(() => ({ lang, setLang, t: mergedT }), [lang, mergedT]);
 
   return (
     <LangContext.Provider value={ctx}>
@@ -323,10 +560,12 @@ function Page() {
         />
 
         <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
-        <Biography />
-        <Portfolio />
-        <Showreels />
+        <Biography moodData={mergedMoodData} />
+        <Portfolio images={dbData?.portfolioImages} />
+        <Showreels videos={dbData?.showreels} />
         <Credits
+          credits={dbData?.credits}
+          reviewQuotes={reviewQuotes}
           activeCommentaryUrl={activeCommentary?.url}
           onPlayCommentary={setActiveCommentary}
         />

@@ -78,3 +78,8 @@ This document tracks completed features, animation systems, layout updates, and 
 
 - **Website Producer Credit:** Appended "Sirin Öngörür" as Website Producer to the end of the credits list scrolling marquee in `Footer.tsx`.
 - **CSS Marquee Pause:** Replaced Framer Motion's snap-back hover-reset with a pure CSS hardware-accelerated scroll keyframe. Set `animation-play-state: paused` on hover so the roll halts smoothly and continues scrolling exactly where it was without resetting.
+
+### 12. Admin Console Cursor Bug Fix
+
+- **Custom Spotlight Suppression:** Wrapped the backstage route rendering tree in a `data-no-spotlight` container. This tells the global cinematic `Spotlight` follower to hide, avoiding visual double-cursor noise in the admin panel.
+- **Native Browser Cursor Restoration:** Implemented an inline CSS style override block specifically targeting backstage child elements (inputs, textareas, buttons, select menus, containers). This overrides the global `html, body { cursor: none; }` rules, restoring the native cursor, I-beam text editing indicators, and standard hand pointers over clickable CMS buttons.

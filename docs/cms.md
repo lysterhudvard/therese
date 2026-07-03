@@ -11,7 +11,7 @@ It is designed to be highly optimized for Google/AI-engine indexing (AEO/GEO) wh
 To avoid conflicts with the Git-synced nature of the website (especially when building/syncing with platforms like Lovable), content will be stored in a cloud database rather than local JSON/Markdown files.
 
 *   **Backend Database:** **Supabase (PostgreSQL)** — Free tier is perfect for this scale, offers instant REST/GraphQL APIs, built-in Authentication, and easy image storage buckets.
-*   **CMS Interface:** Secure admin dashboard built directly into the site (under a protected route `/admin`) using standard React components.
+*   **CMS Interface:** Secure admin dashboard built directly into the site (under a protected route `/backstage`) using standard React components.
 *   **Authentication:** Supabase GoTrue (Email/Password login) for Therese.
 *   **Astro-Ready:** The database APIs will connect seamlessly to TanStack Start today and can be migrated to Astro's static site generation (SSG) or Server-Side Rendering (SSR) fetch loops tomorrow.
 
@@ -125,25 +125,26 @@ graph TD
 ## 5. Implementation Roadmap
 
 ### Phase 1: Database Setup (Supabase)
-1.  Initialize a Supabase project.
-2.  Create tables: `profiles` (for Auth), `biography`, `credits`, `showreels`, `voice_reels`, and `seo_settings`.
-3.  Configure Storage Buckets for portfolio photos, audio reels, and showreel thumbnails.
+1. Initialize a Supabase project.
+2. Create tables: `profiles` (for Auth), `biography`, `credits`, `showreels`, `voice_reels`, and `seo_settings`.
+3. Configure Storage Buckets for portfolio photos, audio reels, and showreel thumbnails.
 
-### Phase 2: CMS Admin Interface
-1.  Create the `/admin` path inside the TanStack Router structure.
-2.  Build the login form connecting to Supabase Auth.
-3.  Design the dashboard layout with tabs matching the "Acts" structure.
-4.  Implement side-by-side translation editors for SV and EN inputs.
-5.  Add image upload dropzones with automated resizing, renaming, and mandatory Alt fields.
+### Phase 2: CMS Admin Interface (Access Route: `/backstage`)
+1. Create the `/backstage` path inside the TanStack Router structure. *(Completed)*
+2. Build the secure login form with access key validation. *(Completed)*
+3. Design the dashboard layout with tabs matching the "Acts" structure. *(Completed)*
+4. Implement side-by-side translation editors for SV and EN inputs. *(Completed)*
+5. Add image upload and alt-tag configurations, along with character-validated inputs. *(Completed)*
+6. Build tabular CV/Merit manager and Google Search Snippet/OpenGraph Preview card widgets. *(Completed)*
 
 ### Phase 3: SEO Integration & Live Snippet Mockups
-1.  Implement character counters and the visual Google/Social card mockup on the SEO settings tab.
-2.  Wire up automatic JSON-LD script generation on page load based on active database rows.
+1. Integrate character counters and the visual Google/Social card mockup on the SEO settings tab. *(Completed)*
+2. Wire up automatic JSON-LD script generation on page load based on active database rows.
 
 ### Phase 4: Dynamic Frontend Connection
-1.  Replace the static `CREDITS` and `I18N` objects in `src/routes/index.tsx` with dynamic fetches from the Supabase API.
-2.  Add client-side caching or SSR preload queries to prevent layout shifts (CLS) and ensure fast Largest Contentful Paint (LCP) performance.
+1. Replace the static `CREDITS` and `I18N` objects in `src/routes/index.tsx` with dynamic fetches from the database.
+2. Add client-side caching or SSR preload queries to prevent layout shifts (CLS) and ensure fast Largest Contentful Paint (LCP) performance.
 
 ### Phase 5: Verification & Testing
-1.  Verify SEO schema structure using Google Rich Results Test tool.
-2.  Ensure that all page routes and SEO tags compile cleanly under 400 lines of code per component.
+1. Verify SEO schema structure using Google Rich Results Test tool.
+2. Ensure that all page routes and SEO tags compile cleanly under 400 lines of code per component. *(Completed)*

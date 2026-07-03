@@ -4,10 +4,10 @@ import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
 import { MOOD_DATA, type Mood } from "../../routes/index";
 
-export function Biography() {
+export function Biography({ moodData = MOOD_DATA }: { moodData?: typeof MOOD_DATA }) {
   const { t } = useT();
   const [mood, setMood] = useState<Mood>("Dramatic");
-  const data = MOOD_DATA[mood];
+  const data = moodData[mood];
 
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -34,7 +34,7 @@ export function Biography() {
                 {t.bio.director}
               </div>
               <div className="inline-flex hairline border-t-0 border border-bone/15">
-                {(Object.keys(MOOD_DATA) as Mood[]).map((m) => (
+                {(Object.keys(moodData) as Mood[]).map((m) => (
                   <button
                     key={m}
                     onClick={() => setMood(m)}

@@ -10,9 +10,7 @@ import {
   type FilterKey,
 } from "../../routes/index";
 
-export function ParallaxQuotes() {
-  const { lang } = useT();
-  const quotes = lang === "sv" ? REVIEW_QUOTES_SV : REVIEW_QUOTES_EN;
+export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const layers = [
@@ -39,7 +37,7 @@ export function ParallaxQuotes() {
   ];
   return (
     <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {quotes.map((q, i) => (
+      {quotes.slice(0, 5).map((q, i) => (
         <motion.div
           key={q}
           style={{
@@ -58,9 +56,13 @@ export function ParallaxQuotes() {
 }
 
 export function Credits({
+  credits = CREDITS,
+  reviewQuotes,
   activeCommentaryUrl,
   onPlayCommentary,
 }: {
+  credits?: Credit[];
+  reviewQuotes?: string[];
   activeCommentaryUrl?: string;
   onPlayCommentary?: (c: { title: string; role: string; url: string; text: string } | null) => void;
 }) {
@@ -79,9 +81,12 @@ export function Credits({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const defaultQuotes = useMemo(() => lang === "sv" ? REVIEW_QUOTES_SV : REVIEW_QUOTES_EN, [lang]);
+  const activeQuotes = reviewQuotes || defaultQuotes;
+
   const rows = useMemo(
-    () => (filter === "Alla" ? CREDITS : CREDITS.filter((c) => c.type === filter)),
-    [filter],
+    () => (filter === "Alla" ? credits : credits.filter((c) => c.type === filter)),
+    [filter, credits],
   );
 
   const visibleRows = useMemo(() => {
@@ -99,7 +104,7 @@ export function Credits({
   return (
     <section id="credits" ref={ref} className="relative px-6 py-28 md:px-12 md:py-40">
       <motion.div style={{ opacity, scale }} className="w-full h-full">
-        <ParallaxQuotes />
+        <ParallaxQuotes quotes={activeQuotes} />
         <div className="relative mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
             <div>
@@ -123,7 +128,7 @@ export function Credits({
                 >
                   {t.credits.filters[f]}
                   <span className="ml-2 font-mono text-[9px] text-bone/30">
-                    {f === "Alla" ? CREDITS.length : CREDITS.filter((c) => c.type === f).length}
+                    {f === "Alla" ? credits.length : credits.filter((c) => c.type === f).length}
                   </span>
                 </button>
               ))}

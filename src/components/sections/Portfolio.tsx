@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { IMG } from "../../routes/index";
 
-export function Portfolio() {
+export function Portfolio({ images = IMG.portfolio }: { images?: string[] }) {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -65,7 +65,7 @@ export function Portfolio() {
           style={{ x }}
           className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
         >
-          {IMG.portfolio.map((src, i) => (
+          {images.map((src, i) => (
             <div
               key={src}
               className="relative shrink-0"
@@ -78,7 +78,7 @@ export function Portfolio() {
                 className="h-full w-full object-cover"
               />
               <div className="absolute left-2 top-2 font-mono text-[10px] text-bone/70">
-                {String(i + 1).padStart(2, "0")} / {String(IMG.portfolio.length).padStart(2, "0")}
+                {String(i + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
               </div>
               <div className="absolute bottom-2 right-2 font-mono text-[10px] text-bone/70">
                 THESS · {String(2020 + (i % 4))}
@@ -99,7 +99,7 @@ export function Portfolio() {
           </div>
           <div className="w-full overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-4 px-6">
-              {IMG.portfolio.map((src, i) => (
+              {images.map((src, i) => (
                 <div key={src} className="relative shrink-0 w-[240px] aspect-[3/4]">
                   <img
                     src={src}

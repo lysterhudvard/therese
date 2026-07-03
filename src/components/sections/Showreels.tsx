@@ -4,9 +4,9 @@ import { Play, Pause, Volume2, VolumeX, Maximize2, ArrowLeft, ArrowRight } from 
 import { useT } from "../../hooks/use-t";
 import { VIDEOS, type VideoItem } from "./ShowreelsData";
 
-export function Showreels() {
+export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
   const { lang } = useT();
-  const [activeVideo, setActiveVideo] = useState<VideoItem>(VIDEOS[0]);
+  const [activeVideo, setActiveVideo] = useState<VideoItem>(videos[0] || VIDEOS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -17,8 +17,14 @@ export function Showreels() {
   const [isTransitionComplete, setIsTransitionComplete] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
 
-  const hasMoreVideos = VIDEOS.length > 3;
-  const displayedVideos = showAllVideos ? VIDEOS : VIDEOS.slice(0, 3);
+  useEffect(() => {
+    if (videos && videos.length > 0) {
+      setActiveVideo(videos[0]);
+    }
+  }, [videos]);
+
+  const hasMoreVideos = videos.length > 3;
+  const displayedVideos = showAllVideos ? videos : videos.slice(0, 3);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
