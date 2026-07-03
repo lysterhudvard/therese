@@ -142,7 +142,7 @@ export function Contact() {
               ref={formCardRef}
               style={{
                 background: isSpotlightActive
-                  ? "radial-gradient(circle 650px at 50% 50%, rgba(235, 94, 40, 0.18) 0%, rgba(28, 28, 28, 0.4) 60%, rgba(10, 10, 10, 0.8) 100%)"
+                  ? "radial-gradient(circle 750px at 50% 50%, rgba(235, 94, 40, 0.22) 0%, rgba(28, 28, 28, 0.35) 60%, rgba(10, 10, 10, 0.8) 100%)"
                   : undefined,
                 borderColor: isSpotlightActive ? "rgba(235, 94, 40, 0.55)" : undefined,
                 boxShadow: isSpotlightActive ? "0 0 60px rgba(235, 94, 40, 0.15)" : undefined,
@@ -155,7 +155,7 @@ export function Contact() {
                 style={{
                   opacity: isSpotlightActive ? 1 : 0,
                   background:
-                    "radial-gradient(circle 650px at 50% 50%, rgba(255, 255, 255, 0.14) 0%, rgba(235, 94, 40, 0.05) 60%, transparent 100%)",
+                    "radial-gradient(circle 750px at 50% 50%, rgba(255, 255, 255, 0.18) 0%, rgba(235, 94, 40, 0.08) 60%, transparent 100%)",
                 }}
                 className="absolute inset-0 pointer-events-none transition-opacity duration-800 z-20"
               />
@@ -210,9 +210,7 @@ export function Contact() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className={`space-y-8 relative z-10 transition-all duration-700 ${
-                      isSpotlightActive
-                        ? "opacity-100 filter-none"
-                        : "opacity-30 filter grayscale contrast-75 brightness-[0.8]"
+                      isSpotlightActive ? "opacity-100" : "opacity-60"
                     }`}
                   >
                     <Field
@@ -245,7 +243,7 @@ export function Contact() {
                       type="submit"
                       data-hover
                       disabled={!form.name || !form.email || !form.msg}
-                      className="group inline-flex items-center gap-3 border border-ember bg-ember px-8 py-4 text-[11px] uppercase tracking-[0.3em] text-ink transition-all hover:bg-bone hover:border-bone disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="group inline-flex items-center gap-3 border border-ember bg-ember px-8 py-4 text-[11px] uppercase tracking-[0.3em] text-ink transition-all hover:bg-bone hover:border-bone disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {t.contact.submit}{" "}
                       <Send size={14} className="transition-transform group-hover:translate-x-1" />
