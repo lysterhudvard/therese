@@ -50,10 +50,19 @@ type Status =
   | "flying"
   | "sent";
 
-export function Contact() {
+export function Contact({ bioData }: { bioData?: any }) {
   const { t } = useT();
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", msg: "" });
+
+  const links = typeof bioData?.contact_links === "string" 
+    ? JSON.parse(bioData.contact_links) 
+    : (bioData?.contact_links || {});
+
+  const agentEmail = links.agentEmail || "jonas@schultzbergagency.com";
+  const voiceEmail = links.voiceEmail || "theresejarvheden@gmail.com";
+  const instagram = links.instagram || "https://www.instagram.com/theresejarvheden/";
+  const facebook = links.facebook || "https://www.facebook.com/therese.jarvhedenfdpersson";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,11 +129,11 @@ export function Contact() {
                   {t.contact.agentLabel}
                 </div>
                 <a
-                  href="mailto:jonas@schultzbergagency.com"
+                  href={`mailto:${agentEmail}`}
                   data-hover
                   className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
                 >
-                  <Mail size={20} /> jonas@schultzbergagency.com
+                  <Mail size={20} /> {agentEmail}
                 </a>
                 <div className="mt-1 text-xs text-bone/40">{t.contact.agentSub}</div>
               </div>
@@ -133,16 +142,16 @@ export function Contact() {
                   {t.contact.voiceLabel}
                 </div>
                 <a
-                  href="mailto:theresejarvheden@gmail.com"
+                  href={`mailto:${voiceEmail}`}
                   data-hover
                   className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
                 >
-                  <Mail size={20} /> theresejarvheden@gmail.com
+                  <Mail size={20} /> {voiceEmail}
                 </a>
               </div>
               <div className="flex items-center gap-5 pt-4">
                 <a
-                  href="https://www.instagram.com/theresejarvheden/"
+                  href={instagram}
                   target="_blank"
                   rel="noreferrer"
                   data-hover
@@ -151,7 +160,7 @@ export function Contact() {
                   <Instagram size={16} /> Instagram
                 </a>
                 <a
-                  href="https://www.facebook.com/therese.jarvhedenfdpersson"
+                  href={facebook}
                   target="_blank"
                   rel="noreferrer"
                   data-hover

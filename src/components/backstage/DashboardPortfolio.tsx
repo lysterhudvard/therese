@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { Save, ArrowUp, ArrowDown, Image as ImageIcon, Trash2, Plus, Upload, Link } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
+import { MediaPickerModal } from "./MediaPickerModal";
+
 interface GalleryImage {
   id: string;
   url: string;
@@ -17,6 +19,7 @@ export function DashboardPortfolio() {
   const [isUploading, setIsUploading] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [newImageAlt, setNewImageAlt] = useState("");
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
 
   // Fetch data from Supabase on mount
   useEffect(() => {
@@ -169,6 +172,7 @@ export function DashboardPortfolio() {
   };
 
   return (
+    <>
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
       <div className="border-b border-bone/10 pb-4 mb-6">
         <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
@@ -204,11 +208,20 @@ export function DashboardPortfolio() {
                 />
                 <button
                   type="button"
+                  onClick={() => setIsMediaPickerOpen(true)}
+                  className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
+                  title="Välj från mediebibliotek"
+                >
+                  <ImageIcon size={12} />
+                </button>
+                <button
+                  type="button"
                   id="klick-portfolio-url-add"
                   onClick={handleAddImageUrl}
                   className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
+                  title="Lägg till länk"
                 >
-                  <Link size={12} />
+                  <Plus size={12} />
                 </button>
               </div>
             </div>
@@ -336,5 +349,13 @@ export function DashboardPortfolio() {
         </button>
       </div>
     </form>
+    
+    <MediaPickerModal
+      isOpen={isMediaPickerOpen}
+      onClose={() => setIsMediaPickerOpen(false)}
+      onSelect={(url) => setNewImageUrl(url)}
+      typeFilter="image"
+    />
+    </>
   );
 }

@@ -601,7 +601,7 @@ function Page() {
           onPlayCommentary={setActiveCommentary}
         />
         <Voice />
-        <Contact />
+        <Contact bioData={dbData?.biography} />
         <Footer bioData={dbData?.biography} />
 
         {/* Dynamic JSON-LD structured data for SEO/AEO search optimization */}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, ArrowUp, ArrowDown, Video, Trash2, Plus, Upload, Link, Eye } from "lucide-react";
+import { Save, ArrowUp, ArrowDown, Video, Trash2, Plus, Upload, Link, Eye, Image as ImageIcon } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 interface ShowreelItem {
   id: string;
@@ -23,6 +24,7 @@ export function DashboardShowreels() {
   const [showreels, setShowreels] = useState<ShowreelItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingPoster, setIsUploadingPoster] = useState<string | null>(null);
+  const [activePickerId, setActivePickerId] = useState<string | null>(null);
 
   // Fetch showreels on mount
   useEffect(() => {
@@ -170,6 +172,7 @@ export function DashboardShowreels() {
     }
   };
   return (
+    <>
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
       <div className="border-b border-bone/10 pb-4 mb-6 flex justify-between items-end gap-4">
         <div>
@@ -329,7 +332,7 @@ export function DashboardShowreels() {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="md:col-span-2 space-y-2">
                 <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Posterbild (URL)</label>
                 <div className="flex gap-2">
                   <input
@@ -338,6 +341,14 @@ export function DashboardShowreels() {
                     onChange={(e) => handleReelChange(reel.id, "poster", e.target.value)}
                     className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setActivePickerId(reel.id)}
+                    className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
+                    title="Välj från mediebibliotek"
+                  >
+                    <ImageIcon size={12} />
+                  </button>
                   <input
                     type="file"
                     accept="image/*"
@@ -354,6 +365,9 @@ export function DashboardShowreels() {
                     <Upload size={12} />
                   </label>
                 </div>
+                {reel.poster && (
+                  <img src={reel.poster} alt="Poster preview" className="w-48 aspect-video object-cover rounded mt-2 border border-bone/10" />
+                )}
               </div>
             </div>
           </div>
@@ -378,5 +392,17 @@ export function DashboardShowreels() {
         </button>
       </div>
     </form>
+
+    <MediaPickerModal
+      isOpen={activePickerId !== null}
+      onClose={() => setActivePickerId(null)}
+      onSelect={(url) => {
+        if (activePickerId) {
+          handleReelChange(activePickerId, "poster", url);
+        }
+      }}
+      typeFilter="image"
+    />
+    </>
   );
 }

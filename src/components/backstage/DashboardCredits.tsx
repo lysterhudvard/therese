@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, Star, Volume2, AlignLeft, Upload, ChevronDown, ChevronUp, Link as LinkIcon } from "lucide-react";
+import { Save, Plus, Trash2, Star, Volume2, AlignLeft, Upload, ChevronDown, ChevronUp, Link as LinkIcon, ArrowUp, ArrowDown, Music } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 interface CreditRow {
   id: string;
@@ -38,6 +39,7 @@ export function DashboardCredits() {
   // Track which rows have advanced features expanded
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [isUploadingAudio, setIsUploadingAudio] = useState<string | null>(null);
+  const [activePickerId, setActivePickerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -45,16 +47,35 @@ export function DashboardCredits() {
     const fetchCredits = async () => {
       const { data, error } = await supabase
         .from("credits")
-        .select("*")
-        .order("sort_order", { ascending: true });
+        .select("*");
 
       if (data) {
-        setCredits(data as CreditRow[]);
+        const sorted = (data as CreditRow[]).sort((a, b) => {
+          if (a.year === "—" && b.year !== "—") return 1;
+          if (b.year === "—" && a.year !== "—") return -1;
+          if (a.year !== b.year) {
+             return b.year.localeCompare(a.year);
+          }
+          return a.sort_order - b.sort_order;
+        });
+        setCredits(sorted);
       }
     };
 
     fetchCredits();
   }, []);
+
+  const moveCredit = (index: number, direction: "up" | "down") => {
+    const nextIndex = direction === "up" ? index - 1 : index + 1;
+    if (nextIndex < 0 || nextIndex >= credits.length) return;
+
+    const newCredits = [...credits];
+    const temp = newCredits[index];
+    newCredits[index] = newCredits[nextIndex];
+    newCredits[nextIndex] = temp;
+    setCredits(newCredits);
+    toast.info("Sorteringsordning ändrad.");
+  };
 
   const filteredCredits = filterType === "Alla" 
     ? credits 
@@ -286,14 +307,32 @@ export function DashboardCredits() {
               id={index === 0 ? "klick-credits-row-0" : undefined}
               className="border border-bone/10 bg-stage/5 p-5 rounded-sm relative space-y-4 transition-all duration-300"
             >
-              <button
-                type="button"
-                onClick={() => removeCredit(c.id)}
-                className="absolute top-4 right-4 text-bone/35 hover:text-red-400 transition-colors cursor-pointer z-10"
-                aria-label="Radera"
-              >
-                <Trash2 size={14} />
-              </button>
+              <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+                <button
+                  type="button"
+                  disabled={index === 0}
+                  onClick={() => moveCredit(index, "up")}
+                  className="p-1 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 transition-all rounded cursor-pointer"
+                >
+                  <ArrowUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  disabled={index === credits.length - 1}
+                  onClick={() => moveCredit(index, "down")}
+                  className="p-1 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 transition-all rounded cursor-pointer"
+                >
+                  <ArrowDown size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeCredit(c.id)}
+                  className="p-1 text-bone/35 hover:text-red-400 transition-colors cursor-pointer"
+                  aria-label="Radera"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
 
               {/* Grid structure for inputs */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4">

@@ -113,10 +113,10 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
       <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.012]" />
 
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-bone/10 bg-ink/90 backdrop-blur-md p-6 flex flex-col justify-between shrink-0 relative z-20">
+      <aside className="w-full md:w-60 border-b md:border-b-0 md:border-r border-bone/10 bg-ink/90 backdrop-blur-md p-4 flex flex-col justify-between shrink-0 relative z-20">
         <div>
           {/* Logo / Header */}
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between px-2">
             <div>
               <span className="text-[9px] uppercase tracking-[0.4em] text-ember font-mono block">
                 theresejarvheden.se
@@ -126,7 +126,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
               </span>
             </div>
           </div>
-
+ 
           {/* Navigation Links */}
           <nav className="space-y-1">
             {navigationItems.map((item) => {
@@ -137,13 +137,13 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
                   key={item.id}
                   id={`klick-nav-${item.id}`}
                   onClick={() => setActiveTab(item.id as TabType)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest font-mono rounded-sm transition-all duration-300 cursor-pointer ${
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs uppercase tracking-widest font-mono rounded-sm transition-all duration-300 cursor-pointer whitespace-nowrap text-left ${
                     isActive
                       ? "bg-ember text-ink font-semibold shadow-md"
                       : "text-bone/60 hover:text-bone hover:bg-bone/[0.04]"
                   }`}
                 >
-                  <Icon size={14} className={isActive ? "text-ink" : "text-bone/45"} />
+                  <Icon size={16} className={`flex-shrink-0 ${isActive ? "text-ink" : "text-bone/45"}`} />
                   {item.label}
                 </button>
               );

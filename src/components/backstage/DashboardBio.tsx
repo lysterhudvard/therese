@@ -116,26 +116,26 @@ export function DashboardBio() {
       }
 
       if (data) {
-        setQuoteSv(data.quote_sv || "");
-        setQuoteEn(data.quote_en || "");
-        setQuoteComedicSv(data.quote_comedic_sv || "");
-        setQuoteComedicEn(data.quote_comedic_en || "");
-        setQuoteClassicalSv(data.quote_classical_sv || "");
-        setQuoteClassicalEn(data.quote_classical_en || "");
+        if (data.quote_sv) setQuoteSv(data.quote_sv);
+        if (data.quote_en) setQuoteEn(data.quote_en);
+        if (data.quote_comedic_sv) setQuoteComedicSv(data.quote_comedic_sv);
+        if (data.quote_comedic_en) setQuoteComedicEn(data.quote_comedic_en);
+        if (data.quote_classical_sv) setQuoteClassicalSv(data.quote_classical_sv);
+        if (data.quote_classical_en) setQuoteClassicalEn(data.quote_classical_en);
         
-        setHeadingSv(data.heading_sv || "");
-        setHeadingEn(data.heading_en || "");
-        setParagraph1Sv(data.paragraph1_sv || "");
-        setParagraph1En(data.paragraph1_en || "");
-        setParagraph2Sv(data.paragraph2_sv || "");
-        setParagraph2En(data.paragraph2_en || "");
-        setParagraph3Sv(data.paragraph3_sv || "");
-        setParagraph3En(data.paragraph3_en || "");
+        if (data.heading_sv) setHeadingSv(data.heading_sv);
+        if (data.heading_en) setHeadingEn(data.heading_en);
+        if (data.paragraph1_sv) setParagraph1Sv(data.paragraph1_sv);
+        if (data.paragraph1_en) setParagraph1En(data.paragraph1_en);
+        if (data.paragraph2_sv) setParagraph2Sv(data.paragraph2_sv);
+        if (data.paragraph2_en) setParagraph2En(data.paragraph2_en);
+        if (data.paragraph3_sv) setParagraph3Sv(data.paragraph3_sv);
+        if (data.paragraph3_en) setParagraph3En(data.paragraph3_en);
 
-        setDialectsSv(data.dialects_sv || "");
-        setDialectsEn(data.dialects_en || "");
-        setLanguagesSv(data.languages_sv || "");
-        setLanguagesEn(data.languages_en || "");
+        if (data.dialects_sv) setDialectsSv(data.dialects_sv);
+        if (data.dialects_en) setDialectsEn(data.dialects_en);
+        if (data.languages_sv) setLanguagesSv(data.languages_sv);
+        if (data.languages_en) setLanguagesEn(data.languages_en);
         
         if (data.faqs && Array.isArray(data.faqs)) {
           setFaqs(data.faqs as FAQItem[]);
@@ -395,7 +395,7 @@ export function DashboardBio() {
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
             {dramaticImage && (
-              <img src={dramaticImage} alt="Dramatisk förhandsvisning" className="w-full h-20 object-cover mt-2 rounded border border-bone/5 opacity-80" />
+              <img src={dramaticImage} alt="Dramatisk förhandsvisning" className="w-full h-40 object-cover mt-2 rounded border border-bone/5 opacity-80" />
             )}
           </div>
           <div className="space-y-2">
@@ -407,7 +407,7 @@ export function DashboardBio() {
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
             {comedicImage && (
-              <img src={comedicImage} alt="Komisk förhandsvisning" className="w-full h-20 object-cover mt-2 rounded border border-bone/5 opacity-80" />
+              <img src={comedicImage} alt="Komisk förhandsvisning" className="w-full h-40 object-cover mt-2 rounded border border-bone/5 opacity-80" />
             )}
           </div>
           <div className="space-y-2">
@@ -419,7 +419,7 @@ export function DashboardBio() {
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
             {classicalImage && (
-              <img src={classicalImage} alt="Klassisk förhandsvisning" className="w-full h-20 object-cover mt-2 rounded border border-bone/5 opacity-80" />
+              <img src={classicalImage} alt="Klassisk förhandsvisning" className="w-full h-40 object-cover mt-2 rounded border border-bone/5 opacity-80" />
             )}
           </div>
         </div>
