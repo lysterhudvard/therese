@@ -66,3 +66,15 @@ This document tracks completed features, animation systems, layout updates, and 
 - Built a slow-morphing "Theater Mode" that scales the player canvas smoothly to an IMAX-style widescreen format (`w-[94vw] max-w-[1400px]`) over 2.2 seconds with a custom ease curve.
 - Implemented delayed projection: the player keeps the video unmounted and displays a static poster image during expansion, gradually darkening the poster to black as the screen grows. Autoplay initiates only after the transition completes and the background dims to pitch black.
 - Mapped dynamic background glow backlighting matching each reel's signature color.
+
+### 10. Showreel Pagination & Merits Section Pagination (Load More)
+
+- **Showreel Card Cap:** Restricted visible showreels to 3 items maximum by default. Added two mock reels to a new decoupled file `src/components/sections/ShowreelsData.ts` to test expansion logic.
+- **Side Arrow Toggle Card:** Created a custom interactive selector card on the side with animate-loop arrow icons (`ArrowLeft` / `ArrowRight`) to let the user expand/collapse showreels with smooth transition styling.
+- **Merits Count Limit:** Limited the credits list to show 10 items (5 on mobile screens, dynamically monitored on viewport resize). 
+- **Load More / Less Button:** Styled an elegant, cinematic, borders-only button centered below the credits list that handles expanding or collapsing rows based on active category filtering.
+
+### 11. Website Producer & Marquee Pause (Akt XII)
+
+- **Website Producer Credit:** Appended "Sirin Öngörür" as Website Producer to the end of the credits list scrolling marquee in `Footer.tsx`.
+- **CSS Marquee Pause:** Replaced Framer Motion's snap-back hover-reset with a pure CSS hardware-accelerated scroll keyframe. Set `animation-play-state: paused` on hover so the roll halts smoothly and continues scrolling exactly where it was without resetting.

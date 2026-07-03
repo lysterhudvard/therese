@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useT } from "../../hooks/use-t";
@@ -68,11 +68,27 @@ export function Credits({
   const [filter, setFilter] = useState<FilterKey>("Alla");
   const [hoveredCredit, setHoveredCredit] = useState<Credit | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [showAllCredits, setShowAllCredits] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const rows = useMemo(
     () => (filter === "Alla" ? CREDITS : CREDITS.filter((c) => c.type === filter)),
     [filter],
   );
+
+  const visibleRows = useMemo(() => {
+    if (showAllCredits) return rows;
+    const limit = isMobile ? 5 : 10;
+    return rows.slice(0, limit);
+  }, [rows, showAllCredits, isMobile]);
   const filters: FilterKey[] = ["Alla", "Film", "TV", "Theater", "Voice"];
 
   const ref = useRef<HTMLDivElement>(null);
@@ -116,7 +132,7 @@ export function Credits({
 
           <ul className="mt-14 border-t border-bone/20">
             <AnimatePresence initial={false}>
-              {rows.map((c, i) => (
+              {visibleRows.map((c, i) => (
                 <motion.li
                   key={c.title}
                   layout
@@ -218,6 +234,20 @@ export function Credits({
               ))}
             </AnimatePresence>
           </ul>
+
+          {rows.length > (isMobile ? 5 : 10) && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => setShowAllCredits(!showAllCredits)}
+                data-hover
+                className="px-6 py-3 border border-bone/10 hover:border-ember text-bone hover:text-ember font-mono text-[10px] uppercase tracking-widest transition-all duration-300 rounded-sm bg-stage/10 cursor-pointer pointer-events-auto"
+              >
+                {showAllCredits
+                  ? (lang === "sv" ? "Visa färre meriter" : "Show Less Credits")
+                  : (lang === "sv" ? "Visa fler meriter" : "Show More Credits")}
+              </button>
+            </div>
+          )}
         </div>
 
         <AnimatePresence>

@@ -5,7 +5,6 @@ import { IMG } from "../../routes/index";
 
 export function Footer() {
   const { lang, t } = useT();
-  const [isHovered, setIsHovered] = useState(false);
   const [animatedIn, setAnimatedIn] = useState(false);
   const [startScroll, setStartScroll] = useState(false);
 
@@ -62,6 +61,10 @@ export function Footer() {
     },
     { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström" },
     { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" },
+    {
+      label: lang === "sv" ? "PRODUCENT HEMSIDA" : "WEBSITE PRODUCER",
+      value: "Sirin Öngörür",
+    },
   ];
 
   return (
@@ -152,30 +155,27 @@ export function Footer() {
 
         {/* Scrolling Credits container */}
         <div className="w-full h-[240px] relative overflow-hidden z-10 border-y border-bone/5">
+          <style>{`
+            @keyframes creditScroll {
+              0% { transform: translateY(220px); }
+              100% { transform: translateY(-100%); }
+            }
+            .credit-scroll-container {
+              animation: creditScroll 30s linear infinite;
+            }
+            .credit-scroll-container:hover {
+              animation-play-state: paused;
+            }
+          `}</style>
           <AnimatePresence>
             {startScroll && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
-                className="absolute inset-0 py-4"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                className="absolute inset-0 py-4 pointer-events-auto"
               >
-                <motion.div
-                  animate={{
-                    y: isHovered ? "0%" : ["40%", "-100%"],
-                  }}
-                  transition={{
-                    y: {
-                      repeat: Infinity,
-                      repeatType: "loop",
-                      duration: 26,
-                      ease: "linear",
-                    },
-                  }}
-                  className="flex flex-col items-center gap-8 text-center font-mono select-none"
-                >
+                <div className="credit-scroll-container flex flex-col items-center gap-8 text-center font-mono select-none">
                   {creditsList.map((item, index) => (
                     <div key={index} className="flex flex-col items-center">
                       <span className="text-[10px] uppercase tracking-[0.3em] text-bone/45 mb-1">
@@ -202,7 +202,7 @@ export function Footer() {
                   <div className="text-sm md:text-base font-display uppercase tracking-[0.4em] text-bone mt-8 font-semibold">
                     {t.footer.end}
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

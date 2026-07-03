@@ -1,56 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize2, ArrowLeft, ArrowRight } from "lucide-react";
 import { useT } from "../../hooks/use-t";
-
-interface VideoItem {
-  id: string;
-  title: { sv: string; en: string };
-  sub: { sv: string; en: string };
-  url?: string;
-  youtubeId?: string;
-  vimeoId?: string;
-  poster: string;
-  genre: string;
-  specs: string;
-  glow: string; // Tailwind glow gradient or color
-}
-
-const VIDEOS: VideoItem[] = [
-  {
-    id: "main-reel",
-    title: { sv: "Huvudshowreel", en: "Main Showreel" },
-    sub: { sv: "Therese Järvheden — Skådespelerska", en: "Therese Järvheden — Actress" },
-    vimeoId: "1206764752",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-dramatic-female-portrait-in-dark-room-41655-large.mp4",
-    poster: "https://img.youtube.com/vi/J9_4XQiQtNk/maxresdefault.jpg",
-    genre: "SHOWREEL",
-    specs: "16:9 // HD // 25 FPS",
-    glow: "rgba(235, 94, 40, 0.18)", // Ember/orange glow
-  },
-  {
-    id: "drama",
-    title: { sv: "Drama & Scen", en: "Drama & Stage" },
-    sub: { sv: "Beck, SVT 'En våldsam kärlek' m.m.", en: "Beck, SVT 'En våldsam kärlek' etc." },
-    url: "https://assets.mixkit.co/videos/preview/mixkit-dramatic-female-portrait-in-dark-room-41655-large.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
-    genre: "DRAMA",
-    specs: "2.39:1 // ANAMORPHIC // 24 FPS",
-    glow: "rgba(14, 116, 144, 0.15)", // Cyan/Teal glow
-  },
-  {
-    id: "comedy",
-    title: { sv: "Komedi & Humor", en: "Comedy & Humor" },
-    sub: { sv: "Karatefylla, Anna Blomberg show", en: "Karatefylla, Anna Blomberg show" },
-    url: "https://assets.mixkit.co/videos/preview/mixkit-laughing-woman-in-close-up-portrait-40283-large.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&q=80&w=1000",
-    genre: "COMEDY",
-    specs: "16:9 // FLAT // 25 FPS",
-    glow: "rgba(235, 94, 40, 0.15)", // Ember glow
-  },
-];
+import { VIDEOS, type VideoItem } from "./ShowreelsData";
 
 export function Showreels() {
   const { lang } = useT();
@@ -63,6 +15,10 @@ export function Showreels() {
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [isTransitionComplete, setIsTransitionComplete] = useState(false);
+  const [showAllVideos, setShowAllVideos] = useState(false);
+
+  const hasMoreVideos = VIDEOS.length > 3;
+  const displayedVideos = showAllVideos ? VIDEOS : VIDEOS.slice(0, 3);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -465,8 +421,16 @@ export function Showreels() {
         </div>
 
         {/* Thumbnails Selector Row */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[960px] mx-auto">
-          {VIDEOS.map((item) => {
+        <div
+          className={`mt-12 grid gap-6 max-w-[960px] mx-auto ${
+            showAllVideos
+              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+              : hasMoreVideos
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
+                : "grid-cols-1 md:grid-cols-3"
+          }`}
+        >
+          {displayedVideos.map((item) => {
             const isHovered = hoveredCardId === item.id;
             const isSelected = activeVideo.id === item.id;
 
@@ -518,6 +482,31 @@ export function Showreels() {
               </div>
             );
           })}
+
+          {/* Toggle card for show more/less */}
+          {hasMoreVideos && (
+            <div
+              onClick={() => setShowAllVideos(!showAllVideos)}
+              className="relative border border-bone/10 hover:border-ember bg-stage/10 cursor-pointer rounded-sm overflow-hidden flex flex-col items-center justify-center p-6 text-center group transition-all duration-500 min-h-[150px] md:h-auto"
+            >
+              <motion.div
+                animate={{ x: showAllVideos ? 0 : [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                className="w-10 h-10 rounded-full border border-bone/20 flex items-center justify-center text-bone/60 group-hover:text-ember group-hover:border-ember transition-colors mb-2"
+              >
+                {showAllVideos ? (
+                  <ArrowLeft size={16} className="rotate-90 md:rotate-0" />
+                ) : (
+                  <ArrowRight size={16} className="rotate-90 md:rotate-0" />
+                )}
+              </motion.div>
+              <span className="font-mono text-[9px] tracking-widest text-bone/60 group-hover:text-bone transition-colors uppercase">
+                {showAllVideos
+                  ? (lang === "sv" ? "Visa färre" : "Show Less")
+                  : (lang === "sv" ? "Visa fler" : "Show More")}
+              </span>
+            </div>
+          )}
         </div>
       </motion.div>
     </section>
