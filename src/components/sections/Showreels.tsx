@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Play, Pause, Volume2, VolumeX, Maximize2, RotateCcw } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
 import { useT } from "../../hooks/use-t";
 
 interface VideoItem {
   id: string;
   title: { sv: string; en: string };
   sub: { sv: string; en: string };
-  url: string;
+  url?: string;
+  youtubeId?: string;
   poster: string;
   genre: string;
   specs: string;
@@ -16,8 +17,19 @@ interface VideoItem {
 
 const VIDEOS: VideoItem[] = [
   {
+    id: "main-reel",
+    title: { sv: "Huvudshowreel", en: "Main Showreel" },
+    sub: { sv: "Therese Järvheden — Skådespelerska", en: "Therese Järvheden — Actress" },
+    youtubeId: "J9_4XQiQtNk",
+    url: "https://assets.mixkit.co/videos/preview/mixkit-dramatic-female-portrait-in-dark-room-41655-large.mp4",
+    poster: "https://img.youtube.com/vi/J9_4XQiQtNk/maxresdefault.jpg",
+    genre: "SHOWREEL",
+    specs: "16:9 // HD // 25 FPS",
+    glow: "rgba(235, 94, 40, 0.18)", // Ember/orange glow
+  },
+  {
     id: "drama",
-    title: { sv: "Drama Showreel", en: "Drama Showreel" },
+    title: { sv: "Drama & Scen", en: "Drama & Stage" },
     sub: { sv: "Beck, SVT 'En våldsam kärlek' m.m.", en: "Beck, SVT 'En våldsam kärlek' etc." },
     url: "https://assets.mixkit.co/videos/preview/mixkit-dramatic-female-portrait-in-dark-room-41655-large.mp4",
     poster:
@@ -37,21 +49,10 @@ const VIDEOS: VideoItem[] = [
     specs: "16:9 // FLAT // 25 FPS",
     glow: "rgba(235, 94, 40, 0.15)", // Ember glow
   },
-  {
-    id: "commercial",
-    title: { sv: "Reklam & Dubbning", en: "Commercial & Voiceover" },
-    sub: { sv: "Varumärken och röstproduktioner", en: "Brands and voiceover projects" },
-    url: "https://assets.mixkit.co/videos/preview/mixkit-fashion-woman-with-elegant-makeup-40432-large.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=1000",
-    genre: "COMMERCIAL",
-    specs: "1.85:1 // SPHERICAL // 24 FPS",
-    glow: "rgba(220, 38, 38, 0.15)", // Red glow
-  },
 ];
 
 export function Showreels() {
-  const { t, lang } = useT();
+  const { lang } = useT();
   const [activeVideo, setActiveVideo] = useState<VideoItem>(VIDEOS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -180,102 +181,116 @@ export function Showreels() {
           </p>
         </div>
 
-        {/* Cinematic Main Theater Player Container */}
-        <div className="relative mx-auto max-w-[960px] aspect-[21/9] bg-stage/20 border border-bone/10 shadow-2xl rounded-sm group overflow-hidden">
-          <video
-            ref={videoRef}
-            src={activeVideo.url}
-            poster={activeVideo.poster}
-            onClick={togglePlay}
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            onEnded={handleEnded}
-            playsInline
-            className="w-full h-full object-cover select-none cursor-pointer"
-          />
+        {/* Cinematic Main Theater Player Container (Standard Widescreen 16:9 for perfect fit) */}
+        <div className="relative mx-auto max-w-[960px] aspect-[16/9] bg-stage/20 border border-bone/10 shadow-2xl rounded-sm group overflow-hidden">
+          {activeVideo.youtubeId ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=0&rel=0&modestbranding=1&controls=1`}
+              className="w-full h-full border-0 absolute inset-0 z-10"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              src={activeVideo.url}
+              poster={activeVideo.poster}
+              onClick={togglePlay}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              onEnded={handleEnded}
+              playsInline
+              className="w-full h-full object-cover select-none cursor-pointer"
+            />
+          )}
 
           {/* Film Grain overlay */}
-          <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02]" />
+          <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02] z-20" />
 
           {/* Letterbox widescreen shadow lines */}
-          <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-ink/90 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-ink/90 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-ink/90 to-transparent pointer-events-none z-20" />
+          <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-ink/90 to-transparent pointer-events-none z-20" />
 
           {/* TECHNICAL MONITOR OVERLAY */}
-          <div className="absolute top-4 left-6 pointer-events-none flex flex-col font-mono text-[9px] tracking-wider text-bone/60 space-y-0.5">
+          <div className="absolute top-4 left-6 pointer-events-none flex flex-col font-mono text-[9px] tracking-wider text-bone/60 space-y-0.5 z-20">
             <div>REEL // {activeVideo.genre}</div>
             <div className="text-[8px] text-bone/40">{activeVideo.specs}</div>
           </div>
-          <div className="absolute top-4 right-6 pointer-events-none font-mono text-[9px] tracking-widest text-bone/60 flex items-center gap-2">
+          <div className="absolute top-4 right-6 pointer-events-none font-mono text-[9px] tracking-widest text-bone/60 flex items-center gap-2 z-20">
             <span className="w-1.5 h-1.5 rounded-full bg-ember animate-pulse" />
             LIVE REC
           </div>
 
-          {/* Big Center Play Button Overlay */}
-          <AnimatePresence>
-            {!isPlaying && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={togglePlay}
-                className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-stage/80 backdrop-blur-sm border border-bone/20 flex items-center justify-center text-ember shadow-lg hover:scale-105 hover:bg-stage transition-transform z-20 group-hover:scale-105"
-              >
-                <Play size={24} fill="currentColor" className="ml-1" />
-              </motion.button>
-            )}
-          </AnimatePresence>
+          {/* Render play button and controls ONLY if it's not a YouTube video (as YouTube handles its own controls natively) */}
+          {!activeVideo.youtubeId && (
+            <>
+              {/* Big Center Play Button Overlay */}
+              <AnimatePresence>
+                {!isPlaying && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={togglePlay}
+                    className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-stage/80 backdrop-blur-sm border border-bone/20 flex items-center justify-center text-ember shadow-lg hover:scale-105 hover:bg-stage transition-transform z-20 group-hover:scale-105"
+                  >
+                    <Play size={24} fill="currentColor" className="ml-1" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
-          {/* CUSTOM CINEMA PLAYER CONTROLS */}
-          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex flex-col gap-3">
-            {/* Timeline Progress Bar */}
-            <div
-              onClick={handleSeek}
-              className="relative w-full h-1 bg-bone/20 rounded-full cursor-pointer group/timeline hover:h-1.5 transition-all"
-            >
-              <div
-                className="absolute top-0 left-0 h-full bg-ember rounded-full"
-                style={{ width: `${progress}%` }}
-              />
-              <div
-                className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-bone opacity-0 group-hover/timeline:opacity-100 transition-opacity"
-                style={{ left: `calc(${progress}% - 5px)` }}
-              />
-            </div>
+              {/* CUSTOM CINEMA PLAYER CONTROLS */}
+              <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 flex flex-col gap-3">
+                {/* Timeline Progress Bar */}
+                <div
+                  onClick={handleSeek}
+                  className="relative w-full h-1 bg-bone/20 rounded-full cursor-pointer group/timeline hover:h-1.5 transition-all"
+                >
+                  <div
+                    className="absolute top-0 left-0 h-full bg-ember rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-bone opacity-0 group-hover/timeline:opacity-100 transition-opacity"
+                    style={{ left: `calc(${progress}% - 5px)` }}
+                  />
+                </div>
 
-            {/* Panel Buttons */}
-            <div className="flex items-center justify-between text-bone/80 text-xs">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={togglePlay}
-                  className="hover:text-ember transition-colors"
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                >
-                  {isPlaying ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
-                </button>
-                <button
-                  onClick={toggleMute}
-                  className="hover:text-ember transition-colors"
-                  aria-label={isMuted ? "Unmute" : "Mute"}
-                >
-                  {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-                </button>
-                <span className="font-mono text-[10px]">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
+                {/* Panel Buttons */}
+                <div className="flex items-center justify-between text-bone/80 text-xs">
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={togglePlay}
+                      className="hover:text-ember transition-colors"
+                      aria-label={isPlaying ? "Pause" : "Play"}
+                    >
+                      {isPlaying ? <Pause size={15} /> : <Play size={15} fill="currentColor" />}
+                    </button>
+                    <button
+                      onClick={toggleMute}
+                      className="hover:text-ember transition-colors"
+                      aria-label={isMuted ? "Unmute" : "Mute"}
+                    >
+                      {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                    </button>
+                    <span className="font-mono text-[10px]">
+                      {formatTime(currentTime)} / {formatTime(duration)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={requestFullscreen}
+                      className="hover:text-ember transition-colors"
+                      aria-label="Fullscreen"
+                    >
+                      <Maximize2 size={14} />
+                    </button>
+                  </div>
+                </div>
               </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={requestFullscreen}
-                  className="hover:text-ember transition-colors"
-                  aria-label="Fullscreen"
-                >
-                  <Maximize2 size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Thumbnails Selector Row */}
@@ -297,7 +312,7 @@ export function Showreels() {
                 {/* Visual Thumbnail Frame */}
                 <div className="relative aspect-[16/9] w-full overflow-hidden">
                   {/* Real video looping silent preview on hover */}
-                  {isHovered ? (
+                  {isHovered && item.url ? (
                     <video
                       src={item.url}
                       muted
