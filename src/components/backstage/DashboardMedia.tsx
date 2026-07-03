@@ -51,12 +51,12 @@ export function DashboardMedia() {
 
             return {
               name: file.name,
-              id: file.id,
+              id: file.id || "",
               url: urlData.publicUrl,
               isImage,
               isVideo,
               size: file.metadata?.size,
-              created_at: file.created_at,
+              created_at: file.created_at || undefined,
             };
           });
         setFiles(mapped);
@@ -282,6 +282,7 @@ export function DashboardMedia() {
               />
               <label
                 htmlFor="media-library-upload"
+                id="klick-media-dropzone"
                 className={`w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-bone/20 hover:border-ember/40 bg-stage/20 py-8 rounded-sm text-xs font-mono text-bone/50 hover:text-bone cursor-pointer transition-colors ${
                   isUploading ? "pointer-events-none opacity-55" : ""
                 }`}
@@ -389,7 +390,7 @@ export function DashboardMedia() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {files.map((file) => (
+              {files.map((file, index) => (
                 <div key={file.id} className="border border-bone/10 bg-stage/10 rounded-sm overflow-hidden flex flex-col justify-between">
                   {/* File preview box */}
                   <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
@@ -419,6 +420,7 @@ export function DashboardMedia() {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
+                        id={index === 0 ? "klick-media-copy-0" : undefined}
                         onClick={() => handleCopyUrl(file.url)}
                         className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
                         title="Kopiera länk till urklipp"
@@ -430,6 +432,7 @@ export function DashboardMedia() {
                       {file.isImage ? (
                         <button
                           type="button"
+                          id={index === 0 ? "klick-media-add-portfolio-0" : undefined}
                           onClick={() => handleAddToPortfolio(file.url, file.name)}
                           className="flex items-center justify-center gap-1.5 py-1.5 bg-ember/15 border border-ember/25 text-ember hover:bg-ember hover:text-ink transition-all rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
                         >

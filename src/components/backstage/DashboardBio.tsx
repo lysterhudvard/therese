@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, HelpCircle } from "lucide-react";
+import { Save, Plus, Trash2, HelpCircle, FileText } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 interface FAQItem {
@@ -13,6 +13,16 @@ export function DashboardBio() {
   const [quoteSv, setQuoteSv] = useState("");
   const [quoteEn, setQuoteEn] = useState("");
   
+  // Biography Headings & Paragraphs
+  const [headingSv, setHeadingSv] = useState("");
+  const [headingEn, setHeadingEn] = useState("");
+  const [paragraph1Sv, setParagraph1Sv] = useState("");
+  const [paragraph1En, setParagraph1En] = useState("");
+  const [paragraph2Sv, setParagraph2Sv] = useState("");
+  const [paragraph2En, setParagraph2En] = useState("");
+  const [paragraph3Sv, setParagraph3Sv] = useState("");
+  const [paragraph3En, setParagraph3En] = useState("");
+
   // Facts
   const [dialectsSv, setDialectsSv] = useState("");
   const [dialectsEn, setDialectsEn] = useState("");
@@ -39,17 +49,28 @@ export function DashboardBio() {
     const fetchBioData = async () => {
       const { data, error } = await supabase
         .from("biography")
-        .select("quote_sv, quote_en, dialects_sv, dialects_en, languages_sv, languages_en, faqs")
+        .select("quote_sv, quote_en, dialects_sv, dialects_en, languages_sv, languages_en, faqs, heading_sv, heading_en, paragraph1_sv, paragraph1_en, paragraph2_sv, paragraph2_en, paragraph3_sv, paragraph3_en")
         .eq("id", "main")
         .maybeSingle();
 
       if (data) {
         setQuoteSv(data.quote_sv || "");
         setQuoteEn(data.quote_en || "");
+        
+        setHeadingSv(data.heading_sv || "");
+        setHeadingEn(data.heading_en || "");
+        setParagraph1Sv(data.paragraph1_sv || "");
+        setParagraph1En(data.paragraph1_en || "");
+        setParagraph2Sv(data.paragraph2_sv || "");
+        setParagraph2En(data.paragraph2_en || "");
+        setParagraph3Sv(data.paragraph3_sv || "");
+        setParagraph3En(data.paragraph3_en || "");
+
         setDialectsSv(data.dialects_sv || "");
         setDialectsEn(data.dialects_en || "");
         setLanguagesSv(data.languages_sv || "");
         setLanguagesEn(data.languages_en || "");
+        
         if (data.faqs && Array.isArray(data.faqs)) {
           setFaqs(data.faqs as FAQItem[]);
         }
@@ -101,6 +122,14 @@ export function DashboardBio() {
       id: "main",
       quote_sv: quoteSv,
       quote_en: quoteEn,
+      heading_sv: headingSv,
+      heading_en: headingEn,
+      paragraph1_sv: paragraph1Sv,
+      paragraph1_en: paragraph1En,
+      paragraph2_sv: paragraph2Sv,
+      paragraph2_en: paragraph2En,
+      paragraph3_sv: paragraph3Sv,
+      paragraph3_en: paragraph3En,
       dialects_sv: dialectsSv,
       dialects_en: dialectsEn,
       languages_sv: languagesSv,
@@ -120,10 +149,10 @@ export function DashboardBio() {
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
       <div className="border-b border-bone/10 pb-4 mb-6">
         <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
-          Akt II — <span className="italic text-ember">Biografi & Entity AEO</span>
+          Akt II — <span className="italic text-ember">Biografi</span>
         </h2>
         <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
-          Här redigerar du Theresa's biografi, egenskaper, samt sökmotorernas FAQ-frågor (AEO/GEO).
+          Här redigerar du Thereses biografi, egenskaper, samt sökmotorernas FAQ-frågor (AEO/GEO).
         </p>
       </div>
 
@@ -135,6 +164,7 @@ export function DashboardBio() {
           </label>
           <input
             type="text"
+            id="klick-bio-quote-sv"
             value={quoteSv}
             onChange={(e) => setQuoteSv(e.target.value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
@@ -146,10 +176,122 @@ export function DashboardBio() {
           </label>
           <input
             type="text"
+            id="klick-bio-quote-en"
             value={quoteEn}
             onChange={(e) => setQuoteEn(e.target.value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
           />
+        </div>
+      </div>
+
+      {/* Biography Texts Editor */}
+      <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
+        <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
+          <FileText size={14} className="text-ember" /> Biografiska Texter
+        </h3>
+
+        {/* Heading */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Rubrik (Svenska)</label>
+            <input
+              type="text"
+              id="klick-bio-heading-sv"
+              value={headingSv}
+              onChange={(e) => setHeadingSv(e.target.value)}
+              placeholder="En skådespelerska med bredd..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Heading (English)</label>
+            <input
+              type="text"
+              id="klick-bio-heading-en"
+              value={headingEn}
+              onChange={(e) => setHeadingEn(e.target.value)}
+              placeholder="An actress with range..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+            />
+          </div>
+        </div>
+
+        {/* Paragraph 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Paragraf 1 (Svenska)</label>
+            <textarea
+              id="klick-bio-p1-sv"
+              value={paragraph1Sv}
+              onChange={(e) => setParagraph1Sv(e.target.value)}
+              rows={4}
+              placeholder="Therese var senast aktuell i..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Paragraph 1 (English)</label>
+            <textarea
+              id="klick-bio-p1-en"
+              value={paragraph1En}
+              onChange={(e) => setParagraph1En(e.target.value)}
+              rows={4}
+              placeholder="Therese was most recently seen in..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
+            />
+          </div>
+        </div>
+
+        {/* Paragraph 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Paragraf 2 (Svenska)</label>
+            <textarea
+              id="klick-bio-p2-sv"
+              value={paragraph2Sv}
+              onChange={(e) => setParagraph2Sv(e.target.value)}
+              rows={4}
+              placeholder="Hon har spelat teater och musikal sedan..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Paragraph 2 (English)</label>
+            <textarea
+              id="klick-bio-p2-en"
+              value={paragraph2En}
+              onChange={(e) => setParagraph2En(e.target.value)}
+              rows={4}
+              placeholder="She has performed theatre and musicals since..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
+            />
+          </div>
+        </div>
+
+        {/* Paragraph 3 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Paragraf 3 (Svenska)</label>
+            <textarea
+              id="klick-bio-p3-sv"
+              value={paragraph3Sv}
+              onChange={(e) => setParagraph3Sv(e.target.value)}
+              rows={3}
+              placeholder="Drama är något som Therese känner..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Paragraph 3 (English)</label>
+            <textarea
+              id="klick-bio-p3-en"
+              value={paragraph3En}
+              onChange={(e) => setParagraph3En(e.target.value)}
+              rows={3}
+              placeholder="Drama is something Therese feels..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
+            />
+          </div>
         </div>
       </div>
 
@@ -165,6 +307,7 @@ export function DashboardBio() {
             </label>
             <input
               type="text"
+              id="klick-bio-dialects-sv"
               value={dialectsSv}
               onChange={(e) => setDialectsSv(e.target.value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
@@ -176,6 +319,7 @@ export function DashboardBio() {
             </label>
             <input
               type="text"
+              id="klick-bio-dialects-en"
               value={dialectsEn}
               onChange={(e) => setDialectsEn(e.target.value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
@@ -187,6 +331,7 @@ export function DashboardBio() {
             </label>
             <input
               type="text"
+              id="klick-bio-languages-sv"
               value={languagesSv}
               onChange={(e) => setLanguagesSv(e.target.value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
@@ -198,6 +343,7 @@ export function DashboardBio() {
             </label>
             <input
               type="text"
+              id="klick-bio-languages-en"
               value={languagesEn}
               onChange={(e) => setLanguagesEn(e.target.value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
@@ -214,6 +360,7 @@ export function DashboardBio() {
           </h3>
           <button
             type="button"
+            id="klick-bio-add-faq"
             onClick={addFaq}
             className="px-3 py-1 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[9px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
           >
@@ -283,6 +430,7 @@ export function DashboardBio() {
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
+          id="klick-bio-save"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
         >

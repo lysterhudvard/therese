@@ -2,19 +2,22 @@ import React, { useState, useEffect } from "react";
 import { DashboardHero } from "./DashboardHero";
 import { DashboardBio } from "./DashboardBio";
 import { DashboardPortfolio } from "./DashboardPortfolio";
+import { DashboardShowreels } from "./DashboardShowreels";
 import { DashboardCredits } from "./DashboardCredits";
+import { DashboardVoice } from "./DashboardVoice";
 import { DashboardSeo } from "./DashboardSeo";
 import { DashboardMedia } from "./DashboardMedia";
-import { LogOut, Home, Star, User, Image, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen } from "lucide-react";
+import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { checkDatabaseSeeded, seedDatabaseWithCurrentContent } from "../../lib/supabase-sync";
+import { KlickGuideWidget } from "./KlickGuideWidget";
 
 interface BackstageDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = "hero" | "bio" | "portfolio" | "credits" | "seo" | "media";
+type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "seo" | "media";
 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
@@ -55,11 +58,13 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   };
 
   const navigationItems = [
-    { id: "hero", label: "Akt I: Hero", icon: Star },
+    { id: "hero", label: "Akt I: Nu aktuell", icon: Star },
     { id: "bio", label: "Akt II: Biografi", icon: User },
-    { id: "portfolio", label: "Akt III: Galleri", icon: Image },
-    { id: "credits", label: "Akt IV: Meriter", icon: List },
-    { id: "seo", label: "Akt V: SEO", icon: Settings },
+    { id: "portfolio", label: "Akt III: Portfolio", icon: Image },
+    { id: "showreels", label: "Akt IV: Showreels", icon: Video },
+    { id: "credits", label: "Akt V: Meriter", icon: List },
+    { id: "voice", label: "Akt VI: Röst", icon: Volume2 },
+    { id: "seo", label: "SEO & Inställningar", icon: Settings },
     { id: "media", label: "Mediebibliotek", icon: FolderOpen },
   ];
 
@@ -79,8 +84,12 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
         return <DashboardBio />;
       case "portfolio":
         return <DashboardPortfolio />;
+      case "showreels":
+        return <DashboardShowreels />;
       case "credits":
         return <DashboardCredits />;
+      case "voice":
+        return <DashboardVoice />;
       case "seo":
         return <DashboardSeo />;
       case "media":
@@ -118,6 +127,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
               return (
                 <button
                   key={item.id}
+                  id={`klick-nav-${item.id}`}
                   onClick={() => setActiveTab(item.id as TabType)}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest font-mono rounded-sm transition-all duration-300 cursor-pointer ${
                     isActive
@@ -209,6 +219,8 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
           {renderActiveContent()}
         </div>
       </main>
+      {/* Klick-guiden Chatbot Companion */}
+      <KlickGuideWidget activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, ListOrdered, Calendar, Star } from "lucide-react";
+import { Save, Plus, Trash2, Star, Volume2, AlignLeft, Upload, ChevronDown, ChevronUp, Link as LinkIcon } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 interface CreditRow {
@@ -17,6 +17,16 @@ interface CreditRow {
   img: string;
   is_current_production: boolean;
   sort_order: number;
+  // Audio commentary / röst
+  commentary_url?: string;
+  commentary_duration?: string;
+  commentary_sv?: string;
+  commentary_en?: string;
+  // Script dialogue
+  script_scene?: string;
+  script_char?: string;
+  script_line_sv?: string;
+  script_line_en?: string;
 }
 
 export function DashboardCredits() {
@@ -24,6 +34,10 @@ export function DashboardCredits() {
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [filterType, setFilterType] = useState("Alla");
+  
+  // Track which rows have advanced features expanded
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const [isUploadingAudio, setIsUploadingAudio] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -60,8 +74,17 @@ export function DashboardCredits() {
       img: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=300",
       is_current_production: false,
       sort_order: credits.length,
+      commentary_url: "",
+      commentary_duration: "0:10",
+      commentary_sv: "",
+      commentary_en: "",
+      script_scene: "",
+      script_char: "",
+      script_line_sv: "",
+      script_line_en: "",
     };
     setCredits([newCredit, ...credits]);
+    setExpandedRowId(newCredit.id); // Expand immediately to let them edit voice/script
     toast.success("Ny tom merit tillagd högst upp.");
   };
 
@@ -80,7 +103,6 @@ export function DashboardCredits() {
         
         // If setting this credit to is_current_production, disable all others
         if (field === "is_current_production" && value === true) {
-          // Disable on other credits in state
           setTimeout(() => {
             setCredits(prev => prev.map(item => ({
               ...item,
@@ -92,6 +114,51 @@ export function DashboardCredits() {
         return { ...c, [field]: value };
       })
     );
+  };
+
+  const handleAudioUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAudio(id);
+    toast.loading("Laddar upp röstinspelning...", { id: "audio-upload" });
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `audio-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `audio/${fileName}`;
+
+      const { error } = await supabase.storage
+        .from("portfolio")
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(filePath);
+
+      // Set audio url
+      updateCredit(id, "commentary_url", urlData.publicUrl);
+      
+      // Auto-detect audio duration if browser supports it
+      try {
+        const audio = new Audio(urlData.publicUrl);
+        audio.addEventListener("loadedmetadata", () => {
+          const mins = Math.floor(audio.duration / 60);
+          const secs = Math.round(audio.duration % 60);
+          const computedDuration = `${mins}:${secs.toString().padStart(2, "0")}`;
+          updateCredit(id, "commentary_duration", computedDuration);
+        });
+      } catch (e) {
+        console.warn("Could not determine duration dynamically", e);
+      }
+
+      toast.success("Röstfil uppladdad framgångsrikt!", { id: "audio-upload" });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Ljuduppladdning misslyckades.", { id: "audio-upload" });
+    } finally {
+      setIsUploadingAudio(null);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -126,7 +193,15 @@ export function DashboardCredits() {
           img: c.img || "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=300",
           is_current_production: c.is_current_production,
           sort_order: index,
-          url: c.url || null
+          url: c.url || null,
+          commentary_url: c.commentary_url || null,
+          commentary_duration: c.commentary_duration || null,
+          commentary_sv: c.commentary_sv || null,
+          commentary_en: c.commentary_en || null,
+          script_scene: c.script_scene || null,
+          script_char: c.script_char || null,
+          script_line_sv: c.script_line_sv || null,
+          script_line_en: c.script_line_en || null,
         };
         if (!c.id.startsWith("temp-")) {
           item.id = c.id;
@@ -147,7 +222,7 @@ export function DashboardCredits() {
         setCredits(freshData as CreditRow[]);
       }
 
-      toast.success("Akt IV (Meriter) har sparats framgångsrikt i Supabase!");
+      toast.success("Akt V (Meriter & Ljudfiler) har sparats framgångsrikt i Supabase!");
     } catch (err: any) {
       console.error(err);
       toast.error(`Kunde inte spara meriter: ${err.message}`);
@@ -156,20 +231,25 @@ export function DashboardCredits() {
     }
   };
 
+  const toggleExpandRow = (id: string) => {
+    setExpandedRowId(expandedRowId === id ? null : id);
+  };
+
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-7xl">
       <div className="border-b border-bone/10 pb-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
-            Akt IV — <span className="italic text-ember">Meritförteckning</span>
+            Akt V — <span className="italic text-ember">Meritförteckning & Röstfiler</span>
           </h2>
           <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
-            Hantera den fullständiga listan över skådespelarmeriter, produktioner och roller.
+            Hantera produktioner, roller samt tillhörande röstinspelningar, kommentarer och manusrader.
           </p>
         </div>
 
         <button
           type="button"
+          id="klick-credits-add"
           onClick={addCredit}
           className="px-4 py-2 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[10px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
         >
@@ -178,7 +258,7 @@ export function DashboardCredits() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-1 border-b border-bone/5 pb-4">
+      <div id="klick-credits-filters" className="flex flex-wrap gap-1 border-b border-bone/5 pb-4">
         {["Alla", "Film", "TV", "Theater", "Voice"].map((t) => (
           <button
             key={t}
@@ -197,168 +277,345 @@ export function DashboardCredits() {
 
       {/* Credits Editor Rows */}
       <div className="space-y-6">
-        {filteredCredits.map((c) => (
-          <div
-            key={c.id}
-            className="border border-bone/10 bg-stage/5 p-5 rounded-sm relative space-y-4"
-          >
-            <button
-              type="button"
-              onClick={() => removeCredit(c.id)}
-              className="absolute top-4 right-4 text-bone/35 hover:text-red-400 transition-colors cursor-pointer"
-              aria-label="Radera"
+        {filteredCredits.map((c, index) => {
+          const isExpanded = expandedRowId === c.id;
+
+          return (
+            <div
+              key={c.id}
+              id={index === 0 ? "klick-credits-row-0" : undefined}
+              className="border border-bone/10 bg-stage/5 p-5 rounded-sm relative space-y-4 transition-all duration-300"
             >
-              <Trash2 size={14} />
-            </button>
+              <button
+                type="button"
+                onClick={() => removeCredit(c.id)}
+                className="absolute top-4 right-4 text-bone/35 hover:text-red-400 transition-colors cursor-pointer z-10"
+                aria-label="Radera"
+              >
+                <Trash2 size={14} />
+              </button>
 
-            {/* Grid structure for inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              {/* Year */}
-              <div className="md:col-span-1">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                  År
-                </label>
-                <input
-                  type="text"
-                  value={c.year}
-                  onChange={(e) => updateCredit(c.id, "year", e.target.value)}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                />
+              {/* Grid structure for inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                {/* Year */}
+                <div className="md:col-span-1">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                    År
+                  </label>
+                  <input
+                    type="text"
+                    value={c.year}
+                    onChange={(e) => updateCredit(c.id, "year", e.target.value)}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                  />
+                </div>
+
+                {/* Title */}
+                <div className="md:col-span-4">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                    Produktionstitel
+                  </label>
+                  <input
+                    type="text"
+                    value={c.title}
+                    onChange={(e) => updateCredit(c.id, "title", e.target.value)}
+                    placeholder="Titel..."
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-semibold"
+                  />
+                </div>
+
+                {/* Type */}
+                <div className="md:col-span-2">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                    Huvudtyp
+                  </label>
+                  <select
+                    value={c.type}
+                    onChange={(e) => updateCredit(c.id, "type", e.target.value)}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                  >
+                    <option value="Film">Film</option>
+                    <option value="TV">TV</option>
+                    <option value="Theater">Teater</option>
+                    <option value="Voice">Röst / Voiceover</option>
+                  </select>
+                </div>
+
+                {/* Network */}
+                <div className="md:col-span-3">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                    Kanal / Nätverk / Scen
+                  </label>
+                  <input
+                    type="text"
+                    value={c.network}
+                    onChange={(e) => updateCredit(c.id, "network", e.target.value)}
+                    placeholder="SVT, Dramaten..."
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                  />
+                </div>
+
+                {/* Active current production flag */}
+                <div className="md:col-span-2 flex items-center justify-start gap-2 pt-4 md:pt-2">
+                  <button
+                    type="button"
+                    onClick={() => updateCredit(c.id, "is_current_production", !c.is_current_production)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm text-[9px] uppercase font-mono tracking-wider transition-colors cursor-pointer border ${
+                      c.is_current_production
+                        ? "bg-ember/20 border-ember text-ember"
+                        : "bg-transparent border-bone/10 text-bone/40 hover:text-bone/70"
+                    }`}
+                  >
+                    <Star size={11} fill={c.is_current_production ? "currentColor" : "none"} />
+                    Aktuell
+                  </button>
+                </div>
               </div>
 
-              {/* Title */}
-              <div className="md:col-span-4">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                  Produktionstitel
-                </label>
-                <input
-                  type="text"
-                  value={c.title}
-                  onChange={(e) => updateCredit(c.id, "title", e.target.value)}
-                  placeholder="Titel..."
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-semibold"
-                />
+              {/* Translated role & category details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-bone/5 pt-3">
+                {/* Swedish values */}
+                <div className="space-y-3">
+                  <span className="text-[8px] font-mono text-ember uppercase tracking-wider">🇸🇪 SVENSKA</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Roll
+                      </label>
+                      <input
+                        type="text"
+                        value={c.role_sv}
+                        onChange={(e) => updateCredit(c.id, "role_sv", e.target.value)}
+                        placeholder="Huvudroll..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Kategori (detaljerad)
+                      </label>
+                      <input
+                        type="text"
+                        value={c.category_sv}
+                        onChange={(e) => updateCredit(c.id, "category_sv", e.target.value)}
+                        placeholder="Humorserie..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* English values */}
+                <div className="space-y-3">
+                  <span className="text-[8px] font-mono text-bone/40 uppercase tracking-wider">🇬🇧 ENGLISH</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Role
+                      </label>
+                      <input
+                        type="text"
+                        value={c.role_en}
+                        onChange={(e) => updateCredit(c.id, "role_en", e.target.value)}
+                        placeholder="Lead role..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Category (detailed)
+                      </label>
+                      <input
+                        type="text"
+                        value={c.category_en}
+                        onChange={(e) => updateCredit(c.id, "category_en", e.target.value)}
+                        placeholder="Comedy series..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Type */}
-              <div className="md:col-span-2">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                  Huvudtyp
-                </label>
-                <select
-                  value={c.type}
-                  onChange={(e) => updateCredit(c.id, "type", e.target.value)}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                >
-                  <option value="Film">Film</option>
-                  <option value="TV">TV</option>
-                  <option value="Theater">Teater</option>
-                  <option value="Voice">Röst / Voiceover</option>
-                </select>
-              </div>
-
-              {/* Network */}
-              <div className="md:col-span-3">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                  Kanal / Nätverk / Scen
-                </label>
-                <input
-                  type="text"
-                  value={c.network}
-                  onChange={(e) => updateCredit(c.id, "network", e.target.value)}
-                  placeholder="SVT, Dramaten..."
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-
-              {/* Active current production flag */}
-              <div className="md:col-span-2 flex items-center justify-start gap-2 pt-4 md:pt-2">
+              {/* Advanced collapsable: Audio recordings and scripts */}
+              <div className="border-t border-bone/5 pt-3">
                 <button
                   type="button"
-                  onClick={() => updateCredit(c.id, "is_current_production", !c.is_current_production)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm text-[9px] uppercase font-mono tracking-wider transition-colors cursor-pointer border ${
-                    c.is_current_production
-                      ? "bg-ember/20 border-ember text-ember"
-                      : "bg-transparent border-bone/10 text-bone/40 hover:text-bone/70"
-                  }`}
+                  id={index === 0 ? "klick-credits-advanced-toggle-0" : undefined}
+                  onClick={() => toggleExpandRow(c.id)}
+                  className="flex items-center gap-1 text-[9px] uppercase tracking-widest text-bone/40 hover:text-ember transition-colors font-mono cursor-pointer"
                 >
-                  <Star size={11} fill={c.is_current_production ? "currentColor" : "none"} />
-                  Aktuell
+                  {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  {isExpanded 
+                    ? "Dölj Röstkommentar & Manus (Avancerat)" 
+                    : "Visa Röstkommentar & Manus (Avancerat)"
+                  }
+                  {(c.commentary_url || c.script_scene) && (
+                    <span className="ml-2 px-1.5 py-0.5 bg-ember/15 text-ember text-[8px] rounded-sm font-semibold">
+                      Aktiv
+                    </span>
+                  )}
                 </button>
+
+                {isExpanded && (
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8 bg-stage/15 p-4 rounded border border-bone/5 animate-fadeIn">
+                    
+                    {/* Audio commentary section */}
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] font-mono uppercase tracking-widest text-ember flex items-center gap-1.5 border-b border-bone/5 pb-1">
+                        <Volume2 size={12} /> Röstkommentar / Audio clip
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="md:col-span-2">
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Ljudfil (URL)
+                          </label>
+                          <input
+                            type="text"
+                            value={c.commentary_url || ""}
+                            onChange={(e) => updateCredit(c.id, "commentary_url", e.target.value)}
+                            placeholder="https://exempel.se/ljud.mp3"
+                            className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Ljudfil Uppladdning
+                          </label>
+                          <input
+                            type="file"
+                            accept="audio/*"
+                            onChange={(e) => handleAudioUpload(c.id, e)}
+                            disabled={isUploadingAudio === c.id}
+                            className="hidden"
+                            id={`audio-file-upload-${c.id}`}
+                          />
+                          <label
+                            htmlFor={`audio-file-upload-${c.id}`}
+                            id={index === 0 ? "klick-credits-audio-upload-0" : undefined}
+                            className="w-full flex items-center justify-center gap-1 border border-dashed border-bone/20 hover:border-ember bg-stage/20 py-1.5 rounded-sm text-[10px] font-mono text-bone/50 hover:text-bone cursor-pointer transition-colors"
+                          >
+                            <Upload size={11} />
+                            Välj Ljudfil
+                          </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                          Längd (t.ex. "0:45" eller "1:15")
+                        </label>
+                        <input
+                          type="text"
+                          value={c.commentary_duration || ""}
+                          onChange={(e) => updateCredit(c.id, "commentary_duration", e.target.value)}
+                          placeholder="0:10"
+                          className="w-32 bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Kommentartext (Svenska)
+                          </label>
+                          <textarea
+                            value={c.commentary_sv || ""}
+                            onChange={(e) => updateCredit(c.id, "commentary_sv", e.target.value)}
+                            placeholder="Therese berättar om rollen..."
+                            rows={3}
+                            className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Commentary Text (English)
+                          </label>
+                          <textarea
+                            value={c.commentary_en || ""}
+                            onChange={(e) => updateCredit(c.id, "commentary_en", e.target.value)}
+                            placeholder="Therese talks about the role..."
+                            rows={3}
+                            className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Script dialogue section */}
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] font-mono uppercase tracking-widest text-ember flex items-center gap-1.5 border-b border-bone/5 pb-1">
+                        <AlignLeft size={12} /> Manusrader / Script Dialogue
+                      </h4>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Scennamn (t.ex. "SCEN 12")
+                          </label>
+                          <input
+                            type="text"
+                            value={c.script_scene || ""}
+                            onChange={(e) => updateCredit(c.id, "script_scene", e.target.value)}
+                            placeholder="SCEN 12 — Teater"
+                            className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Karaktär / Rollfigur
+                          </label>
+                          <input
+                            type="text"
+                            value={c.script_char || ""}
+                            onChange={(e) => updateCredit(c.id, "script_char", e.target.value)}
+                            placeholder="Nora"
+                            className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-semibold"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Manus Repliker (Svenska)
+                          </label>
+                          <textarea
+                            value={c.script_line_sv || ""}
+                            onChange={(e) => updateCredit(c.id, "script_line_sv", e.target.value)}
+                            placeholder="Det fanns ingen återvändo..."
+                            rows={3}
+                            className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                            Script Line (English)
+                          </label>
+                          <textarea
+                            value={c.script_line_en || ""}
+                            onChange={(e) => updateCredit(c.id, "script_line_en", e.target.value)}
+                            placeholder="There was no turning back..."
+                            rows={3}
+                            className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Translated role & category details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-bone/5 pt-3">
-              {/* Swedish values */}
-              <div className="space-y-3">
-                <span className="text-[8px] font-mono text-ember uppercase tracking-wider">🇸🇪 SVENSKA</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                      Roll
-                    </label>
-                    <input
-                      type="text"
-                      value={c.role_sv}
-                      onChange={(e) => updateCredit(c.id, "role_sv", e.target.value)}
-                      placeholder="Huvudroll..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                      Kategori (detaljerad)
-                    </label>
-                    <input
-                      type="text"
-                      value={c.category_sv}
-                      onChange={(e) => updateCredit(c.id, "category_sv", e.target.value)}
-                      placeholder="Humorserie..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* English values */}
-              <div className="space-y-3">
-                <span className="text-[8px] font-mono text-bone/40 uppercase tracking-wider">🇬🇧 ENGLISH</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                      Role
-                    </label>
-                    <input
-                      type="text"
-                      value={c.role_en}
-                      onChange={(e) => updateCredit(c.id, "role_en", e.target.value)}
-                      placeholder="Lead role..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                      Category (detailed)
-                    </label>
-                    <input
-                      type="text"
-                      value={c.category_en}
-                      onChange={(e) => updateCredit(c.id, "category_en", e.target.value)}
-                      placeholder="Comedy series..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
+          id="klick-credits-save"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
         >

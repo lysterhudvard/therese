@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, ArrowUp, ArrowDown, Image as ImageIcon, Video, Eye, Trash2, Plus, Upload, Link } from "lucide-react";
+import { Save, ArrowUp, ArrowDown, Image as ImageIcon, Trash2, Plus, Upload, Link } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 interface GalleryImage {
@@ -11,25 +11,8 @@ interface GalleryImage {
   sort_order: number;
 }
 
-interface ShowreelItem {
-  id: string;
-  title_sv: string;
-  title_en: string;
-  sub_sv: string;
-  sub_en: string;
-  vimeo_id?: string;
-  youtube_id?: string;
-  url?: string;
-  poster: string;
-  genre: string;
-  specs: string;
-  glow: string;
-  sort_order: number;
-}
-
 export function DashboardPortfolio() {
   const [images, setImages] = useState<GalleryImage[]>([]);
-  const [showreels, setShowreels] = useState<ShowreelItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState("");
@@ -40,7 +23,6 @@ export function DashboardPortfolio() {
     if (!isSupabaseConfigured()) return;
 
     const fetchData = async () => {
-      // 1. Fetch images
       const { data: imgData } = await supabase
         .from("portfolio_images")
         .select("*")
@@ -48,16 +30,6 @@ export function DashboardPortfolio() {
 
       if (imgData) {
         setImages(imgData as GalleryImage[]);
-      }
-
-      // 2. Fetch showreels
-      const { data: reelData } = await supabase
-        .from("showreels")
-        .select("*")
-        .order("sort_order", { ascending: true });
-
-      if (reelData) {
-        setShowreels(reelData as ShowreelItem[]);
       }
     };
 
@@ -132,12 +104,11 @@ export function DashboardPortfolio() {
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from("portfolio")
         .upload(filePath, file);
 
       if (error) {
-        // If bucket doesn't exist, recommend creating it
         if (error.message.includes("Bucket not found")) {
           throw new Error("Storage-hinken 'portfolio' saknas. Skapa en offentlig hink med namnet 'portfolio' i ditt Supabase Storage först.");
         }
@@ -165,11 +136,6 @@ export function DashboardPortfolio() {
     }
   };
 
-  // Showreels operations
-  const handleReelChange = (id: string, field: keyof ShowreelItem, value: string) => {
-    setShowreels(showreels.map((reel) => (reel.id === id ? { ...reel, [field]: value } : reel)));
-  };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -181,7 +147,7 @@ export function DashboardPortfolio() {
     }
 
     try {
-      // 1. Save images
+      // Save images
       const imagesToUpsert = images.map(({ id, url, alt, allow_download, sort_order }) => {
         const item: any = { url, alt, allow_download, sort_order };
         if (!id.startsWith("temp-")) {
@@ -193,11 +159,7 @@ export function DashboardPortfolio() {
       const { error: imgErr } = await supabase.from("portfolio_images").upsert(imagesToUpsert);
       if (imgErr) throw imgErr;
 
-      // 2. Save showreels
-      const { error: reelErr } = await supabase.from("showreels").upsert(showreels);
-      if (reelErr) throw reelErr;
-
-      toast.success("Akt III (Galleri & Showreels) har sparats i Supabase!");
+      toast.success("Akt III (Portfolio Bilder) har sparats i Supabase!");
     } catch (err: any) {
       console.error(err);
       toast.error(`Fel vid sparning: ${err.message}`);
@@ -210,10 +172,10 @@ export function DashboardPortfolio() {
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
       <div className="border-b border-bone/10 pb-4 mb-6">
         <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
-          Akt III & III.V — <span className="italic text-ember">Galleri & Showreels</span>
+          Akt III — <span className="italic text-ember">Portfolio Bilder</span>
         </h2>
         <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
-          Hantera portfoliobilder (ordning och alt-texter) samt showreels.
+          Hantera portfoliobilder (ordning och alt-texter för sökoptimering).
         </p>
       </div>
 
@@ -221,19 +183,20 @@ export function DashboardPortfolio() {
       <div className="space-y-4">
         <div className="border-b border-bone/5 pb-2">
           <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-            <ImageIcon size={14} className="text-ember" /> Gällande Galleribilder & Sortering
+            <ImageIcon size={14} className="text-ember" /> Gällande Portfoliobilder & Sortering
           </h3>
         </div>
 
         {/* Add photo tool */}
         <div className="bg-stage/15 border border-bone/5 p-4 rounded-sm space-y-4">
-          <h4 className="text-[10px] uppercase tracking-widest text-bone/70 font-mono">Lägg till ny bild i galleri</h4>
+          <h4 className="text-[10px] uppercase tracking-widest text-bone/70 font-mono">Lägg till ny bild</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild via URL</label>
               <div className="flex gap-2">
                 <input
                   type="text"
+                  id="klick-portfolio-url-input"
                   value={newImageUrl}
                   onChange={(e) => setNewImageUrl(e.target.value)}
                   placeholder="https://exempel.se/bild.jpg"
@@ -241,6 +204,7 @@ export function DashboardPortfolio() {
                 />
                 <button
                   type="button"
+                  id="klick-portfolio-url-add"
                   onClick={handleAddImageUrl}
                   className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
                 >
@@ -262,6 +226,7 @@ export function DashboardPortfolio() {
                 />
                 <label
                   htmlFor="portfolio-file-upload"
+                  id="klick-portfolio-upload"
                   className="w-full flex items-center justify-center gap-2 border border-dashed border-bone/20 hover:border-ember/40 bg-stage/20 py-1.5 rounded-sm text-xs font-mono text-bone/50 hover:text-bone cursor-pointer transition-colors"
                 >
                   <Upload size={12} />
@@ -282,7 +247,7 @@ export function DashboardPortfolio() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div id="klick-portfolio-grid" className="space-y-3">
           {images.map((img, index) => (
             <div
               key={img.id}
@@ -353,97 +318,10 @@ export function DashboardPortfolio() {
         </div>
       </div>
 
-      {/* Showreels section */}
-      <div className="space-y-4">
-        <div className="border-b border-bone/5 pb-2">
-          <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-            <Video size={14} className="text-ember" /> Showreels & Vimeo/YouTube Länkar
-          </h3>
-        </div>
-
-        <div className="space-y-6">
-          {showreels.map((reel) => (
-            <div key={reel.id} className="border border-bone/10 bg-stage/5 p-4 rounded-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-bone/5 pb-2">
-                <span className="text-[10px] font-mono tracking-widest text-ember uppercase">{reel.genre}</span>
-                <span className="text-[9px] font-mono text-bone/40">{reel.specs}</span>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Titel (Svenska)</label>
-                  <input
-                    type="text"
-                    value={reel.title_sv}
-                    onChange={(e) => handleReelChange(reel.id, "title_sv", e.target.value)}
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Title (English)</label>
-                  <input
-                    type="text"
-                    value={reel.title_en}
-                    onChange={(e) => handleReelChange(reel.id, "title_en", e.target.value)}
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Undertext (Svenska)</label>
-                  <input
-                    type="text"
-                    value={reel.sub_sv}
-                    onChange={(e) => handleReelChange(reel.id, "sub_sv", e.target.value)}
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Subtitle (English)</label>
-                  <input
-                    type="text"
-                    value={reel.sub_en}
-                    onChange={(e) => handleReelChange(reel.id, "sub_en", e.target.value)}
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Vimeo ID (Valfritt)</label>
-                  <input
-                    type="text"
-                    value={reel.vimeo_id || ""}
-                    onChange={(e) => handleReelChange(reel.id, "vimeo_id", e.target.value)}
-                    placeholder="T.ex: 1206764752"
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Direkt Video-URL (Backup)</label>
-                  <input
-                    type="text"
-                    value={reel.url || ""}
-                    onChange={(e) => handleReelChange(reel.id, "url", e.target.value)}
-                    placeholder="https://assets.mixkit.co/..."
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Posterbild (URL)</label>
-                  <input
-                    type="text"
-                    value={reel.poster}
-                    onChange={(e) => handleReelChange(reel.id, "poster", e.target.value)}
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
+          id="klick-portfolio-save"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
         >
@@ -460,4 +338,3 @@ export function DashboardPortfolio() {
     </form>
   );
 }
-

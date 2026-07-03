@@ -172,7 +172,7 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember">
-            {lang === "sv" ? "Akt III.V — Showreels" : "Act III.V — Showreels"}
+            {lang === "sv" ? "Akt IV — Showreels" : "Act IV — Showreels"}
           </div>
           <h2 className="mt-4 font-display text-5xl md:text-7xl text-bone leading-none">
             {lang === "sv" ? "Rörligt " : "Moving "}

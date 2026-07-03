@@ -103,3 +103,8 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Dynamic Clipboard Utility**: Added a copy helper to easily copy public URLs for any image or video asset.
 - **Immediate Portfolio Push**: Added a "Plus/Add to Portfolio" quick trigger that inserts the image record directly into `portfolio_images` with descriptive alt tags.
 - **External URL Link Manager**: Integrated URL link registers to save external images/showreels from direct paths.
+
+### 16. Audio Commentary Uploads & Script Editor in Merits (Akt V)
+- **Advanced Options Drawer:** Implemented a collapsable advanced section inside each merit row in `DashboardCredits.tsx` to handle voice recordings and script dialogue details.
+- **Direct Audio File Upload:** Added a local file picker that uploads audio files (`audio/*`) directly to the Supabase `portfolio` storage bucket, auto-calculating the duration (mins:secs) dynamically.
+- **Dialogue & Scene Transcription:** Added localized textareas for commentary descriptions and structured inputs for script scenes, character names, and dialogue lines in both Swedish and English.

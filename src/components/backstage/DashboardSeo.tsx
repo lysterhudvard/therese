@@ -166,6 +166,7 @@ export function DashboardSeo() {
                 </div>
                 <input
                   type="text"
+                  id="klick-seo-title-sv"
                   value={titleSv}
                   onChange={(e) => setTitleSv(e.target.value)}
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember"
@@ -182,6 +183,7 @@ export function DashboardSeo() {
                   </span>
                 </div>
                 <textarea
+                  id="klick-seo-desc-sv"
                   value={descSv}
                   onChange={(e) => setDescSv(e.target.value)}
                   rows={4}
@@ -202,6 +204,7 @@ export function DashboardSeo() {
                 </div>
                 <input
                   type="text"
+                  id="klick-seo-title-en"
                   value={titleEn}
                   onChange={(e) => setTitleEn(e.target.value)}
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember"
@@ -218,6 +221,7 @@ export function DashboardSeo() {
                   </span>
                 </div>
                 <textarea
+                  id="klick-seo-desc-en"
                   value={descEn}
                   onChange={(e) => setDescEn(e.target.value)}
                   rows={4}
@@ -252,6 +256,7 @@ export function DashboardSeo() {
               />
               <label
                 htmlFor="og-file-upload"
+                id="klick-seo-upload-img"
                 className="w-full flex items-center justify-center gap-2 border border-dashed border-bone/20 hover:border-ember/40 bg-stage/20 py-2 rounded-sm text-xs font-mono text-bone/50 hover:text-bone cursor-pointer transition-colors"
               >
                 <Upload size={12} />
@@ -326,6 +331,7 @@ export function DashboardSeo() {
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
+          id="klick-seo-save"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
         >

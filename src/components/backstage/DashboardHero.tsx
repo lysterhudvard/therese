@@ -117,6 +117,7 @@ export function DashboardHero() {
         </div>
         <button
           type="button"
+          id="klick-hero-sync"
           onClick={() => {
             if (isAutomated) {
               setIsAutomated(false);
@@ -148,6 +149,7 @@ export function DashboardHero() {
               Framhävd Text (Aktuell produktion)
             </label>
             <textarea
+              id="klick-hero-sv"
               value={currentTextSv}
               onChange={(e) => {
                 setCurrentTextSv(e.target.value);
@@ -156,7 +158,7 @@ export function DashboardHero() {
               disabled={isAutomated}
               rows={3}
               placeholder="Skriv vad Therese är aktuell med på svenska..."
-              className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300 resize-none"
+              className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300 resize-none animate-guide-glow"
             />
           </div>
         </div>
@@ -184,6 +186,7 @@ export function DashboardHero() {
               Featured Text (Current production)
             </label>
             <textarea
+              id="klick-hero-en"
               value={currentTextEn}
               onChange={(e) => {
                 setCurrentTextEn(e.target.value);
@@ -201,6 +204,7 @@ export function DashboardHero() {
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
+          id="klick-hero-save"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
         >

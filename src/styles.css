@@ -148,3 +148,28 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: #ebe6db !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Klick Guiden Blinking Outline Glow */
+@keyframes klick-glow {
+  0% {
+    outline: 3px solid #22c55e !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4), inset 0 0 8px rgba(34, 197, 94, 0.2) !important;
+  }
+  50% {
+    outline: 3.5px solid #10b981 !important;
+    outline-offset: 5px !important;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.95), 0 0 10px rgba(34, 197, 94, 0.5) !important;
+  }
+  100% {
+    outline: 3px solid #22c55e !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4), inset 0 0 8px rgba(34, 197, 94, 0.2) !important;
+  }
+}
+.animate-klick-glow {
+  animation: klick-glow 1.5s infinite ease-in-out !important;
+  position: relative !important;
+  z-index: 50 !important;
+}
+

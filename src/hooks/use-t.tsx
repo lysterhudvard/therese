@@ -58,12 +58,12 @@ export const I18N = {
       ] as [string, string][],
     },
     portfolio: {
-      act: "Akt III",
+      act: "Akt III — Portfolio",
       title: ["Portfolio", "Bilder"],
       hint: "Scrolla för att se bilder.",
     },
     credits: {
-      act: "Akt IV — Meriter",
+      act: "Akt V — Meriter",
       heading: ["Roller & ", "Meriter"],
       filters: { Alla: "Alla", Film: "Film", TV: "TV", Theater: "Teater", Voice: "Röst" } as Record<
         string,
@@ -71,7 +71,7 @@ export const I18N = {
       >,
     },
     voice: {
-      act: "Akt V — Röst",
+      act: "Akt VI — Röst",
       heading: ["En ", "skånsk", " röst — varm, rå, omedelbar."],
       body: [
         "Therese har använts flitigt för sin skånska röst i många radio- och TV-reklamer. Hon har även dubbat rösten till mamman i barnserien ",
@@ -82,7 +82,7 @@ export const I18N = {
       demo: "Demo via e-post",
     },
     contact: {
-      act: "Akt VI — Kontakt",
+      act: "Akt VII — Kontakt",
       heading: ["Ta ett ", "möte", "."],
       agentLabel: "Skådespelerska — agentur",
       agentSub: "Schultzberg Agency",
@@ -95,7 +95,7 @@ export const I18N = {
       again: "Skicka ytterligare ett meddelande",
     },
     footer: {
-      act: "Akt XII — Ridåfall",
+      act: "Akt VIII — Ridåfall",
       title: "Slut på showen",
       role: "Skådespelerska · Röst",
       agent: "Agent",
@@ -159,9 +159,9 @@ export const I18N = {
         ["Languages", "Swedish · English"],
       ] as [string, string][],
     },
-    portfolio: { act: "Act III", title: ["Portfolio", "Images"], hint: "Scroll to view images." },
+    portfolio: { act: "Act III — Portfolio", title: ["Portfolio", "Images"], hint: "Scroll to view images." },
     credits: {
-      act: "Act IV — Credits",
+      act: "Act V — Credits",
       heading: ["Performance ", "Credits"],
       filters: {
         Alla: "All",
@@ -172,7 +172,7 @@ export const I18N = {
       } as Record<string, string>,
     },
     voice: {
-      act: "Act V — Voice",
+      act: "Act VI — Voice",
       heading: ["A ", "Scanian", " voice — warm, raw, immediate."],
       body: [
         "Therese is frequently booked for her Scanian voice in radio and TV commercials. She has also dubbed the mother in the children's series ",
@@ -183,7 +183,7 @@ export const I18N = {
       demo: "Demo via email",
     },
     contact: {
-      act: "Act VI — Contact",
+      act: "Act VII — Contact",
       heading: ["Take a ", "meeting", "."],
       agentLabel: "Actress — agency",
       agentSub: "Schultzberg Agency",
@@ -196,7 +196,7 @@ export const I18N = {
       again: "Send another message",
     },
     footer: {
-      act: "Act XII — Curtain Fall",
+      act: "Act VIII — Curtain Fall",
       title: "End of Show",
       role: "Actress · Voice",
       agent: "Agent",

@@ -532,6 +532,28 @@ function Page() {
       
       const classicalQuote = lang === "sv" ? bio.quote_classical_sv : bio.quote_classical_en;
       if (classicalQuote) base.bio.lines.Classical = classicalQuote;
+
+      // 3. Voice settings
+      if (bio.voice_settings) {
+        try {
+          const vs = typeof bio.voice_settings === "string" ? JSON.parse(bio.voice_settings) : bio.voice_settings;
+          if (vs) {
+            if (lang === "sv") {
+              if (vs.heading_sv) base.voice.heading = [vs.heading_sv, "", ""];
+              if (vs.body_sv) base.voice.body = [vs.body_sv, "", ""];
+              if (vs.cta_sv) base.voice.cta = vs.cta_sv;
+              if (vs.demo_sv) base.voice.demo = vs.demo_sv;
+            } else {
+              if (vs.heading_en) base.voice.heading = [vs.heading_en, "", ""];
+              if (vs.body_en) base.voice.body = [vs.body_en, "", ""];
+              if (vs.cta_en) base.voice.cta = vs.cta_en;
+              if (vs.demo_en) base.voice.demo = vs.demo_en;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse voice settings:", e);
+        }
+      }
     }
     
     return base;
