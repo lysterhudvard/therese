@@ -41,26 +41,26 @@
 :root {
   --background: oklch(0.13 0.005 60);
   --foreground: oklch(0.94 0.012 75);
-  --stage: oklch(0.10 0.004 60);
+  --stage: oklch(0.1 0.004 60);
   --ink: oklch(0.08 0.003 60);
   --ember: oklch(0.78 0.12 65);
   --ember-soft: oklch(0.85 0.06 75);
   --bone: oklch(0.94 0.012 75);
   --ash: oklch(0.55 0.008 70);
-  --muted: oklch(0.20 0.005 60);
-  --muted-foreground: oklch(0.65 0.010 70);
+  --muted: oklch(0.2 0.005 60);
+  --muted-foreground: oklch(0.65 0.01 70);
   --border: oklch(0.25 0.006 60);
   --primary: oklch(0.78 0.12 65);
-  --primary-foreground: oklch(0.10 0.004 60);
+  --primary-foreground: oklch(0.1 0.004 60);
   --accent: oklch(0.78 0.12 65);
-  --accent-foreground: oklch(0.10 0.004 60);
+  --accent-foreground: oklch(0.1 0.004 60);
   --card: oklch(0.15 0.005 60);
   --card-foreground: oklch(0.94 0.012 75);
   --popover: oklch(0.15 0.005 60);
   --popover-foreground: oklch(0.94 0.012 75);
-  --secondary: oklch(0.20 0.005 60);
+  --secondary: oklch(0.2 0.005 60);
   --secondary-foreground: oklch(0.94 0.012 75);
-  --destructive: oklch(0.55 0.20 25);
+  --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.98 0 0);
   --input: oklch(0.25 0.006 60);
   --ring: oklch(0.78 0.12 65);
@@ -70,7 +70,8 @@
   * {
     border-color: var(--color-border);
   }
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
@@ -85,14 +86,25 @@
     color: var(--color-ink);
   }
   @media (pointer: coarse) {
-    html, body { cursor: auto; }
+    html,
+    body {
+      cursor: auto;
+    }
   }
 
-  a, button, [data-hover] {
-    transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  a,
+  button,
+  [data-hover] {
+    transition:
+      background-color 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
   }
 
-  a:hover, button:hover, [data-hover]:hover {
+  a:hover,
+  button:hover,
+  [data-hover]:hover {
     background-color: color-mix(in oklch, var(--color-ember) 12%, transparent);
     box-shadow: 0 0 20px color-mix(in oklch, var(--color-ember) 12%, transparent);
   }
@@ -120,5 +132,9 @@
   border-top: 1px solid color-mix(in oklch, var(--color-bone) 14%, transparent);
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}

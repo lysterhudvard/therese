@@ -7,6 +7,8 @@ export function Field({
   onChange,
   type = "text",
   textarea,
+  onFocus,
+  onBlur,
 }: {
   label: string;
   id: string;
@@ -14,6 +16,8 @@ export function Field({
   onChange: (v: string) => void;
   type?: string;
   textarea?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }) {
   const [focus, setFocus] = useState(false);
   const active = focus || value.length > 0;
@@ -32,8 +36,14 @@ export function Field({
           id={id}
           value={value}
           rows={4}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
+          onFocus={() => {
+            setFocus(true);
+            onFocus?.();
+          }}
+          onBlur={() => {
+            setFocus(false);
+            onBlur?.();
+          }}
           onChange={(e) => onChange(e.target.value)}
           className="mt-6 w-full resize-none border-b border-bone/20 bg-transparent pb-2 pt-1 text-bone outline-none focus:border-ember transition-colors"
         />
@@ -42,8 +52,14 @@ export function Field({
           id={id}
           type={type}
           value={value}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
+          onFocus={() => {
+            setFocus(true);
+            onFocus?.();
+          }}
+          onBlur={() => {
+            setFocus(false);
+            onBlur?.();
+          }}
           onChange={(e) => onChange(e.target.value)}
           className="mt-6 w-full border-b border-bone/20 bg-transparent pb-2 pt-1 text-bone outline-none focus:border-ember transition-colors"
         />

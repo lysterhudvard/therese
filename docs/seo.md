@@ -39,12 +39,12 @@ brand SERP is fast and cheap.
 
 Branded (high-priority, low-effort):
 
-| Keyword                          | Vol/mo | KD |
-| -------------------------------- | ------ | -- |
-| therese järvheden                | 480    | 28 |
-| therese järvheden skådespelerska | <10    | —  |
-| therese järvheden imdb           | <10    | —  |
-| therese järvheden röst           | <10    | —  |
+| Keyword                          | Vol/mo | KD  |
+| -------------------------------- | ------ | --- |
+| therese järvheden                | 480    | 28  |
+| therese järvheden skådespelerska | <10    | —   |
+| therese järvheden imdb           | <10    | —   |
+| therese järvheden röst           | <10    | —   |
 
 Industry / casting-director intent:
 
@@ -107,55 +107,48 @@ One `<h1>` per page. CV entries inside `<table>` or `<ul>` — not as images.
 
 ```json
 {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Therese Järvheden",
-    "alternateName": "Therese Järvheden Persson",
-    "jobTitle": "Skådespelerska, Röstskådespelare",
-    "description": "Svensk skådespelerska och röstskådespelare. Aktuell i SVT:s En våldsam kärlek. Skånsk dialekt.",
-    "url": "https://www.theresejarvheden.se",
-    "image": "https://www.theresejarvheden.se/img/therese-jarvheden-headshot.jpg",
-    "gender": "Female",
-    "nationality": "Swedish",
-    "knowsLanguage": ["sv", "en"],
-    "sameAs": [
-        "https://www.imdb.com/name/nm5098431/",
-        "https://commercialactors.com/en/therese-jarvheden",
-        "https://schultzbergagency.com/therese-jarvheden/",
-        "https://www.instagram.com/theresejarvheden/",
-        "https://www.facebook.com/therese.jarvhedenfdpersson",
-        "https://sv.wikipedia.org/wiki/Therese_Järvheden"
-    ],
-    "knowsAbout": [
-        "Acting",
-        "Voice acting",
-        "Dubbing",
-        "Skånska dialect",
-        "Comedy",
-        "Drama"
-    ],
-    "worksFor": [
-        {
-            "@type": "Organization",
-            "name": "Schultzberg Agency",
-            "url": "https://schultzbergagency.com"
-        },
-        {
-            "@type": "Organization",
-            "name": "Commercial Actors",
-            "url": "https://commercialactors.com"
-        }
-    ],
-    "performerIn": [
-        {
-            "@type": "TVSeries",
-            "name": "En våldsam kärlek",
-            "url": "https://www.svtplay.se/en-valdsam-karlek"
-        },
-        { "@type": "TVSeries", "name": "Karatefylla" },
-        { "@type": "TVSeries", "name": "Jävla klåpare" },
-        { "@type": "Movie", "name": "Beck – Utan uppsåt" }
-    ]
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Therese Järvheden",
+  "alternateName": "Therese Järvheden Persson",
+  "jobTitle": "Skådespelerska, Röstskådespelare",
+  "description": "Svensk skådespelerska och röstskådespelare. Aktuell i SVT:s En våldsam kärlek. Skånsk dialekt.",
+  "url": "https://www.theresejarvheden.se",
+  "image": "https://www.theresejarvheden.se/img/therese-jarvheden-headshot.jpg",
+  "gender": "Female",
+  "nationality": "Swedish",
+  "knowsLanguage": ["sv", "en"],
+  "sameAs": [
+    "https://www.imdb.com/name/nm5098431/",
+    "https://commercialactors.com/en/therese-jarvheden",
+    "https://schultzbergagency.com/therese-jarvheden/",
+    "https://www.instagram.com/theresejarvheden/",
+    "https://www.facebook.com/therese.jarvhedenfdpersson",
+    "https://sv.wikipedia.org/wiki/Therese_Järvheden"
+  ],
+  "knowsAbout": ["Acting", "Voice acting", "Dubbing", "Skånska dialect", "Comedy", "Drama"],
+  "worksFor": [
+    {
+      "@type": "Organization",
+      "name": "Schultzberg Agency",
+      "url": "https://schultzbergagency.com"
+    },
+    {
+      "@type": "Organization",
+      "name": "Commercial Actors",
+      "url": "https://commercialactors.com"
+    }
+  ],
+  "performerIn": [
+    {
+      "@type": "TVSeries",
+      "name": "En våldsam kärlek",
+      "url": "https://www.svtplay.se/en-valdsam-karlek"
+    },
+    { "@type": "TVSeries", "name": "Karatefylla" },
+    { "@type": "TVSeries", "name": "Jävla klåpare" },
+    { "@type": "Movie", "name": "Beck – Utan uppsåt" }
+  ]
 }
 ```
 
@@ -163,15 +156,15 @@ Add `BreadcrumbList` on subpages and `VideoObject` schema per showreel:
 
 ```json
 {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    "name": "Therese Järvheden — Drama Showreel 2025",
-    "description": "Drama-scener från SVT En våldsam kärlek, Beck Utan uppsåt m.fl.",
-    "thumbnailUrl": "https://www.theresejarvheden.se/img/showreel-drama-thumb.jpg",
-    "uploadDate": "2025-09-01",
-    "contentUrl": "https://player.vimeo.com/video/xxxxxxxxx",
-    "embedUrl": "https://player.vimeo.com/video/xxxxxxxxx",
-    "duration": "PT2M45S"
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "Therese Järvheden — Drama Showreel 2025",
+  "description": "Drama-scener från SVT En våldsam kärlek, Beck Utan uppsåt m.fl.",
+  "thumbnailUrl": "https://www.theresejarvheden.se/img/showreel-drama-thumb.jpg",
+  "uploadDate": "2025-09-01",
+  "contentUrl": "https://player.vimeo.com/video/xxxxxxxxx",
+  "embedUrl": "https://player.vimeo.com/video/xxxxxxxxx",
+  "duration": "PT2M45S"
 }
 ```
 
@@ -197,45 +190,45 @@ Add `BreadcrumbList` on subpages and `VideoObject` schema per showreel:
 ```html
 <h2>Filmografi</h2>
 <table>
-    <thead>
-        <tr>
-            <th>År</th>
-            <th>Titel</th>
-            <th>Roll</th>
-            <th>Regi</th>
-            <th>Produktion</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>2025</td>
-            <td>En våldsam kärlek</td>
-            <td>Huvudroll</td>
-            <td>—</td>
-            <td>SVT</td>
-        </tr>
-        <tr>
-            <td>2023</td>
-            <td>Karatefylla</td>
-            <td>—</td>
-            <td>—</td>
-            <td>SVT</td>
-        </tr>
-        <tr>
-            <td>2022</td>
-            <td>Beck – Utan uppsåt</td>
-            <td>Nora (lärare)</td>
-            <td>—</td>
-            <td>Filmlance</td>
-        </tr>
-        <tr>
-            <td>—</td>
-            <td>Familjen Valentin</td>
-            <td>Mamman (röst/dubb)</td>
-            <td>—</td>
-            <td>—</td>
-        </tr>
-    </tbody>
+  <thead>
+    <tr>
+      <th>År</th>
+      <th>Titel</th>
+      <th>Roll</th>
+      <th>Regi</th>
+      <th>Produktion</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2025</td>
+      <td>En våldsam kärlek</td>
+      <td>Huvudroll</td>
+      <td>—</td>
+      <td>SVT</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>Karatefylla</td>
+      <td>—</td>
+      <td>—</td>
+      <td>SVT</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>Beck – Utan uppsåt</td>
+      <td>Nora (lärare)</td>
+      <td>—</td>
+      <td>Filmlance</td>
+    </tr>
+    <tr>
+      <td>—</td>
+      <td>Familjen Valentin</td>
+      <td>Mamman (röst/dubb)</td>
+      <td>—</td>
+      <td>—</td>
+    </tr>
+  </tbody>
 </table>
 ```
 

@@ -108,9 +108,13 @@ export function CommentaryPlayer({
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <div className="relative flex h-2 w-2">
-            <span className={`relative inline-flex rounded-full h-2 w-2 bg-ember ${playing ? "animate-pulse" : ""}`} />
+            <span
+              className={`relative inline-flex rounded-full h-2 w-2 bg-ember ${playing ? "animate-pulse" : ""}`}
+            />
           </div>
-          <span className="text-[10px] uppercase tracking-wider text-ember">Director's Commentary</span>
+          <span className="text-[10px] uppercase tracking-wider text-ember">
+            Director's Commentary
+          </span>
         </div>
         <button onClick={onClose} className="text-bone/45 hover:text-bone transition-colors p-1">
           <X size={15} />
@@ -148,17 +152,22 @@ export function CommentaryPlayer({
             onChange={handleSliderChange}
             className="flex-1 h-1 bg-bone/15 rounded-lg appearance-none cursor-pointer accent-ember focus:outline-none"
             style={{
-              background: `linear-gradient(to right, #D88C5A 0%, #D88C5A ${((currentTime / (duration || 1)) * 100).toFixed(
-                1
-              )}%, rgba(220, 218, 209, 0.15) ${((currentTime / (duration || 1)) * 100).toFixed(
-                1
-              )}%, rgba(220, 218, 209, 0.15) 100%)`,
+              background: `linear-gradient(to right, #D88C5A 0%, #D88C5A ${(
+                (currentTime / (duration || 1)) *
+                100
+              ).toFixed(1)}%, rgba(220, 218, 209, 0.15) ${(
+                (currentTime / (duration || 1)) *
+                100
+              ).toFixed(1)}%, rgba(220, 218, 209, 0.15) 100%)`,
             }}
           />
           <span className="text-[9px] text-bone/50 w-8 text-right">{formatTime(duration)}</span>
         </div>
 
-        <button onClick={toggleMute} className="text-bone/55 hover:text-ember transition-colors p-1">
+        <button
+          onClick={toggleMute}
+          className="text-bone/55 hover:text-ember transition-colors p-1"
+        >
           {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
         </button>
       </div>

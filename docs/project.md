@@ -6,9 +6,10 @@ This document serves as the project overview, current architecture map, constrai
 
 ## 1. Project Overview & Current Architecture
 
-The goal of this project is to build a premium portfolio and casting portal for **Therese Järvheden**, a Swedish actress and voice actor (specializing in Scanian/skånsk dialect). 
+The goal of this project is to build a premium portfolio and casting portal for **Therese Järvheden**, a Swedish actress and voice actor (specializing in Scanian/skånsk dialect).
 
 ### Current Tech Stack
+
 - **Framework:** TanStack Start (`@tanstack/react-start`) on React 19 and Vite
 - **Routing:** TanStack Router (`@tanstack/react-router`) with file-based routing
 - **Styling:** Tailwind CSS v4.0 (with new `@theme` configuration and `@utility` rules in `src/styles.css`)
@@ -16,6 +17,7 @@ The goal of this project is to build a premium portfolio and casting portal for 
 - **Icons:** Lucide React
 
 ### Current Codebase Map
+
 - `src/routes/__root.tsx`: The root shell, HTML scaffolding, metadata/viewport settings, Google Fonts integration (Cormorant Garamond + Inter Tight).
 - `src/routes/index.tsx`: The primary single-page landing component. It holds all copy translations (Swedish and English), portfolio media assets, credit tables, and components (Spotlight, Hero, Biography, FilmReel, Credits, Voice, Contact, Footer).
 - `src/styles.css`: Standard styling variables (oklch colors), custom Tailwind v4 configurations, utility classes (film-grain, cursor defaults, no-scrollbar).
@@ -38,21 +40,23 @@ This project is actively synced with the [Lovable.dev](https://lovable.dev) AI p
 To maximize performance, load times, and search/AI-engine indexability, the long-term plan is to migrate this application to **Astro**.
 
 ### Why Astro?
+
 - **Zero JS by Default:** Astro ships zero client-side JavaScript by default, only hydrating interactive islands (like the custom Spotlight cursor, contact forms, or image carousels) where necessary.
 - **Outstanding Core Web Vitals:** Minimizing initial bundle sizes directly optimizes Largest Contentful Paint (LCP) and Interaction to Next Paint (INP).
 - **First-Class SEO:** Astro offers static HTML generation (SSG) alongside server-side rendering (SSR), allowing search bots and LLMs (ChatGPT, Gemini, Perplexity) to crawl fully populated HTML pages without rendering JavaScript.
 
 ### Migration Mapping Guide
+
 When the migration to Astro occurs, the TanStack Router structure should be mapped as follows:
 
-| Current Route (TanStack Start) | Astro Output Route | Static/SSR | Notes |
-| :--- | :--- | :--- | :--- |
-| `src/routes/index.tsx` (Home) | `src/pages/index.astro` | Static (SSG) | Hero section, short bio, key showreels, direct links. |
-| `/cv` (TBD - currently section) | `src/pages/cv.astro` | Static (SSG) | Full HTML table for credits, printable styling. |
-| `/showreels` (TBD) | `src/pages/showreels.astro` | Static (SSG) | Embedded video objects using Vimeo and schema.org markup. |
-| `/voice` (TBD) | `src/pages/voice.astro` | Static (SSG) | Voice reels, audio elements, Scania dialect marketing. |
-| `/kontakt` (TBD) | `src/pages/kontakt.astro` | SSR / Hybrid | Form submission endpoint. |
-| `/en/*` (TBD - currently local state) | `src/pages/en/...` | Static (SSG) | Localized paths for international casting agencies. |
+| Current Route (TanStack Start)        | Astro Output Route          | Static/SSR   | Notes                                                     |
+| :------------------------------------ | :-------------------------- | :----------- | :-------------------------------------------------------- |
+| `src/routes/index.tsx` (Home)         | `src/pages/index.astro`     | Static (SSG) | Hero section, short bio, key showreels, direct links.     |
+| `/cv` (TBD - currently section)       | `src/pages/cv.astro`        | Static (SSG) | Full HTML table for credits, printable styling.           |
+| `/showreels` (TBD)                    | `src/pages/showreels.astro` | Static (SSG) | Embedded video objects using Vimeo and schema.org markup. |
+| `/voice` (TBD)                        | `src/pages/voice.astro`     | Static (SSG) | Voice reels, audio elements, Scania dialect marketing.    |
+| `/kontakt` (TBD)                      | `src/pages/kontakt.astro`   | SSR / Hybrid | Form submission endpoint.                                 |
+| `/en/*` (TBD - currently local state) | `src/pages/en/...`          | Static (SSG) | Localized paths for international casting agencies.       |
 
 ---
 
@@ -69,5 +73,39 @@ Any updates to the current TanStack Start implementation must keep the final Ast
 ---
 
 ## 5. Technical Progress & Issue Resolutions
-* For detailed documentation on completed features, act divisions, and navigation lifecycle, see [progress.md](progress.md).
-* For detailed documentation on layout shifts, touchscreen fixes, scroll lock resolution, and structural swaps, see [fixes.md](fixes.md).
+
+- For detailed documentation on completed features, act divisions, and navigation lifecycle, see [progress.md](progress.md).
+- For detailed documentation on layout shifts, touchscreen fixes, scroll lock resolution, and structural swaps, see [fixes.md](fixes.md).
+
+---
+
+## 6. Section Scroll Transitions & Visual Effects
+
+To create a cohesive, cinematic visual flow, a scroll exit transition has been implemented for all major page sections. This effect ensures that as the user scrolls past any section, it smoothly fades out and zooms in, revealing the dark stage background underneath and enhancing section-to-section readability.
+
+### Animation Details (Framer Motion)
+
+- **Normal Flow Sections** (`Biography`, `Credits`, `Voice`, `Contact`):
+  - **Hook:** `useScroll` tracking the section element with offset `["start start", "end start"]`.
+  - **Mappings:** Progress from `0.5` to `0.95` translates `opacity` from `1` to `0` and `scale` from `1` to `1.05`.
+  - **Wrapper:** Content is wrapped in a `<motion.div style={{ opacity, scale }}>` to ensure layout styles remain unaffected.
+- **Sticky Portfolio Section** (`Portfolio`):
+  - **Challenge:** The horizontal scroll track uses a sticky container inside a `320vh` parent, meaning standard offsets would cause it to fade out prematurely.
+  - **Solution:** Configured `useScroll` with offset `["end end", "end start"]` to trigger the exit transition only _after_ the horizontal scroll finishes and the section begins moving off-screen.
+
+- **Contact Form Spotlight Overlay**:
+  - **Trigger:** Activates whenever any input or textarea inside the Contact component gains focus.
+  - **Effect:** Overlays a dark (`bg-black/80`) mask covering the form container (`z-20` overlay with `pointer-events-none`).
+  - **Spotlight Mask:** Uses CSS `mask-image` with a custom `radial-gradient` that creates a `450px` radius transparent circle. This highlights only the active focal area in high-contrast brightness, while keeping user input fully interactive.
+  - **Tracking:** The spotlight automatically centers over the focused field element when first focused, and then follows the user's mouse coordinates dynamically on mouse movement.
+  - **Deactivation:** Fades away on blur, when the user clicks outside, or when scrolling away to a different section (achieved using an `IntersectionObserver` that blurs the active input when the contact section exits the viewport).
+
+---
+
+## 7. Guidelines Alignment & SEO Checklist
+
+By referencing `docs/rules.md` and `docs/seo.md`, our technical updates follow these core principles:
+
+- **Clean Structure for Astro:** Scroll transitions are applied modularly inside each section component rather than using global, page-wide scroll listeners, ensuring they remain easy to translate into Astro components in the future.
+- **No CLS / Safe Scaling:** All animated containers use hardware-accelerated CSS properties (`transform: scale`, `opacity`) avoiding layout shifts (CLS).
+- **Lovable Sync Stability:** All edits avoid altering files in the `.lovable/` folder or altering established Git commit history.

@@ -35,15 +35,31 @@ export function Footer() {
   }, [isInView]);
 
   const creditsList = [
-    { label: t.footer.agent, value: "Schultzberg Agency", href: "mailto:jonas@schultzbergagency.com" },
+    {
+      label: t.footer.agent,
+      value: "Schultzberg Agency",
+      href: "mailto:jonas@schultzbergagency.com",
+    },
     {
       label: lang === "sv" ? "KONTAKT" : "CONTACT",
       value: "theresejarvheden@gmail.com",
       href: "mailto:theresejarvheden@gmail.com",
     },
-    { label: "INSTAGRAM", value: "@theresejarvheden", href: "https://www.instagram.com/theresejarvheden/" },
-    { label: "FACEBOOK", value: "Therese Järvheden", href: "https://www.facebook.com/therese.jarvhedenfdpersson" },
-    { label: t.footer.photo, value: "Robert Eldrim", href: "https://www.instagram.com/roberteldrim/" },
+    {
+      label: "INSTAGRAM",
+      value: "@theresejarvheden",
+      href: "https://www.instagram.com/theresejarvheden/",
+    },
+    {
+      label: "FACEBOOK",
+      value: "Therese Järvheden",
+      href: "https://www.facebook.com/therese.jarvhedenfdpersson",
+    },
+    {
+      label: t.footer.photo,
+      value: "Robert Eldrim",
+      href: "https://www.instagram.com/roberteldrim/",
+    },
     { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström" },
     { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" },
   ];
@@ -101,7 +117,8 @@ export function Footer() {
               <div
                 className="absolute inset-0 opacity-[0.08] pointer-events-none"
                 style={{
-                  backgroundImage: "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+                  backgroundImage:
+                    "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
                   backgroundSize: "100% 4px",
                 }}
               />
@@ -124,7 +141,8 @@ export function Footer() {
               <div
                 className="absolute inset-0 opacity-[0.08] pointer-events-none"
                 style={{
-                  backgroundImage: "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+                  backgroundImage:
+                    "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
                   backgroundSize: "100% 4px",
                 }}
               />
@@ -160,7 +178,9 @@ export function Footer() {
                 >
                   {creditsList.map((item, index) => (
                     <div key={index} className="flex flex-col items-center">
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-bone/45 mb-1">{item.label}</span>
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-bone/45 mb-1">
+                        {item.label}
+                      </span>
                       {item.href ? (
                         <a
                           href={item.href}

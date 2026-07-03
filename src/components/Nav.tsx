@@ -59,12 +59,12 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-[70] transition-all duration-700 ease-in-out ${
-        scrolled
-          ? "bg-ink border-b border-bone/10"
-          : "bg-transparent"
+        scrolled ? "bg-ink border-b border-bone/10" : "bg-transparent"
       }`}
     >
-      <div className={`flex items-center justify-between pl-4 pr-6 md:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-3.5" : "py-5"}`}>
+      <div
+        className={`flex items-center justify-between pl-4 pr-6 md:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-3.5" : "py-5"}`}
+      >
         {heroDone ? (
           <motion.button
             layoutId="header-logo"
@@ -86,7 +86,11 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
         >
           <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
             {links.map((l) => (
-              <button key={l.id} onClick={() => go(l.id)} className="hover:text-bone transition-colors px-3 py-1.5 rounded-sm">
+              <button
+                key={l.id}
+                onClick={() => go(l.id)}
+                className="hover:text-bone transition-colors px-3 py-1.5 rounded-sm"
+              >
                 {l.label}
               </button>
             ))}
@@ -123,9 +127,15 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
               className="flex flex-col gap-1.5 text-bone"
               aria-label="Menu"
             >
-              <span className={`block h-px w-7 bg-bone transition-transform ${open ? "translate-y-[6px] rotate-45" : ""}`} />
-              <span className={`block h-px w-7 bg-bone transition-opacity ${open ? "opacity-0" : ""}`} />
-              <span className={`block h-px w-7 bg-bone transition-transform ${open ? "-translate-y-[6px] -rotate-45" : ""}`} />
+              <span
+                className={`block h-px w-7 bg-bone transition-transform ${open ? "translate-y-[6px] rotate-45" : ""}`}
+              />
+              <span
+                className={`block h-px w-7 bg-bone transition-opacity ${open ? "opacity-0" : ""}`}
+              />
+              <span
+                className={`block h-px w-7 bg-bone transition-transform ${open ? "-translate-y-[6px] -rotate-45" : ""}`}
+              />
             </button>
           </div>
         </motion.div>
@@ -140,7 +150,11 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
           >
             <div className="flex flex-col px-6 py-6 gap-4">
               {links.map((l) => (
-                <button key={l.id} onClick={() => go(l.id)} className="text-left font-display text-2xl text-bone">
+                <button
+                  key={l.id}
+                  onClick={() => go(l.id)}
+                  className="text-left font-display text-2xl text-bone"
+                >
                   {l.label}
                 </button>
               ))}

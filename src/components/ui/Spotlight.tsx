@@ -41,7 +41,12 @@ export function Spotlight() {
         <motion.div
           animate={{ scale: 1, opacity: 1 }}
           className="-translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{ width: 14, height: 14, background: "var(--color-bone)", mixBlendMode: "difference" }}
+          style={{
+            width: 14,
+            height: 14,
+            background: "var(--color-bone)",
+            mixBlendMode: "difference",
+          }}
         />
       </motion.div>
       <motion.div

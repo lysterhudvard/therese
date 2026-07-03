@@ -22,7 +22,10 @@ function NotFoundComponent() {
           The scene you are looking for has left the stage.
         </p>
         <div className="mt-8">
-          <Link to="/" className="inline-flex items-center gap-2 border border-bone/20 px-6 py-3 text-xs uppercase tracking-[0.3em] hover:bg-bone hover:text-ink transition-colors">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 border border-bone/20 px-6 py-3 text-xs uppercase tracking-[0.3em] hover:bg-bone hover:text-ink transition-colors"
+          >
             Return to lobby
           </Link>
         </div>
@@ -45,7 +48,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-3 text-sm text-muted-foreground">Try the cue again.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="border border-ember/40 bg-ember/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-ember hover:bg-ember hover:text-ink transition-colors"
           >
             Retry
@@ -62,22 +68,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Therese Järvheden — Skådespelerska" },
-      { name: "description", content: "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'." },
+      {
+        name: "description",
+        content:
+          "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.",
+      },
       { name: "author", content: "Therese Järvheden" },
       { property: "og:title", content: "Therese Järvheden — Skådespelerska" },
-      { property: "og:description", content: "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'." },
+      {
+        property: "og:description",
+        content:
+          "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.",
+      },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650" },
+      {
+        property: "og:image",
+        content:
+          "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+      },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650" },
+      {
+        name: "twitter:image",
+        content:
+          "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+      },
       { name: "twitter:title", content: "Therese Järvheden — Skådespelerska" },
-      { name: "twitter:description", content: "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'." },
+      {
+        name: "twitter:description",
+        content:
+          "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter+Tight:wght@300;400;500;600&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter+Tight:wght@300;400;500;600&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

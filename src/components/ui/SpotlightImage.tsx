@@ -26,8 +26,10 @@ export function SpotlightImage({
     const rect = container.getBoundingClientRect();
     if (isFinePointer) {
       // Desktop: initially hidden offscreen
-      mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
-      mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.webkitMaskImage =
+        "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.maskImage =
+        "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
     } else {
       // Mobile/Tablet: initially centered
       const initX = rect.width ? rect.width / 2 : 150;
@@ -38,7 +40,7 @@ export function SpotlightImage({
 
     const updateScrollSpotlight = () => {
       if (isFinePointer) return; // Never auto-glide on desktop
-      
+
       const rect = container.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       if (rect.top < viewportHeight && rect.bottom > 0) {
@@ -46,14 +48,14 @@ export function SpotlightImage({
         const totalDist = viewportHeight + rect.height;
         const currentDist = viewportHeight - rect.top;
         const progress = Math.max(0, Math.min(1, currentDist / totalDist));
-        
+
         // Glide x from -50px to width + 50px
         const x = -50 + progress * (rect.width + 100);
         // Smooth sine wave for y to glide up and down like a searchlight
         const y = rect.height * (0.35 + Math.sin(progress * Math.PI * 1.5) * 0.22);
-        
+
         const radius = 160;
-        
+
         mask.style.webkitMaskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
         mask.style.maskImage = `radial-gradient(circle ${radius}px at ${x}px ${y}px, black 10%, transparent 80%)`;
       }
@@ -70,8 +72,10 @@ export function SpotlightImage({
 
     const onMouseLeave = () => {
       if (!isFinePointer) return;
-      mask.style.webkitMaskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
-      mask.style.maskImage = "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.webkitMaskImage =
+        "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
+      mask.style.maskImage =
+        "radial-gradient(circle 300px at -500px -500px, black 10%, transparent 80%)";
     };
 
     if (isFinePointer) {

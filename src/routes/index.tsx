@@ -17,10 +17,21 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Therese Järvheden — Skådespelerska" },
-      { name: "description", content: "Swedish actress Therese Järvheden. Drama, comedy, voice. SVT 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'." },
+      {
+        name: "description",
+        content:
+          "Swedish actress Therese Järvheden. Drama, comedy, voice. SVT 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.",
+      },
       { property: "og:title", content: "Therese Järvheden — Skådespelerska" },
-      { property: "og:description", content: "Swedish actress Therese Järvheden. Drama, comedy, voice." },
-      { property: "og:image", content: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650" },
+      {
+        property: "og:description",
+        content: "Swedish actress Therese Järvheden. Drama, comedy, voice.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+      },
     ],
   }),
   component: Page,
@@ -30,8 +41,10 @@ export const Route = createFileRoute("/")({
 export const IMG = {
   hero: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
   bioA: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000012-8d9138d916/Thess0822_lowres.jpg?ph=a6c2528650",
-  voice: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650",
-  feature: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000031-558e7558ea/image-crop-200000013-8.jpeg?ph=a6c2528650",
+  voice:
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650",
+  feature:
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000031-558e7558ea/image-crop-200000013-8.jpeg?ph=a6c2528650",
   portfolio: [
     "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000028-5883458837/image-crop-200000014-6.jpeg?ph=a6c2528650",
     "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000032-c5f44c5f47/Thess0972_bw_highres.jpg?ph=a6c2528650",
@@ -47,7 +60,6 @@ export const IMG = {
     "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000046-2484224845/Thess1078_lowres.jpg?ph=a6c2528650",
   ],
 };
-
 
 export type Credit = {
   year: string;
@@ -86,8 +98,10 @@ export const CREDITS: Credit[] = [
     commentary: {
       url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       duration: "0:15",
-      svText: "Det var en emotionellt utmanande roll, men oerhört viktig att berätta för att uppmärksamma kvinnofrid och våld i nära relationer.",
-      enText: "It was an emotionally challenging role, but incredibly important to tell to draw attention to domestic abuse and relationship violence."
+      svText:
+        "Det var en emotionellt utmanande roll, men oerhört viktig att berätta för att uppmärksamma kvinnofrid och våld i nära relationer.",
+      enText:
+        "It was an emotionally challenging role, but incredibly important to tell to draw attention to domestic abuse and relationship violence.",
     },
     script: {
       scene: "SCENE 4 - INT. APARTMENT - NIGHT",
@@ -95,10 +109,10 @@ export const CREDITS: Credit[] = [
         char: "THERESE",
         line: {
           sv: "Vi måste prata om det här. Vi kan inte låtsas som ingenting längre.",
-          en: "We need to talk about this. We can't pretend it's nothing anymore."
-        }
-      }
-    }
+          en: "We need to talk about this. We can't pretend it's nothing anymore.",
+        },
+      },
+    },
   },
   {
     year: "2023",
@@ -111,8 +125,10 @@ export const CREDITS: Credit[] = [
     commentary: {
       url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
       duration: "0:12",
-      svText: "Att spela Nora i Beck var fantastiskt. Hon bär på en tyst intensitet som gör varje blick laddad.",
-      enText: "Playing Nora in Beck was fantastic. She carries a quiet intensity that makes every look charged."
+      svText:
+        "Att spela Nora i Beck var fantastiskt. Hon bär på en tyst intensitet som gör varje blick laddad.",
+      enText:
+        "Playing Nora in Beck was fantastic. She carries a quiet intensity that makes every look charged.",
     },
     script: {
       scene: "SCENE 17 - INT. CLASSROOM - DAY",
@@ -120,10 +136,10 @@ export const CREDITS: Credit[] = [
         char: "NORA",
         line: {
           sv: "Alla slår upp sidan fyrtiotvå. Vi har inte mycket tid kvar.",
-          en: "Everyone open to page forty-two. We don't have much time left."
-        }
-      }
-    }
+          en: "Everyone open to page forty-two. We don't have much time left.",
+        },
+      },
+    },
   },
   {
     year: "2021",
@@ -139,10 +155,10 @@ export const CREDITS: Credit[] = [
         char: "TJEJEN",
         line: {
           sv: "Ska du ha en stor stark eller ska du bara stå där och titta?",
-          en: "Are you having a big beer or are you just going to stand there and watch?"
-        }
-      }
-    }
+          en: "Are you having a big beer or are you just going to stand there and watch?",
+        },
+      },
+    },
   },
   {
     year: "2020",
@@ -158,16 +174,56 @@ export const CREDITS: Credit[] = [
         char: "KUNDEN",
         line: {
           sv: "Det här är helt oacceptabelt. Vem är ansvarig här?",
-          en: "This is completely unacceptable. Who is in charge here?"
-        }
-      }
-    }
+          en: "This is completely unacceptable. Who is in charge here?",
+        },
+      },
+    },
   },
-  { year: "2019", title: "Anna Blomberg show", role: { sv: "Sketch ensemble", en: "Sketch ensemble" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[5] },
-  { year: "2018", title: "Jobbtjuven", role: { sv: "Återkommande roll", en: "Recurring role" }, type: "TV", category: { sv: "Komedi", en: "Comedy" }, network: "SVT", img: IMG.portfolio[7] },
-  { year: "—", title: "Familjen Valentin", role: { sv: "Mamman (röst, dubb)", en: "The mother (voice, dub)" }, type: "Voice", category: { sv: "Animation", en: "Animation" }, network: "Barnkanalen", img: IMG.voice },
-  { year: "—", title: "Radio- & TV-reklam", role: { sv: "Röst (skånsk dialekt)", en: "Voice (Scanian dialect)" }, type: "Voice", category: { sv: "Reklam", en: "Commercials" }, network: "Diverse", img: IMG.portfolio[1] },
-  { year: "—", title: "Teater & Musikal", role: { sv: "Diverse roller", en: "Various roles" }, type: "Theater", category: { sv: "Scen", en: "Stage" }, network: "Diverse uppsättningar", img: IMG.portfolio[10] },
+  {
+    year: "2019",
+    title: "Anna Blomberg show",
+    role: { sv: "Sketch ensemble", en: "Sketch ensemble" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.portfolio[5],
+  },
+  {
+    year: "2018",
+    title: "Jobbtjuven",
+    role: { sv: "Återkommande roll", en: "Recurring role" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.portfolio[7],
+  },
+  {
+    year: "—",
+    title: "Familjen Valentin",
+    role: { sv: "Mamman (röst, dubb)", en: "The mother (voice, dub)" },
+    type: "Voice",
+    category: { sv: "Animation", en: "Animation" },
+    network: "Barnkanalen",
+    img: IMG.voice,
+  },
+  {
+    year: "—",
+    title: "Radio- & TV-reklam",
+    role: { sv: "Röst (skånsk dialekt)", en: "Voice (Scanian dialect)" },
+    type: "Voice",
+    category: { sv: "Reklam", en: "Commercials" },
+    network: "Diverse",
+    img: IMG.portfolio[1],
+  },
+  {
+    year: "—",
+    title: "Teater & Musikal",
+    role: { sv: "Diverse roller", en: "Various roles" },
+    type: "Theater",
+    category: { sv: "Scen", en: "Stage" },
+    network: "Diverse uppsättningar",
+    img: IMG.portfolio[10],
+  },
 ];
 
 export const REVIEW_QUOTES_SV = [
@@ -187,7 +243,11 @@ export const REVIEW_QUOTES_EN = [
 
 export const MOOD_DATA = {
   Dramatic: { image: IMG.hero, weight: 300 },
-  Comedic: { image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000044-20e3320e36/Thess0564_highres.jpg?ph=a6c2528650", weight: 500 },
+  Comedic: {
+    image:
+      "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000044-20e3320e36/Thess0564_highres.jpg?ph=a6c2528650",
+    weight: 500,
+  },
   Classical: { image: IMG.feature, weight: 400 },
 } as const;
 
@@ -199,7 +259,12 @@ function Page() {
   const [heroDone, setHeroDone] = useState(false);
   const [lang, setLangState] = useState<Lang>("sv");
   const [isInPortfolio, setIsInPortfolio] = useState(false);
-  const [activeCommentary, setActiveCommentary] = useState<{ title: string; role: string; url: string; text: string } | null>(null);
+  const [activeCommentary, setActiveCommentary] = useState<{
+    title: string;
+    role: string;
+    url: string;
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -212,7 +277,7 @@ function Page() {
       {
         rootMargin: "-10% 0px -10% 0px",
         threshold: 0.05,
-      }
+      },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -241,7 +306,7 @@ function Page() {
       <main className="relative bg-stage text-bone selection:bg-ember selection:text-ink">
         <Spotlight />
         <Nav heroDone={heroDone} />
-        
+
         {/* Cinematic Anamorphic Scope Bars (Point 1) */}
         <div
           className="pointer-events-none fixed inset-x-0 top-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"
