@@ -105,6 +105,22 @@ This document tracks completed features, animation systems, layout updates, and 
 - **External URL Link Manager**: Integrated URL link registers to save external images/showreels from direct paths.
 
 ### 16. Audio Commentary Uploads & Script Editor in Merits (Akt V)
+
 - **Advanced Options Drawer:** Implemented a collapsable advanced section inside each merit row in `DashboardCredits.tsx` to handle voice recordings and script dialogue details.
 - **Direct Audio File Upload:** Added a local file picker that uploads audio files (`audio/*`) directly to the Supabase `portfolio` storage bucket, auto-calculating the duration (mins:secs) dynamically.
 - **Dialogue & Scene Transcription:** Added localized textareas for commentary descriptions and structured inputs for script scenes, character names, and dialogue lines in both Swedish and English.
+
+### 17. Admin Navigation & Sidebar Spacing Optimization
+- **Naming Alignment:** Synchronized sidebar navigation labels to precisely match the website's acts: "Akt VII: Kontaktinfo" and "Akt VIII: Ridåfall" (replacing any generic or mismatched titles).
+- **Text Wrapping & Padding:** Resolved navigation layout breakage on sidebar labels (prevented multi-line wrapping using `whitespace-nowrap`). Optimized sidebar spacing by reducing paddings to `p-4` and button paddings to `px-3 py-2` to maximize available content width.
+- **Icon Sizing & Scale Lock:** Added `flex-shrink-0` to all sidebar icons to prevent browser rendering engines from shrinking icons when text runs long. Locked icon sizes to an uniform `16px`.
+
+### 18. Supabase Update Queries & Database Constraint Resolutions
+- **Partial Database Updates:** Replaced partial Supabase `.upsert()` operations with targeted `.update().eq('id', 'main')` queries in the Bio, Contact, and Curtain/Ridåfall panels. This bypasses NOT-NULL constraints on non-edited fields (such as `quote_sv` in biography) when saving unrelated tabs.
+- **Empty Array Initialization Safeguard:** Fixed biography's background quotes loader. It now properly preserves fallback original values if the loaded database JSON array is empty (`[]`), rather than wiping out the editor interface.
+
+### 19. Media Library Integration, Previews & Merit Ordering Controls
+- **Shared Media Picker Dialog:** Built a modular, responsive `MediaPickerModal` that overlays the CMS. It retrieves direct files from the `portfolio` Supabase storage bucket, categorized by type (images, video, audio).
+- **Inline Media Selectors:** Attached media picker launchers next to the URL input fields in **Portfolio CMS** (for images), **Showreels CMS** (for poster images), and **Meriter CMS** (for advanced audio commentary tracks), enabling direct selection of pre-uploaded media assets.
+- **Showreel Poster Preview:** Added immediate image thumbnail previews underneath the poster URL input boxes inside the Showreels list.
+- **Automatic Year Sorting & Move Controls:** Configured the Merit list to sort dynamically by year (`year` descending, latest first) and then by user-controlled `sort_order`. Added up and down arrow control keys on each merit row, enabling fine-grained order tweaking of items within a single year.

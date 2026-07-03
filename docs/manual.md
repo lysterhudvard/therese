@@ -9,13 +9,15 @@ Välkommen till **Backstage CMS** manualen för [theresejarvheden.se](https://th
 Backstage CMS är byggt för att styra alla sektioner på hemsidan dynamiskt via din **Supabase**-databas. Gränssnittet är indelat i åtta flikar som speglar sajtens ordning:
 
 1. **Akt I: Nu aktuell** (Hero-huvudlinje)
-2. **Akt II: Biografi** (Citat, introduktionstext, egenskaper och FAQ)
-3. **Akt III: Portfolio** (Bildgalleri med sortering, uppladdning och alt-texter)
-4. **Akt IV: Showreels** (Vimeo/YouTube/Egna videor med anpassad glöd)
-5. **Akt V: Meriter** (Meritförteckning med avancerad röstinspelning och manusrepliker)
+2. **Akt II: Biografi** (Citat, introduktionstext, egenskaper, FAQ samt rullande bakgrundscitat)
+3. **Akt III: Portfolio** (Bildgalleri med biblioteksval, sortering och alt-texter)
+4. **Akt IV: Showreels** (Vimeo/YouTube/Egna videor med mediebibliotek-stöd och förhandsvisning)
+5. **Akt V: Meriter** (Meritförteckning med årssortering, flytt-pilar, och ljudval från mediebiblioteket)
 6. **Akt VI: Röst** (Röstintroduktion, knappar och bokningsdetaljer)
-7. **SEO & Inställningar** (Sökmotorsoptimering, titel, beskrivning och delningsbild)
-8. **Mediebibliotek** (Filhanterare för alla uppladdade bilder och ljudfiler)
+7. **Akt VII: Kontaktinfo** (Sociala medier-länkar, kontaktuppgifter som telefon, e-post och kontaktformulär)
+8. **Akt VIII: Ridåfall** (Eftertextinställningar för rullande text och slutbild)
+9. **SEO & Inställningar** (Sökmotorsoptimering, titel, beskrivning och delningsbild)
+10. **Mediebibliotek** (Filhanterare för alla uppladdade bilder, videor och ljudfiler)
 
 ---
 
@@ -53,12 +55,13 @@ För att komma till adminpanelen:
 ### 3. Akt III: Portfolio
 * **Syfte:** Styr bilderna i det horisontella rullningsgalleriet.
 * **Hur du ändrar:**
+  * **Biblioteksval:** Klicka på den lilla bild-ikonen bredvid bildfältet för att välja en bild direkt från ditt Mediebibliotek.
   * **Uppladdning:** Klicka på **Välj fil** för att ladda upp en ny bild från datorn till Supabase Storage. Den läggs till direkt.
   * **Sortering:** Ändra siffran i fältet *Sorteringsordning* (lägre siffror visas först).
   * **SEO Alt-text:** Skriv en beskrivande bildtext (t.ex. `"Therese Järvheden porträtt i studiomiljö"`). Detta hjälper Google Image Search att indexera bilden.
 * **Teststeg:**
-  1. Ladda upp en testbild.
-  2. Skriv en alt-text och sätt ordningen till `0` så att den hamnar först. Spara.
+  1. Klicka på bild-ikonen och välj en bild från mediebiblioteket.
+  2. Skriv en alt-text och sätt ordningen till `0` så datan hamnar först. Spara.
   3. Kontrollera startsidan för att se att den nya bilden visas först.
 
 ### 4. Akt IV: Showreels
@@ -66,23 +69,28 @@ För att komma till adminpanelen:
 * **Hur du ändrar:**
   * Fyll i titel och undertitel på svenska och engelska.
   * Ange ett **Vimeo-ID** (t.ex. `1206764752`) eller **YouTube-ID**. Om du använder en rå `.mp4`-fil, klistra in den i *Backup Video URL*.
+  * **Posterbild (URL) & Mediebibliotek:** Klicka på den lilla bild-ikonen bredvid fältet för att välja en bild direkt från Mediebiblioteket. En förhandsvisning av bilden ritas ut direkt under inmatningsfältet.
   * Välj en **Glow-färg** (t.ex. `rgba(235, 94, 40, 0.15)` för en varm orange glöd bakom videospelaren).
 * **Teststeg:**
   1. Klicka på en befintlig showreel och ändra dess rubrik. Spara.
-  2. Gå till showreel-sektionen på hemsidan och starta videon för att säkerställa att "Teaterläget" expanderar videon mjukt och dämpar bakgrunden.
+  2. Klicka på bild-ikonen för att välja en posterbild och verifiera att förhandsgranskningen dyker upp.
+  3. Gå till showreel-sektionen på hemsidan och starta videon för att säkerställa att "Teaterläget" expanderar videon mjukt och dämpar bakgrunden.
 
 ### 5. Akt V: Meriter (Meritförteckning)
-* **Syfte:** Hanterar den sökbara listan över filmer, TV-serier, teaterpjäser och röstjobb.
+* **Syfte:** Hanterar den sökbara listan över filmer, TV-serier, teaterpjäser och röstjobb. Listan är sorterad på år (nyast först) som standard.
 * **Hur du ändrar:**
   * Klicka på **+ Lägg till merit** för att skapa en ny rad.
   * Välj typ (Film, TV, Teater, Röst).
+  * **Ompositionering:** Klicka på **Upp-** eller **Ner-pilarna** uppe till höger på merit-kortet för att flytta produktionen upp eller ner i listan. Detta justerar ordningsföljden för meriter under samma år.
   * Klicka på **Visa Röstkommentar & Manus (Avancerat)** för att expandera specialfunktioner:
-    * **Ljuduppladdning:** Ladda upp en röstinspelning (`.mp3` eller `.wav`). CMS-systemet beräknar automatiskt ljudets längd och fyller i fältet **Längd** (t.ex. `1:24`).
+    * **Ljudfil (URL) & Mediebibliotek:** Klicka på den lilla musik-ikonen bredvid fältet för att välja en röstfil direkt från Mediebiblioteket.
+    * **Ljuduppladdning:** Ladda upp en ny röstinspelning (`.mp3` eller `.wav`). CMS-systemet beräknar automatiskt ljudets längd och fyller i fältet **Längd** (t.ex. `1:24`).
     * **Manusdialog:** Skriv in scennamn, karaktär och repliker för att visa interaktivt manus bredvid ljudspelaren på startsidan.
 * **Teststeg:**
   1. Lägg till en ny merit med typen "Voice".
-  2. Öppna de avancerade inställningarna och ladda upp en liten ljudfil. Spara.
-  3. Verifiera på startsidan att meriten visas i listan, och att det går att klicka på **"Kommentar"**-knappen bredvid för att lyssna på ljudinspelningen i sajten inbyggda ljudspelare.
+  2. Flytta runt raden med pilarna.
+  3. Öppna de avancerade inställningarna och klicka på musik-ikonen för att välja en ljudfil från Mediebiblioteket. Spara.
+  4. Verifiera på startsidan att meriten visas i listan, och att det går att klicka på **"Kommentar"**-knappen bredvid för att lyssna på ljudinspelningen i sajten inbyggda ljudspelare.
 
 ### 6. Akt VI: Röst
 * **Syfte:** Hanterar texterna och knapparna för röstprovs-sektionen på förstasidan.
@@ -92,7 +100,25 @@ För att komma till adminpanelen:
   1. Ändra texten på knappen till `"Boka röst omgående"`. Spara.
   2. Kontrollera att knappen i röst-sektionen har uppdaterats på startsidan.
 
-### 7. SEO & Inställningar
+### 7. Akt VII: Kontaktinfo
+* **Syfte:** Hanterar din kontaktinformation samt dina sociala medier-länkar.
+* **Hur du ändrar:**
+  * Fyll i rubriker, telefonnummer, e-post och eventuell beskrivning på både svenska och engelska.
+  * Hantera dina länkar till sociala medier såsom Instagram och IMDb under den nedre panelen.
+* **Teststeg:**
+  1. Ändra kontakttelefonnumret i panelen. Spara.
+  2. Gå till hemsidan och verifiera att det nya numret visas i kontakt-delen.
+
+### 8. Akt VIII: Ridåfall
+* **Syfte:** Styr sajtens eftertexter (scrolling marquee) samt den lilla dolda post-credits-bilden i botten.
+* **Hur du ändrar:**
+  * Redigera eftertext-listan på svenska och engelska. Denna text rullar i eftertexterna.
+  * Ändra URL eller ladda upp en ny bild/video för den lilla dolda post-credits-boxen som dyker upp när man når sidfoten.
+* **Teststeg:**
+  1. Redigera en rad i eftertexterna. Spara.
+  2. Scrolla till botten på startsidan och kontrollera att eftertexterna rullar med den uppdaterade texten.
+
+### 9. SEO & Inställningar
 * **Syfte:** Globala sökmotorsinställningar.
 * **Hur du ändrar:**
   * **Sajttitel (Title Tag):** Det som visas i webbläsarens flik.
@@ -103,7 +129,7 @@ För att komma till adminpanelen:
   2. Ladda upp en ny delningsbild.
   3. Ladda om startsidan och håll muspekaren över webbläsarfliken för att verifiera den nya titeln.
 
-### 8. Mediebibliotek
+### 10. Mediebibliotek
 * **Syfte:** En översikt över alla dina råfiler i Supabase Storage.
 * **Hur du ändrar:**
   * Ladda upp filer direkt härifrån.

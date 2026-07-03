@@ -69,6 +69,22 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Resolution:** Caught bucket errors explicitly and updated dashboard feedback to instruct the user to create the public `portfolio` bucket in their console, while leaving raw text URL fields as immediate override options.
 
 ## 10. Credits Upsert Foreign Key / Deletion Conflicts
+
 - **Symptom:** Saving credit rows threw integrity errors when deleting some items while adding or modifying others.
 - **Root Cause:** Performing upsert lists asynchronously simultaneously with deletion queries caused layout key index collisions.
 - **Resolution:** Rewrote save functions to await deletion transactions first before running upsert listings, preserving database indexes and row orders.
+
+## 11. NOT-NULL Column Constraint Violation on CMS Save
+- **Symptom:** Saving the Biografi or Ridåfall sections threw `null value in column "quote_sv" of relation "biography" violates not-null constraint`.
+- **Root Cause:** Using `.upsert()` with partial fields when updating records caused missing fields to default to null, violating PostgreSQL column constraints.
+- **Resolution:** Replaced all partial table upserts with targeted `.update().eq('id', 'main')` queries, preserving existing database field values safely.
+
+## 12. Compressed/Shrunk Sidebar Icons in CMS Panel
+- **Symptom:** Navigation icons in the admin backstage sidebar were compressed, appearing smaller and distorted when the menu link text was longer.
+- **Root Cause:** Flexbox container layout defaults shrank the SVGs to accommodate the longer text labels inside the navigation item container.
+- **Resolution:** Added `flex-shrink-0` to the sidebar navigation icons, and standardized all sizes to a fixed `16px` using Tailwind classes.
+
+## 13. Blank Background Quotes After Initial Save
+- **Symptom:** The Scrolling Background Quotes list in the Biografi CMS appeared empty on initial load after connecting a fresh database.
+- **Root Cause:** The database initialized the `review_quotes` column with an empty JSON array (`[]`), which evaluated as valid data and overwrote the fallback frontend defaults.
+- **Resolution:** Modified the fetch logic to only set state if the fetched array is non-empty (`data.review_quotes.length > 0`), ensuring fallback values remain visible until explicit user overrides are saved.

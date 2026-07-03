@@ -119,3 +119,15 @@ By referencing `docs/rules.md` and `docs/seo.md`, our technical updates follow t
 - **Clean Structure for Astro:** Scroll transitions are applied modularly inside each section component rather than using global, page-wide scroll listeners, ensuring they remain easy to translate into Astro components in the future.
 - **No CLS / Safe Scaling:** All animated containers use hardware-accelerated CSS properties (`transform: scale`, `opacity`) avoiding layout shifts (CLS).
 - **Lovable Sync Stability:** All edits avoid altering files in the `.lovable/` folder or altering established Git commit history.
+
+---
+
+## 8. Backstage CMS Updates & Shared Media Picker
+
+Recent enhancements to the admin panel streamline content management and align the interface with site semantics:
+
+- **Shared Media Selector:** A reusable component `MediaPickerModal` retrieves files from the Supabase storage bucket (`portfolio`), filtering assets by type (images, videos, audio) for one-click selection.
+- **Showreel Poster Previews:** Embeds real-time image previews within the Showreels dashboard to verify poster asset links.
+- **Year-Based Auto-Sorting & Custom Ordering:** Merit list elements are sorted automatically by year descending. The addition of manual move-up/down arrows updates the sorting indexes locally so users can customize production display orders.
+- **Act Nomenclature Alignment:** Updated sidebar navigation to strictly match the website's acts, renaming tabs to "Akt VII: Kontaktinfo" and "Akt VIII: Ridåfall". Spacing padding was tightened, and icon dimensions were locked using `flex-shrink-0` to protect sidebar layouts.
+- **Safe Database Mutations:** Switched mutations to `.update().eq('id', 'main')` to avoid database null constraint violations when saving partial states.
