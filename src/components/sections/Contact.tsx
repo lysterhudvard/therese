@@ -58,10 +58,11 @@ export function Contact() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("shrinking");
-    // Wait for the form to fade out while envelope rises
-    await new Promise((r) => setTimeout(r, 600));
+    // Allow the envelope to rise and stay visible for reading
+    await new Promise((r) => setTimeout(r, 2200));
     setStatus("dropping");
-    await new Promise((r) => setTimeout(r, 600));
+    // Allow the slower slide-in animation to complete
+    await new Promise((r) => setTimeout(r, 1600));
     setStatus("closing");
     await new Promise((r) => setTimeout(r, 600));
     setStatus("flipping");
@@ -218,7 +219,7 @@ export function Contact() {
                             ? { y: 15 } // Slid perfectly into the envelope
                             : { y: -150 }
                         }
-                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        transition={{ duration: 1.2, ease: "easeInOut" }}
                       >
                         <div className="space-y-3 text-[9px] text-bone/80 font-sans text-left select-none leading-normal">
                           <div>
