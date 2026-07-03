@@ -4,47 +4,73 @@ import { Mail, Check, Send } from "lucide-react";
 import { useT } from "../../hooks/use-t";
 import { Field } from "../ui/Field";
 
-const Instagram = ({ size = 16 }: { size?: number }) => (
+const Instagram = ({ size = 24, className = "" }) => (
   <svg
+    xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.6"
+    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    aria-hidden
+    className={className}
   >
-    <rect x="3" y="3" width="18" height="18" rx="5" />
-    <circle cx="12" cy="12" r="4" />
-    <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
-const Facebook = ({ size = 16 }: { size?: number }) => (
+const Facebook = ({ size = 24, className = "" }) => (
   <svg
+    xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.6"
+    strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    aria-hidden
+    className={className}
   >
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 
+type Status =
+  | "idle"
+  | "shrinking"
+  | "dropping"
+  | "closing"
+  | "flipping"
+  | "writing"
+  | "flying"
+  | "sent";
+
 export function Contact() {
   const { t } = useT();
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", msg: "" });
-  const submit = (e: React.FormEvent) => {
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setStatus("shrinking");
+    // Wait for the form to fade out while envelope rises
+    await new Promise((r) => setTimeout(r, 600));
+    setStatus("dropping");
+    await new Promise((r) => setTimeout(r, 600));
+    setStatus("closing");
+    await new Promise((r) => setTimeout(r, 600));
+    setStatus("flipping");
+    await new Promise((r) => setTimeout(r, 800));
+    setStatus("writing");
+    await new Promise((r) => setTimeout(r, 1800));
+    setStatus("flying");
+    await new Promise((r) => setTimeout(r, 900));
+    setStatus("sent");
   };
 
   const ref = useRef<HTMLDivElement>(null);
@@ -55,7 +81,6 @@ export function Contact() {
   const [isSpotlightActive, setIsSpotlightActive] = useState(false);
   const formCardRef = useRef<HTMLDivElement>(null);
 
-  // IntersectionObserver to blur active elements if contact scrolls out of view
   useEffect(() => {
     if (!ref.current) return;
     const observer = new IntersectionObserver(
@@ -148,7 +173,7 @@ export function Contact() {
                 boxShadow: isSpotlightActive ? "0 0 60px rgba(235, 94, 40, 0.15)" : undefined,
                 transition: "background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease",
               }}
-              className="relative border border-bone/10 bg-stage/40 backdrop-blur-sm p-8 md:p-12 overflow-hidden"
+              className="relative border border-bone/10 bg-stage/40 backdrop-blur-sm p-8 md:p-12 min-h-[550px] md:min-h-[600px] flex items-center justify-center [perspective:1200px]"
             >
               {/* Spotlight Glow Overlay */}
               <div
@@ -160,15 +185,132 @@ export function Contact() {
                 className="absolute inset-0 pointer-events-none transition-opacity duration-800 z-20"
               />
 
+              {/* Envelope Animation Layer */}
+              {status !== "idle" && status !== "sent" && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+                  <style>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap');
+                  `}</style>
+                  <motion.div
+                    className="relative w-[380px] h-[250px] [transform-style:preserve-3d]"
+                    initial={{ scale: 0.85, opacity: 0, y: 100 }}
+                    animate={
+                      status === "flying"
+                        ? { rotateY: 180, y: -600, x: 100, rotateZ: 10, scale: 0.5, opacity: 0 }
+                        : status === "flipping" || status === "writing"
+                          ? { rotateY: 180, scale: 1, opacity: 1, y: 0 }
+                          : { rotateY: 0, scale: 1, opacity: 1, y: 0 }
+                    }
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  >
+                    {/* ENVELOPE BACK (Flap Side) */}
+                    <div className="absolute inset-0 [backface-visibility:hidden]">
+                      {/* Envelope Back Wall */}
+                      <div className="absolute inset-0 bg-[#cbb8a0] rounded-sm shadow-inner" />
+
+                      {/* FAKE LETTER */}
+                      <motion.div
+                        className="absolute top-4 left-6 right-6 bg-stage border border-bone/10 p-5 rounded-sm flex flex-col justify-between shadow-lg z-10"
+                        style={{ height: "190px" }}
+                        initial={{ y: -150 }} // Sticking out significantly
+                        animate={
+                          status === "dropping" || status === "closing" || status === "flipping"
+                            ? { y: 15 } // Slid perfectly into the envelope
+                            : { y: -150 }
+                        }
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                      >
+                        <div className="space-y-4">
+                          <div className="w-1/3 h-1.5 bg-bone/30 rounded-full" />
+                          <div className="w-full h-px bg-bone/20" />
+                          <div className="w-1/4 h-1.5 bg-bone/30 rounded-full" />
+                          <div className="w-full h-px bg-bone/20" />
+                          <div className="w-1/3 h-1.5 bg-bone/30 rounded-full" />
+                          <div className="w-full h-10 bg-bone/10 rounded-sm" />
+                        </div>
+                        <div className="w-1/3 h-6 bg-ember rounded-sm mt-3" />
+                      </motion.div>
+
+                      {/* TOP FLAP */}
+                      <motion.div
+                        className="absolute inset-0 bg-[#d9c4ad] origin-top drop-shadow-lg"
+                        style={{
+                          clipPath: "polygon(0 0, 100% 0, 50% 50%)",
+                          zIndex:
+                            status === "closing" ||
+                            status === "flipping" ||
+                            status === "writing" ||
+                            status === "flying"
+                              ? 25
+                              : 5,
+                        }}
+                        initial={{ rotateX: -180 }}
+                        animate={
+                          status === "closing" ||
+                          status === "flipping" ||
+                          status === "writing" ||
+                          status === "flying"
+                            ? { rotateX: 0 }
+                            : { rotateX: -180 }
+                        }
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                      />
+
+                      {/* ENVELOPE FRONT FLAPS */}
+                      <div className="absolute inset-0 z-20 pointer-events-none drop-shadow-md">
+                        <div
+                          className="absolute inset-0 bg-[#e2d1bc]"
+                          style={{ clipPath: "polygon(0 0, 50% 50%, 0 100%)" }}
+                        />
+                        <div
+                          className="absolute inset-0 bg-[#e2d1bc]"
+                          style={{ clipPath: "polygon(100% 0, 50% 50%, 100% 100%)" }}
+                        />
+                        <div
+                          className="absolute inset-0 bg-[#d9c4ad]"
+                          style={{ clipPath: "polygon(0 100%, 50% 50%, 100% 100%)" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* ADDRESS SIDE (Front of physical envelope) */}
+                    <div className="absolute inset-0 bg-[#e2d1bc] rounded-sm [backface-visibility:hidden] [transform:rotateY(180deg)] shadow-xl flex items-center justify-center p-6">
+                      <div className="absolute top-4 right-4 w-12 h-14 bg-[#f0e6d8] border-[2px] border-dotted border-[#cbb8a0] flex items-center justify-center rotate-[8deg]">
+                        <div className="w-8 h-8 border border-ink/20 rounded-full flex items-center justify-center">
+                          <div className="w-5 h-5 border border-ink/20 rounded-full" />
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-12 left-10 right-10 border-b border-ink/10" />
+                      <div className="absolute bottom-20 left-10 right-10 border-b border-ink/10" />
+
+                      <div className="w-full mt-8 rotate-[-4deg] pl-2">
+                        {status === "writing" || status === "flying" ? (
+                          <motion.div
+                            initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
+                            animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+                            transition={{ duration: 1.5, ease: "linear" }}
+                            className="text-ink/90 text-3xl md:text-4xl"
+                            style={{ fontFamily: "'Caveat', cursive" }}
+                          >
+                            Till Therese Järvheden
+                          </motion.div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+
               <AnimatePresence mode="wait">
-                {sent ? (
+                {status === "sent" ? (
                   <motion.div
                     key="ok"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex flex-col items-center justify-center py-16 text-center"
+                    className="flex flex-col items-center justify-center text-center relative z-30 w-full max-w-[300px]"
                   >
                     <motion.div
                       initial={{ scale: 0, rotate: -45 }}
@@ -188,13 +330,13 @@ export function Contact() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1, transition: { delay: 0.55 } }}
-                      className="mt-3 max-w-sm text-sm text-bone/60"
+                      className="mt-3 text-sm text-bone/60"
                     >
                       {t.contact.okBody(form.name)}
                     </motion.p>
                     <motion.button
                       onClick={() => {
-                        setSent(false);
+                        setStatus("idle");
                         setForm({ name: "", email: "", msg: "" });
                       }}
                       className="mt-8 text-[10px] uppercase tracking-[0.35em] text-bone/40 hover:text-ember transition-colors"
@@ -202,14 +344,15 @@ export function Contact() {
                       {t.contact.again}
                     </motion.button>
                   </motion.div>
-                ) : (
+                ) : status === "idle" ? (
                   <motion.form
                     key="form"
                     onSubmit={submit}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className={`space-y-8 relative z-10 transition-all duration-700 ${
+                    exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
+                    transition={{ duration: 0.4 }}
+                    className={`w-full max-w-[450px] space-y-8 relative z-10 transition-all duration-700 ${
                       isSpotlightActive ? "opacity-100" : "opacity-60"
                     }`}
                   >
@@ -249,6 +392,8 @@ export function Contact() {
                       <Send size={14} className="transition-transform group-hover:translate-x-1" />
                     </button>
                   </motion.form>
+                ) : (
+                  <motion.div key="placeholder" className="w-full h-[400px]" />
                 )}
               </AnimatePresence>
             </div>
