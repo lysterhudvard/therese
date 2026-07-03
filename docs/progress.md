@@ -59,3 +59,10 @@ This document tracks completed features, animation systems, layout updates, and 
   - Core sections extracted to `src/components/sections/` (`Hero.tsx`, `Biography.tsx`, `Portfolio.tsx`, `Credits.tsx`, `Voice.tsx`, `Contact.tsx`, and `Footer.tsx`).
 - Main page routing file reduced to **320 lines of clean, readable code**, complying fully with the repository-wide 400-line constraint.
 - Type compile safety confirmed green across the entire modular layout.
+
+### 9. Cinematic Showreels & Theater Mode (Akt III.V)
+
+- Created a custom widescreen video showcase section supporting Vimeo embeds (e.g. `vimeoId: "1206764752"`) and native video files.
+- Built a slow-morphing "Theater Mode" that scales the player canvas smoothly to an IMAX-style widescreen format (`w-[94vw] max-w-[1400px]`) over 2.2 seconds with a custom ease curve.
+- Implemented delayed projection: the player keeps the video unmounted and displays a static poster image during expansion, gradually darkening the poster to black as the screen grows. Autoplay initiates only after the transition completes and the background dims to pitch black.
+- Mapped dynamic background glow backlighting matching each reel's signature color.

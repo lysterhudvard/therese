@@ -100,6 +100,11 @@ To create a cohesive, cinematic visual flow, a scroll exit transition has been i
   - **Tracking:** The spotlight automatically centers over the focused field element when first focused, and then follows the user's mouse coordinates dynamically on mouse movement.
   - **Deactivation:** Fades away on blur, when the user clicks outside, or when scrolling away to a different section (achieved using an `IntersectionObserver` that blurs the active input when the contact section exits the viewport).
 
+- **Cinematic Showreel & Theater Mode**:
+  - **Scale and Dimming Transition:** Tracks expansion state `isEnlarged` and completion state `isTransitionComplete`. Scales up the player card to a widescreen theater canvas `w-[94vw] max-w-[1400px]` over a slow, premium 2.2-second transition using an ultra-smooth `[0.16, 1, 0.3, 1]` ease-out curve.
+  - **Delayed Projection Autoplay:** Displays a static poster image during the scale-up, gradually darkening it using an absolute black overlay fading to opacity `1`. The video player mounts and autoplays only after the screen reaches full width and the backdrop turns pitch black.
+  - **Cursor Spotlight Exclusion:** Employs a `data-no-spotlight` attribute to hide the cursor dot and orange spotlight highlight entirely over the media player canvas, ensuring clean distraction-free movie viewing.
+
 ---
 
 ## 7. Guidelines Alignment & SEO Checklist
