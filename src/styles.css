@@ -85,7 +85,7 @@
     background: var(--color-ember);
     color: var(--color-ink);
   }
-  @media (pointer: coarse) {
+  @media (pointer: coarse) and (not (any-pointer: fine)) {
     html,
     body {
       cursor: auto;

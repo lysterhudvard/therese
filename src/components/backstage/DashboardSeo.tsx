@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Search, Share2, Globe, AlertTriangle, Upload, Link } from "lucide-react";
+import { Save, Search, Share2, Globe, AlertTriangle, Upload, Link, Image as ImageIcon } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 export function DashboardSeo() {
   const [titleSv, setTitleSv] = useState("");
@@ -10,6 +11,7 @@ export function DashboardSeo() {
   const [descEn, setDescEn] = useState("");
   const [ogImage, setOgImage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const [activePreviewLang, setActivePreviewLang] = useState<"sv" | "en">("sv");
   const [isSaving, setIsSaving] = useState(false);
@@ -113,7 +115,8 @@ export function DashboardSeo() {
   const currentDesc = activePreviewLang === "sv" ? descSv : descEn;
 
   return (
-    <form onSubmit={handleSave} className="space-y-8 max-w-5xl">
+    <>
+      <form onSubmit={handleSave} className="space-y-8 max-w-5xl">
       <div className="border-b border-bone/10 pb-4 mb-6">
         <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
           Akt V — <span className="italic text-ember">Sökmotoroptimering (SEO)</span>
@@ -236,13 +239,24 @@ export function DashboardSeo() {
             <h4 className="text-[10px] uppercase tracking-widest text-ember font-mono">OpenGraph Delningsbild</h4>
             <div>
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Delningsbild (URL)</label>
-              <input
-                type="text"
-                value={ogImage}
-                onChange={(e) => setOgImage(e.target.value)}
-                placeholder="https://exempel.se/og.jpg"
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={ogImage}
+                  onChange={(e) => setOgImage(e.target.value)}
+                  placeholder="https://exempel.se/og.jpg"
+                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsPickerOpen(true)}
+                  className="px-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 hover:border-bone/20 text-bone hover:text-ember rounded-sm text-xs transition-all duration-300 cursor-pointer flex items-center justify-center gap-1"
+                  title="Välj från mediebibliotek"
+                >
+                  <ImageIcon size={14} />
+                  <span className="sr-only">Välj</span>
+                </button>
+              </div>
             </div>
             
             <div className="relative">
@@ -346,5 +360,12 @@ export function DashboardSeo() {
         </button>
       </div>
     </form>
+    <MediaPickerModal
+      isOpen={isPickerOpen}
+      onClose={() => setIsPickerOpen(false)}
+      onSelect={(url) => setOgImage(url)}
+      typeFilter="image"
+    />
+  </>
   );
 }

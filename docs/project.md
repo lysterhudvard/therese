@@ -126,7 +126,7 @@ By referencing `docs/rules.md` and `docs/seo.md`, our technical updates follow t
 
 Recent enhancements to the admin panel streamline content management and align the interface with site semantics:
 
-- **Shared Media Selector:** A reusable component `MediaPickerModal` retrieves files from the Supabase storage bucket (`portfolio`), filtering assets by type (images, videos, audio) for one-click selection.
+- **Shared Media Selector:** A reusable component `MediaPickerModal` retrieves files from the Supabase storage bucket (`portfolio`), filtering assets by type (images, videos, audio) for one-click selection across Portfolio, Showreels, Meriter, and SEO (OpenGraph image).
 - **Showreel Poster Previews:** Embeds real-time image previews within the Showreels dashboard to verify poster asset links.
 - **Year-Based Auto-Sorting & Custom Ordering:** Merit list elements are sorted automatically by year descending. The addition of manual move-up/down arrows updates the sorting indexes locally so users can customize production display orders.
 - **Act Nomenclature Alignment:** Updated sidebar navigation to strictly match the website's acts, renaming tabs to "Akt VII: Kontaktinfo" and "Akt VIII: Ridåfall". Spacing padding was tightened, and icon dimensions were locked using `flex-shrink-0` to protect sidebar layouts.

@@ -121,6 +121,21 @@ This document tracks completed features, animation systems, layout updates, and 
 
 ### 19. Media Library Integration, Previews & Merit Ordering Controls
 - **Shared Media Picker Dialog:** Built a modular, responsive `MediaPickerModal` that overlays the CMS. It retrieves direct files from the `portfolio` Supabase storage bucket, categorized by type (images, video, audio).
-- **Inline Media Selectors:** Attached media picker launchers next to the URL input fields in **Portfolio CMS** (for images), **Showreels CMS** (for poster images), and **Meriter CMS** (for advanced audio commentary tracks), enabling direct selection of pre-uploaded media assets.
+- **Inline Media Selectors:** Attached media picker launchers next to the URL input fields in **Portfolio CMS** (for images), **Showreels CMS** (for poster images), **Meriter CMS** (for advanced audio commentary tracks), and **SEO CMS** (for OpenGraph sharing images), enabling direct selection of pre-uploaded media assets.
 - **Showreel Poster Preview:** Added immediate image thumbnail previews underneath the poster URL input boxes inside the Showreels list.
 - **Automatic Year Sorting & Move Controls:** Configured the Merit list to sort dynamically by year (`year` descending, latest first) and then by user-controlled `sort_order`. Added up and down arrow control keys on each merit row, enabling fine-grained order tweaking of items within a single year.
+
+### 20. Parallax Quotes Layout Alignment & Prevention of Overlaps
+- **Alternating Positioning:** Configured the background citations inside `Credits.tsx` to automatically alternate between left-aligned (`left: 6%`) and right-aligned (`right: 20-24%` for rightmost items) anchors, ensuring they stay safely inside viewport bounds on all screen sizes.
+- **Natural Wrapping & Max-Width Expansion:** Expanded layout boundaries to `max-w-[70vw]` and removed string truncation rules. Quotes now wrap naturally to multiple lines with a tight `leading-[1.15]` format, ensuring that last words are never clipped or hidden from view.
+- **Vertical Spacing & Translation Clamping:** Standardized vertical separation values and clamped the range of motion (reduced vertical travel range in Framer Motion transforms) to guarantee citations never collide vertically.
+
+### 21. Translation Deep-Clone Function Preservation
+- **Custom deepClone implementation:** Replaced `JSON.parse(JSON.stringify(...))` inside `src/routes/index.tsx` with a custom recursive cloning helper. This prevents Javascript/TypeScript functional attributes inside translation dictionaries (such as `t.contact.okBody`) from being silently omitted, resolving a React crash upon contact form submission.
+
+### 22. Custom Cursor Support for Touch-Enabled Laptops
+- **Dual pointer detection:** Refactored touch detection in `Spotlight.tsx` to check for `any-pointer: fine` rather than just `pointer: coarse`. This allows the beautiful custom cursor dot to be rendered on touch-enabled laptops (which have both a touchscreen and a mouse/touchpad pointer).
+- **CSS cursor synchronization:** Adjusted `@media` queries in `src/styles.css` so that the default browser cursor is only restored on pure touch devices (phones/tablets) and stays hidden on touch-enabled laptops. This avoids both cursor duplication and invisible cursor issues on touchscreen laptops, while leaving the admin backstage panel's native cursors fully working.
+
+### 23. CMS Loading Indicators
+- **Asynchronous loading spinner wrappers:** Introduced `isLoading` states and conditional spinner rendering in `DashboardBio.tsx` and `DashboardVoice.tsx`. This avoids displaying fallback/original hardcoded settings in input forms while Supabase requests are in flight, removing visual mount-flickering.

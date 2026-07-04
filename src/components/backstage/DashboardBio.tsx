@@ -72,9 +72,13 @@ export function DashboardBio() {
   ]);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchBioData = async () => {
       const { data, error } = await supabase
@@ -101,6 +105,7 @@ export function DashboardBio() {
         if (fallbackError) {
           console.error("Core schema load failed:", fallbackError);
           toast.error(`Kunde inte ladda biografi: ${fallbackError.message}`);
+          setIsLoading(false);
           return;
         }
 
@@ -112,6 +117,7 @@ export function DashboardBio() {
           setLanguagesSv(fallbackData.languages_sv || "");
           setLanguagesEn(fallbackData.languages_en || "");
         }
+        setIsLoading(false);
         return;
       }
 
@@ -154,6 +160,7 @@ export function DashboardBio() {
           }
         }
       }
+      setIsLoading(false);
     };
 
     fetchBioData();
@@ -275,6 +282,15 @@ export function DashboardBio() {
       toast.success("Akt II (Biografi & FAQ) har sparats framgångsrikt i Supabase!");
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <span className="w-8 h-8 border-4 border-ember border-t-transparent rounded-full animate-spin" />
+        <span className="font-mono text-[9px] uppercase tracking-widest text-bone/40">Laddar biografi-inställningar...</span>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">

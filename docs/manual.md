@@ -123,11 +123,11 @@ För att komma till adminpanelen:
 * **Hur du ändrar:**
   * **Sajttitel (Title Tag):** Det som visas i webbläsarens flik.
   * **Beskrivning (Meta Description):** Den sammanfattande texten som visas i Googles sökresultat.
-  * **Social Media Image (OG Image):** Bilden som visas när någon delar länken på Facebook, LinkedIn eller i iMessage.
+  * **Social Media Image (OG Image) & Mediebibliotek:** Klicka på den lilla bild-ikonen bredvid fältet för att välja en delningsbild direkt från mediebiblioteket. Alternativt kan du ladda upp en ny fil eller skriva in en extern URL direkt.
 * **Teststeg:**
-  1. Ändra sajttiteln på svenska till `"Therese Järvheden | Officiell Hemsida"`. Spara.
-  2. Ladda upp en ny delningsbild.
-  3. Ladda om startsidan och håll muspekaren över webbläsarfliken för att verifiera den nya titeln.
+  1. Ändra sajttiteln på svenska till `"Therese Järvheden | Officiell Hemsida"`.
+  2. Klicka på bild-ikonen bredvid Delningsbild-fältet och välj en bild från Mediebiblioteket. Spara.
+  3. Ladda om startsidan och håll muspekaren över webbläsarfliken för att verifiera den nya titeln, samt inspektera källkoden för att se att `og:image` meta-taggen uppdaterats.
 
 ### 10. Mediebibliotek
 * **Syfte:** En översikt över alla dina råfiler i Supabase Storage.

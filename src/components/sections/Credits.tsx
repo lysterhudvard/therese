@@ -13,44 +13,94 @@ import {
 export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  
+  // Moderate vertical parallax to keep motion smooth and within separate zones
   const layers = [
     {
-      y: useTransform(scrollYProgress, [0, 1], [120, -260]),
-      x: useTransform(scrollYProgress, [0, 1], [-40, 40]),
+      y: useTransform(scrollYProgress, [0, 1], [80, -100]),
+      x: useTransform(scrollYProgress, [0, 1], [-15, 15]),
     },
     {
-      y: useTransform(scrollYProgress, [0, 1], [40, -440]),
-      x: useTransform(scrollYProgress, [0, 1], [20, -60]),
+      y: useTransform(scrollYProgress, [0, 1], [30, -120]),
+      x: useTransform(scrollYProgress, [0, 1], [10, -20]),
     },
     {
-      y: useTransform(scrollYProgress, [0, 1], [180, -180]),
-      x: useTransform(scrollYProgress, [0, 1], [-10, 30]),
+      y: useTransform(scrollYProgress, [0, 1], [100, -80]),
+      x: useTransform(scrollYProgress, [0, 1], [-10, 10]),
     },
     {
-      y: useTransform(scrollYProgress, [0, 1], [-40, -340]),
-      x: useTransform(scrollYProgress, [0, 1], [60, -20]),
+      y: useTransform(scrollYProgress, [0, 1], [-10, -110]),
+      x: useTransform(scrollYProgress, [0, 1], [20, -10]),
     },
     {
-      y: useTransform(scrollYProgress, [0, 1], [220, -120]),
-      x: useTransform(scrollYProgress, [0, 1], [-30, 50]),
+      y: useTransform(scrollYProgress, [0, 1], [120, -60]),
+      x: useTransform(scrollYProgress, [0, 1], [-20, 20]),
     },
   ];
+
+  // Specific layouts for each of the 5 quotes to prevent overlap and offscreen overflow
+  const quoteLayouts = [
+    {
+      isLeft: false,
+      top: 6,
+      position: { right: "4%" },
+      fontSize: "clamp(1.8rem, 4vw, 4.5rem)",
+      maxWidth: "max-w-[70vw]"
+    },
+    {
+      isLeft: true,
+      top: 25,
+      position: { left: "6%" },
+      fontSize: "clamp(1.8rem, 3.8vw, 4.2rem)",
+      maxWidth: "max-w-[70vw]"
+    },
+    {
+      isLeft: false,
+      top: 45,
+      position: { right: "20%" }, // moved more to the left (pushed inward)
+      fontSize: "clamp(2.1rem, 4.8vw, 5.2rem)",
+      maxWidth: "max-w-[70vw]"
+    },
+    {
+      isLeft: true,
+      top: 65,
+      position: { left: "8%" },
+      fontSize: "clamp(1.7rem, 3.5vw, 4rem)",
+      maxWidth: "max-w-[70vw]"
+    },
+    {
+      isLeft: false,
+      top: 82,
+      position: { right: "24%" }, // moved more to the left (pushed inward)
+      fontSize: "clamp(2.3rem, 5.4vw, 5.8rem)",
+      maxWidth: "max-w-[70vw]"
+    }
+  ];
+
   return (
-    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {quotes.slice(0, 5).map((q, i) => (
-        <motion.div
-          key={q}
-          style={{
-            y: layers[i].y,
-            x: layers[i].x,
-            top: `${10 + i * 18}%`,
-            left: `${(i * 17) % 80}%`,
-          }}
-          className="absolute font-display italic text-bone/[0.06] whitespace-nowrap"
-        >
-          <span style={{ fontSize: `clamp(3rem, ${5 + i}vw, ${7 + i}rem)` }}>"{q}"</span>
-        </motion.div>
-      ))}
+    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+      {quotes.slice(0, 5).map((q, i) => {
+        const layout = quoteLayouts[i] || quoteLayouts[0];
+        
+        return (
+          <motion.div
+            key={q}
+            style={{
+              y: layers[i].y,
+              x: layers[i].x,
+              top: `${layout.top}%`,
+              ...layout.position,
+            }}
+            className={`absolute font-display italic text-bone/[0.05] ${layout.maxWidth} leading-[1.15] ${
+              layout.isLeft ? "text-left" : "text-right"
+            }`}
+          >
+            <span style={{ fontSize: layout.fontSize }}>
+              "{q}"
+            </span>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

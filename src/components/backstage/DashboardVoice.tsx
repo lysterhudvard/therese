@@ -26,26 +26,36 @@ export function DashboardVoice() {
     demo_en: "Demo via email",
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchVoice = async () => {
-      const { data, error } = await supabase
-        .from("biography")
-        .select("voice_settings")
-        .eq("id", "main")
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from("biography")
+          .select("voice_settings")
+          .eq("id", "main")
+          .maybeSingle();
 
-      if (data && data.voice_settings) {
-        const parsed = typeof data.voice_settings === "string" 
-          ? JSON.parse(data.voice_settings) 
-          : data.voice_settings;
-          
-        setSettings((prev) => ({
-          ...prev,
-          ...parsed
-        }));
+        if (data && data.voice_settings) {
+          const parsed = typeof data.voice_settings === "string" 
+            ? JSON.parse(data.voice_settings) 
+            : data.voice_settings;
+            
+          setSettings((prev) => ({
+            ...prev,
+            ...parsed
+          }));
+        }
+      } catch (e) {
+        console.error("Failed to fetch voice settings:", e);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -81,6 +91,15 @@ export function DashboardVoice() {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <span className="w-8 h-8 border-4 border-ember border-t-transparent rounded-full animate-spin" />
+        <span className="font-mono text-[9px] uppercase tracking-widest text-bone/40">Laddar röst-inställningar...</span>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">

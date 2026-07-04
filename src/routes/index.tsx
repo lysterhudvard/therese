@@ -460,8 +460,22 @@ function Page() {
   }, [dbData]);
 
   const mergedT = useMemo(() => {
+    // Helper to deep clone translations while preserving function props like okBody
+    const deepClone = (obj: any): any => {
+      if (obj === null || typeof obj !== "object") return obj;
+      if (typeof obj === "function") return obj;
+      if (Array.isArray(obj)) return obj.map(deepClone);
+      const cloned: any = {};
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          cloned[key] = deepClone(obj[key]);
+        }
+      }
+      return cloned;
+    };
+
     // Start with static translations
-    const base = JSON.parse(JSON.stringify(I18N[lang]));
+    const base = deepClone(I18N[lang]);
     
     // Override biography fields if available in database
     if (dbData?.biography) {

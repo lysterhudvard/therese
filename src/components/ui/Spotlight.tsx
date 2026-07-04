@@ -13,8 +13,8 @@ export function Spotlight() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(pointer: coarse)");
-    setCoarse(mq.matches);
+    const mq = window.matchMedia("(any-pointer: fine)");
+    setCoarse(!mq.matches);
     const onMove = (e: MouseEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
