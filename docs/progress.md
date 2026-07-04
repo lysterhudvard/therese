@@ -139,3 +139,19 @@ This document tracks completed features, animation systems, layout updates, and 
 
 ### 23. CMS Loading Indicators
 - **Asynchronous loading spinner wrappers:** Introduced `isLoading` states and conditional spinner rendering in `DashboardBio.tsx` and `DashboardVoice.tsx`. This avoids displaying fallback/original hardcoded settings in input forms while Supabase requests are in flight, removing visual mount-flickering.
+
+### 24. Showreel-laddningshantering och Teaterläge-fallback
+- **Felsäker laddningsstatus:** Skapade ett `dbLoaded`-tillstånd i `src/routes/index.tsx` för att spåra datahämtningens livscykel från Supabase. Det motverkar oväntade renderingar medan anropen pågår.
+- **Miljöoberoende fallback:** Om hemsidan körs i en miljö utan konfigurerad Supabase (t.ex. lokalt eller under demo-granskning utan `.env`-miljövariabler), faller gränssnittet direkt tillbaka på de inbyggda mock-showreel-videorna, vilket gör att "Teaterläge" (Theater Mode) alltid går att visa och testa.
+- **Rensningssynk:** Om databasen är ansluten men har tömts helt på showreels i CMS, döljs sektionen sömlöst från startsidan istället för att visa raderade mock-data.
+
+### 25. Bildkomprimering & SEO-varningar i Backstage CMS
+- **ImageUploadOptimizer-komponent:** Skapat en återanvändbar optimerings- och valideringsmodul (`ImageUploadOptimizer.tsx`) som körs lokalt i webbläsaren vid bilduppladdning. Den använder HTML5 Canvas för att skala ner bilder till sektionens rekommenderade maxgränser och konvertera dem till det moderna **WebP**-formatet (eller JPEG för SEO social delningsbild) med 82% kvalitet.
+- **Prestandajämförelse & SEO-råd:** Visar originalfilens egenskaper (upplösning, filstorlek, typ) sida-vid-sida med den komprimerade versionen, beräknar storleksbesparingar (ofta 90-98%) och flaggar tunga bilder med varningar. Visar sektionsspecifika SEO-riktlinjer och tips för alt-text baserat på `docs/images.md`.
+- **Global integration i Backstage:** Integrerat optimeraren i samtliga fyra bildkällor i CMS:
+  - `DashboardMedia.tsx` (Mediebibliotek)
+  - `DashboardPortfolio.tsx` (Galleri / Portfolio)
+  - `DashboardShowreels.tsx` (Showreel Poster)
+  - `DashboardSeo.tsx` (OpenGraph Delningsbild)
+- **Flexibla uppladdningsval:** Låter redaktören välja mellan att ladda upp den optimerade WebP-filen för bästa SEO-prestanda eller ladda upp originalfilen oförändrad om så önskas.
+

@@ -277,6 +277,7 @@ function Page() {
     seo: any;
     portfolioImages: string[];
   } | null>(null);
+  const [dbLoaded, setDbLoaded] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -313,7 +314,10 @@ function Page() {
 
   // Load all live Supabase data
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
+    if (!isSupabaseConfigured()) {
+      setDbLoaded(true);
+      return;
+    }
 
     const loadAllData = async () => {
       try {
@@ -389,6 +393,8 @@ function Page() {
         });
       } catch (e) {
         console.error("Failed to load live Supabase data:", e);
+      } finally {
+        setDbLoaded(true);
       }
     };
 
@@ -607,7 +613,13 @@ function Page() {
         <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
         <Biography moodData={mergedMoodData} faqs={dbData?.biography?.faqs} />
         <Portfolio images={dbData?.portfolioImages} />
-        <Showreels videos={dbData?.showreels} />
+        {dbLoaded && (
+          !isSupabaseConfigured() ? (
+            <Showreels />
+          ) : dbData?.showreels && dbData.showreels.length > 0 ? (
+            <Showreels videos={dbData.showreels} />
+          ) : null
+        )}
         <Credits
           credits={dbData?.credits}
           reviewQuotes={reviewQuotes}

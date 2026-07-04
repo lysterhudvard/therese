@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Save, Search, Share2, Globe, AlertTriangle, Upload, Link, Image as ImageIcon } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { MediaPickerModal } from "./MediaPickerModal";
+import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 
 export function DashboardSeo() {
   const [titleSv, setTitleSv] = useState("");
@@ -15,6 +16,10 @@ export function DashboardSeo() {
 
   const [activePreviewLang, setActivePreviewLang] = useState<"sv" | "en">("sv");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Optimizer Modal States
+  const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
+  const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -54,17 +59,31 @@ export function DashboardSeo() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    e.target.value = "";
+
+    if (file.type.startsWith("image/")) {
+      setPendingUploadFile(file);
+      setIsOptimizerOpen(true);
+      return;
+    }
+
+    await proceedWithUpload(file);
+  };
+
+  const proceedWithUpload = async (fileToUpload: File) => {
+    setIsOptimizerOpen(false);
+    setPendingUploadFile(null);
     setIsUploading(true);
     toast.loading("Laddar upp OpenGraph-bild...", { id: "seo-upload" });
 
     try {
-      const fileExt = file.name.split(".").pop();
+      const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `og-${Date.now()}.${fileExt}`;
       const filePath = `og/${fileName}`;
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from("portfolio")
-        .upload(filePath, file);
+        .upload(filePath, fileToUpload);
 
       if (error) {
         if (error.message.includes("Bucket not found")) {
@@ -365,6 +384,18 @@ export function DashboardSeo() {
       onClose={() => setIsPickerOpen(false)}
       onSelect={(url) => setOgImage(url)}
       typeFilter="image"
+    />
+    <ImageUploadOptimizer
+      isOpen={isOptimizerOpen}
+      file={pendingUploadFile}
+      defaultSection="seo"
+      onCancel={() => {
+        setIsOptimizerOpen(false);
+        setPendingUploadFile(null);
+      }}
+      onUpload={(finalFile) => {
+        proceedWithUpload(finalFile);
+      }}
     />
   </>
   );

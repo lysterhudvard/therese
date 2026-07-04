@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Save, ArrowUp, ArrowDown, Video, Trash2, Plus, Upload, Link, Eye, Image as ImageIcon } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { MediaPickerModal } from "./MediaPickerModal";
+import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 
 interface ShowreelItem {
   id: string;
@@ -25,6 +26,11 @@ export function DashboardShowreels() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingPoster, setIsUploadingPoster] = useState<string | null>(null);
   const [activePickerId, setActivePickerId] = useState<string | null>(null);
+
+  // Optimizer Modal States
+  const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
+  const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
+  const [targetReelId, setTargetReelId] = useState<string | null>(null);
 
   // Fetch showreels on mount
   useEffect(() => {
@@ -104,17 +110,33 @@ export function DashboardShowreels() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    e.target.value = "";
+
+    if (file.type.startsWith("image/")) {
+      setTargetReelId(id);
+      setPendingUploadFile(file);
+      setIsOptimizerOpen(true);
+      return;
+    }
+
+    await proceedWithUpload(id, file);
+  };
+
+  const proceedWithUpload = async (id: string, fileToUpload: File) => {
+    setIsOptimizerOpen(false);
+    setPendingUploadFile(null);
+    setTargetReelId(null);
     setIsUploadingPoster(id);
     toast.loading("Laddar upp posterbild...", { id: "poster-upload" });
 
     try {
-      const fileExt = file.name.split(".").pop();
+      const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `poster-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `posters/${fileName}`;
 
       const { error } = await supabase.storage
         .from("portfolio")
-        .upload(filePath, file);
+        .upload(filePath, fileToUpload);
 
       if (error) throw error;
 
@@ -402,6 +424,21 @@ export function DashboardShowreels() {
         }
       }}
       typeFilter="image"
+    />
+    <ImageUploadOptimizer
+      isOpen={isOptimizerOpen}
+      file={pendingUploadFile}
+      defaultSection="showreel"
+      onCancel={() => {
+        setIsOptimizerOpen(false);
+        setPendingUploadFile(null);
+        setTargetReelId(null);
+      }}
+      onUpload={(finalFile) => {
+        if (targetReelId) {
+          proceedWithUpload(targetReelId, finalFile);
+        }
+      }}
     />
     </>
   );

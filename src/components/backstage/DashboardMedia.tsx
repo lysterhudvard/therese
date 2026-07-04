@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Upload, Link as LinkIcon, Copy, Trash2, Video, Image as ImageIcon, ExternalLink, Plus, RefreshCw, FileText } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 
 interface StorageFile {
   name: string;
@@ -20,6 +21,10 @@ export function DashboardMedia() {
   const [externalUrl, setExternalUrl] = useState("");
   const [externalType, setExternalType] = useState<"image" | "video">("image");
   const [externalAlt, setExternalAlt] = useState("");
+
+  // Optimizer Modal States
+  const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
+  const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
 
   const fetchFiles = async () => {
     if (!isSupabaseConfigured()) return;
@@ -77,14 +82,31 @@ export function DashboardMedia() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Reset file input value so same file can be selected again
+    e.target.value = "";
+
+    // Intercept images for optimization
+    if (file.type.startsWith("image/")) {
+      setPendingUploadFile(file);
+      setIsOptimizerOpen(true);
+      return;
+    }
+
+    // Non-images (e.g. videos) go straight to upload
+    await proceedWithUpload(file);
+  };
+
+  const proceedWithUpload = async (fileToUpload: File) => {
+    setIsOptimizerOpen(false);
+    setPendingUploadFile(null);
     setIsUploading(true);
-    const toastId = toast.loading(`Laddar upp ${file.name}...`);
+    const toastId = toast.loading(`Laddar upp ${fileToUpload.name}...`);
 
     try {
-      const fileExt = file.name.split(".").pop();
+      const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       
-      const { error } = await supabase.storage.from("portfolio").upload(fileName, file);
+      const { error } = await supabase.storage.from("portfolio").upload(fileName, fileToUpload);
 
       if (error) throw error;
 
@@ -469,6 +491,18 @@ export function DashboardMedia() {
           )}
         </div>
       </div>
+      <ImageUploadOptimizer
+        isOpen={isOptimizerOpen}
+        file={pendingUploadFile}
+        defaultSection="general"
+        onCancel={() => {
+          setIsOptimizerOpen(false);
+          setPendingUploadFile(null);
+        }}
+        onUpload={(finalFile) => {
+          proceedWithUpload(finalFile);
+        }}
+      />
     </div>
   );
 }

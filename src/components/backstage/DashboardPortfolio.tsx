@@ -4,6 +4,7 @@ import { Save, ArrowUp, ArrowDown, Image as ImageIcon, Trash2, Plus, Upload, Lin
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 import { MediaPickerModal } from "./MediaPickerModal";
+import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 
 interface GalleryImage {
   id: string;
@@ -20,6 +21,10 @@ export function DashboardPortfolio() {
   const [newImageUrl, setNewImageUrl] = useState("");
   const [newImageAlt, setNewImageAlt] = useState("");
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+
+  // Optimizer Modal States
+  const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
+  const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
 
   // Fetch data from Supabase on mount
   useEffect(() => {
@@ -99,17 +104,31 @@ export function DashboardPortfolio() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    e.target.value = "";
+
+    if (file.type.startsWith("image/")) {
+      setPendingUploadFile(file);
+      setIsOptimizerOpen(true);
+      return;
+    }
+
+    await proceedWithUpload(file);
+  };
+
+  const proceedWithUpload = async (fileToUpload: File) => {
+    setIsOptimizerOpen(false);
+    setPendingUploadFile(null);
     setIsUploading(true);
     toast.loading("Laddar upp bild till hink...", { id: "upload-toast" });
 
     try {
-      const fileExt = file.name.split(".").pop();
+      const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error } = await supabase.storage
         .from("portfolio")
-        .upload(filePath, file);
+        .upload(filePath, fileToUpload);
 
       if (error) {
         if (error.message.includes("Bucket not found")) {
@@ -124,7 +143,7 @@ export function DashboardPortfolio() {
       const newImg: GalleryImage = {
         id: `temp-${Date.now()}`,
         url: urlData.publicUrl,
-        alt: file.name.split(".")[0],
+        alt: fileToUpload.name.split(".")[0],
         allow_download: true,
         sort_order: images.length,
       };
@@ -355,6 +374,18 @@ export function DashboardPortfolio() {
       onClose={() => setIsMediaPickerOpen(false)}
       onSelect={(url) => setNewImageUrl(url)}
       typeFilter="image"
+    />
+    <ImageUploadOptimizer
+      isOpen={isOptimizerOpen}
+      file={pendingUploadFile}
+      defaultSection="portfolio"
+      onCancel={() => {
+        setIsOptimizerOpen(false);
+        setPendingUploadFile(null);
+      }}
+      onUpload={(finalFile) => {
+        proceedWithUpload(finalFile);
+      }}
     />
     </>
   );

@@ -71,6 +71,7 @@ För att komma till adminpanelen:
   * Ange ett **Vimeo-ID** (t.ex. `1206764752`) eller **YouTube-ID**. Om du använder en rå `.mp4`-fil, klistra in den i *Backup Video URL*.
   * **Posterbild (URL) & Mediebibliotek:** Klicka på den lilla bild-ikonen bredvid fältet för att välja en bild direkt från Mediebiblioteket. En förhandsvisning av bilden ritas ut direkt under inmatningsfältet.
   * Välj en **Glow-färg** (t.ex. `rgba(235, 94, 40, 0.15)` för en varm orange glöd bakom videospelaren).
+  * **Laddnings- och tomstatus (Felsäkerhet):** Om Supabase-anslutningen saknas (t.ex. vid lokal utveckling utan `.env`-konfiguration), visar startsidan automatiskt de inbyggda mock-showreel-videorna så att du kan provspela dem direkt. Om databasen är ansluten och laddad, men helt tom (alla rader har tagits bort i CMS), döljs hela showreel-sektionen från webbplatsen.
 * **Teststeg:**
   1. Klicka på en befintlig showreel och ändra dess rubrik. Spara.
   2. Klicka på bild-ikonen för att välja en posterbild och verifiera att förhandsgranskningen dyker upp.
@@ -135,6 +136,12 @@ För att komma till adminpanelen:
   * Ladda upp filer direkt härifrån.
   * Klicka på **Kopiera URL** för att snabbt kunna klistra in bild- eller ljudlänkar i övriga fält i CMS-panelen.
   * Klicka på **+ Lägg till i Portfolio** för att skicka en bild direkt till bildgalleriet utan extra krångel.
+
+### ⚡ Bildoptimering & SEO-validering (Nyhet)
+Varje gång du laddar upp en bild i CMS (i Mediebiblioteket, Portfolio, Showreels eller SEO-inställningar) öppnas automatiskt ett **optimeringsverktyg** direkt i Backstage:
+* **Automatisk WebP-konvertering:** Bilder komprimeras automatiskt i webbläsaren till det moderna **WebP**-formatet (eller JPEG för SEO-delningsbilder) med 82% kvalitet. Detta reducerar filstorlekar med upp till 95% utan synbar kvalitetsförlust.
+* **Sektionsanpassad beskärning & maxmått:** Du kan välja var bilden ska användas (t.ex. *Akt I: Hero*, *Akt II: Biografi*, *Akt III: Portfolio*). Verktyget anpassar då automatiskt upplösningen till de rekommenderade gränserna (t.ex. max 2560px för Hero, 1200px för Portfolio).
+* **SEO-varningar:** Om du laddar upp en bild som är för tung (t.ex. över 300 KB för Hero-bilden) varnar systemet dig. Du kan då välja att ladda upp den optimerade versionen (rekommenderas starkt!) eller kringgå systemet genom att klicka på *"Ladda upp Original"*.
 
 ---
 

@@ -126,3 +126,22 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** Standard browser scroll behavior remained active on the document body during viewport expansion.
 - **Resolution:** Added a React `useEffect` inside `Showreels.tsx` that updates the document body style to `overflow = "hidden"` when theater mode is active (`isEnlarged === true`), and restores the default scroll behavior (`overflow = ""`) when exiting.
 
+## 20. React Hook Order Violation in Showreels
+- **Symptom:** Opening the page threw a console error: `React has detected a change in the order of Hooks called by Showreels`.
+- **Root Cause:** An early-return check (`if (!activeVideo || videos.length === 0) return null`) was inserted before several React hook declarations (`useRef`, `useEffect`, `useScroll`), violating the Rules of Hooks.
+- **Resolution:** Relocated the conditional early-return check to the very end of the `Showreels` component function, directly before the JSX return statement, ensuring all hook sequences run unconditionally on every render.
+
+## 21. Framer Motion Hydration Ref Error & Mock Data Flash
+- **Symptom:** Initial page reload crashed with `Uncaught Error: Target ref is defined but not hydrated`, and old mock videos briefly flashed on reload even if they were deleted in the CMS.
+- **Root Cause:** If the database was loading or empty, returning `null` in `<Showreels>` skipped rendering the container element bound to `useScroll({ target: sectionRef })`, causing Framer Motion to fail. Additionally, the component parameter defaulted to mock data when prop was undefined.
+- **Resolution:** Modified the parent page renderer in `src/routes/index.tsx` to conditionally mount `<Showreels>` only if database data has finished loading and contains at least one active video. Reverted internal component null-state guards to keep hook sequences stable.
+
+## 22. Close Button Screen Edge Cutoff & Header Alignment
+- **Symptom:** The Close button (`X`) in Theater Mode was pushed too close to the screen ceiling, getting partially hidden. Additionally, margins for header labels (`SPELAS NU` / `SHOWREEL — THERESE JÄRVHEDEN`) did not align cleanly with the player canvas edges.
+- **Root Cause:** The Close button was positioned relative to the centered player container and offset upwards, squeezing it near the viewport border, and right padding was applied to the headers to try to prevent overlaps.
+- **Resolution:** Repositioned the Close button (`X`) absolute to the viewport space (`right-8 top-8 md:right-12 md:top-12 z-[110]`), moving it down and to the far right. Removed internal container offsets and paddings from the header bar, allowing the capitalized text labels to align exactly with the left and right edges of the player canvas.
+
+## 23. Showreels Section Disappearance and Fallback Lock
+- **Symptom:** The showreels section completely vanished when Supabase was not configured, making it impossible to open the player ("Teaterläge").
+- **Root Cause:** A strict mount guard in `src/routes/index.tsx` hid the `<Showreels>` component when the database array was empty or undefined, forgetting that in local/preview environments without Supabase configured, the section should fall back to the default mock videos (`VIDEOS`).
+- **Resolution:** Introduced a `dbLoaded` state variable tracking data load completion. If Supabase is not configured, the website immediately falls back to displaying the default mock video portfolio. If Supabase is configured, it waits for the data fetch to complete and only renders the section if the user has uploaded/saved at least one video in the CMS, properly hiding it if the list was explicitly cleared.
