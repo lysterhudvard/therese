@@ -6,7 +6,7 @@ interface ImageUploadOptimizerProps {
   file: File | null;
   defaultSection?: "hero" | "bio" | "portfolio" | "showreel" | "seo" | "general";
   onCancel: () => void;
-  onUpload: (finalFile: File) => void;
+  onUpload: (finalFile: File, category: string) => void;
 }
 
 interface ImageProfile {
@@ -197,11 +197,11 @@ export function ImageUploadOptimizer({
     const optimizedFileName = `${nameWithoutExt}-optimized.${extension}`;
 
     const optimizedFile = new File([optimizedBlob], optimizedFileName, { type: mimeType });
-    onUpload(optimizedFile);
+    onUpload(optimizedFile, selectedSection);
   };
 
   const handleUploadOriginal = () => {
-    onUpload(file);
+    onUpload(file, selectedSection);
   };
 
   const formatKb = (bytes: number) => {

@@ -275,7 +275,7 @@ function Page() {
     credits: Credit[];
     showreels: VideoItem[];
     seo: any;
-    portfolioImages: string[];
+    portfolioImages: any[];
   } | null>(null);
   const [dbLoaded, setDbLoaded] = useState(false);
 
@@ -382,14 +382,22 @@ function Page() {
         });
 
         // Map portfolio images
-        const mappedImages = (portRes.data || []).map((p: any) => p.url);
+        const mappedImages = (portRes.data || []).map((p: any) => ({
+          url: p.url,
+          alt: p.alt || "Therese Järvheden porträtt",
+          allow_download: p.allow_download !== false
+        }));
 
         setDbData({
           biography: bioRes.data,
           credits: mappedCredits,
           showreels: mappedShowreels,
           seo: seoRes.data,
-          portfolioImages: mappedImages.length > 0 ? mappedImages : IMG.portfolio
+          portfolioImages: mappedImages.length > 0 ? mappedImages : IMG.portfolio.map((url, i) => ({
+            url,
+            alt: `Therese Järvheden portfolio ${i + 1}`,
+            allow_download: true
+          }))
         });
       } catch (e) {
         console.error("Failed to load live Supabase data:", e);
@@ -465,6 +473,32 @@ function Page() {
     return base;
   }, [dbData]);
 
+  const parsedSections = useMemo(() => {
+    if (dbData?.biography?.bio_sections) {
+      try {
+        const sections = typeof dbData.biography.bio_sections === "string"
+          ? JSON.parse(dbData.biography.bio_sections)
+          : dbData.biography.bio_sections;
+        if (Array.isArray(sections) && sections.length > 0) {
+          return sections;
+        }
+      } catch (e) {
+        console.error("Failed to parse bio sections:", e);
+      }
+    }
+    return undefined;
+  }, [dbData]);
+
+  const imageCredits = useMemo(() => {
+    if (dbData?.biography?.bio_image_credits_sv || dbData?.biography?.bio_image_credits_en) {
+      return {
+        sv: dbData.biography.bio_image_credits_sv || "",
+        en: dbData.biography.bio_image_credits_en || ""
+      };
+    }
+    return undefined;
+  }, [dbData]);
+
   const mergedT = useMemo(() => {
     // Helper to deep clone translations while preserving function props like okBody
     const deepClone = (obj: any): any => {
@@ -503,6 +537,16 @@ function Page() {
       
       if (heroLine) {
         base.hero.line = heroLine;
+      }
+
+      const heroRole = lang === "sv" ? bio.hero_role_sv : bio.hero_role_en;
+      if (heroRole) {
+        base.hero.role = heroRole;
+      }
+      
+      const heroBase = lang === "sv" ? bio.hero_base_sv : bio.hero_base_en;
+      if (heroBase) {
+        base.hero.base = heroBase;
       }
       
       // 2. Biography headings and texts
@@ -610,8 +654,12 @@ function Page() {
           }}
         />
 
-        <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} />
-        <Biography moodData={mergedMoodData} faqs={dbData?.biography?.faqs} />
+        <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} heroImage={dbData?.biography?.hero_image} />
+        <Biography 
+          sections={parsedSections} 
+          imageCredits={imageCredits} 
+          faqs={dbData?.biography?.faqs} 
+        />
         <Portfolio images={dbData?.portfolioImages} />
         {dbLoaded && (
           !isSupabaseConfigured() ? (

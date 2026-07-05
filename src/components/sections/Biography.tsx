@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
@@ -10,10 +10,75 @@ interface FAQItem {
   a: { sv: string; en: string };
 }
 
-export function Biography({ moodData = MOOD_DATA, faqs }: { moodData?: typeof MOOD_DATA; faqs?: FAQItem[] }) {
+export interface BioSection {
+  id: string;
+  title_sv: string;
+  title_en: string;
+  quote_sv: string;
+  quote_en: string;
+  image: string;
+  weight?: number;
+}
+
+const DEFAULT_SECTIONS: BioSection[] = [
+  {
+    id: "Dramatic",
+    title_sv: "Dramatisk",
+    title_en: "Dramatic",
+    quote_sv: "Drama är något jag känner extra starkt för.",
+    quote_en: "Drama is something I feel especially strongly about.",
+    image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+    weight: 300
+  },
+  {
+    id: "Comedic",
+    title_sv: "Komisk",
+    title_en: "Comedic",
+    quote_sv: "Komedi kräver samma precision som tragedi — bara snabbare.",
+    quote_en: "Comedy demands the same precision as tragedy — just faster.",
+    image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
+    weight: 500
+  },
+  {
+    id: "Classical",
+    title_sv: "Klassisk",
+    title_en: "Classical",
+    quote_sv: "Scenen lärde mig allt jag vet om timing och tystnad.",
+    quote_en: "The stage taught me everything I know about timing and silence.",
+    image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
+    weight: 400
+  }
+];
+
+export function Biography({ 
+  sections, 
+  imageCredits, 
+  faqs 
+}: { 
+  sections?: BioSection[]; 
+  imageCredits?: { sv: string; en: string }; 
+  faqs?: FAQItem[] 
+}) {
   const { t, lang } = useT();
-  const [mood, setMood] = useState<Mood>("Dramatic");
-  const data = moodData[mood];
+
+  const activeSections = useMemo(() => {
+    if (sections && sections.length > 0) return sections;
+    return DEFAULT_SECTIONS;
+  }, [sections]);
+
+  const [activeId, setActiveId] = useState<string>(activeSections[0]?.id || "Dramatic");
+
+  // Find current active section data
+  const data = useMemo(() => {
+    return activeSections.find(s => s.id === activeId) || activeSections[0] || DEFAULT_SECTIONS[0];
+  }, [activeSections, activeId]);
+
+  // Adjust activeId if it's no longer in activeSections
+  useEffect(() => {
+    if (!activeSections.some(s => s.id === activeId) && activeSections.length > 0) {
+      setActiveId(activeSections[0].id);
+    }
+  }, [activeSections, activeId]);
 
   const activeFaqs = useMemo(() => {
     if (!faqs || !Array.isArray(faqs)) return [];
@@ -37,7 +102,7 @@ export function Biography({ moodData = MOOD_DATA, faqs }: { moodData?: typeof MO
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.bio.act}</div>
             <h2
               className="mt-5 font-display leading-[0.95] text-bone transition-all duration-700"
-              style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.6rem)", fontWeight: data.weight }}
+              style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.6rem)", fontWeight: data.weight || 300 }}
             >
               {t.bio.heading[0]}
               <span className="italic text-ember">{t.bio.heading[1]}</span>
@@ -48,37 +113,37 @@ export function Biography({ moodData = MOOD_DATA, faqs }: { moodData?: typeof MO
               <div className="text-[10px] uppercase tracking-[0.4em] text-bone/50 mb-3 font-mono">
                 {t.bio.director}
               </div>
-              <div className="inline-flex hairline border-t-0 border border-bone/15">
-                {(Object.keys(moodData) as Mood[]).map((m) => (
+              <div className="inline-flex hairline border-t-0 border border-bone/15 flex-wrap gap-y-2">
+                {activeSections.map((s) => (
                   <button
-                    key={m}
-                    onClick={() => setMood(m)}
+                    key={s.id}
+                    onClick={() => setActiveId(s.id)}
                     data-hover
                     className={`relative px-5 py-3 text-[11px] uppercase tracking-[0.32em] transition-colors ${
-                      mood === m ? "text-ink" : "text-bone/70 hover:text-bone"
+                      activeId === s.id ? "text-ink" : "text-bone/70 hover:text-bone"
                     }`}
                   >
-                    {mood === m && (
+                    {activeId === s.id && (
                       <motion.span
                         layoutId="moodPill"
                         className="absolute inset-0 bg-ember"
                         transition={{ type: "spring", stiffness: 320, damping: 30 }}
                       />
                     )}
-                    <span className="relative">{t.bio.moods[m]}</span>
+                    <span className="relative">{lang === "sv" ? s.title_sv : s.title_en}</span>
                   </button>
                 ))}
               </div>
               <AnimatePresence mode="wait">
                 <motion.p
-                  key={mood}
+                  key={activeId}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4 }}
                   className="mt-5 font-display italic text-bone/80 text-xl md:text-2xl max-w-lg"
                 >
-                  "{t.bio.lines[mood]}"
+                  "{lang === "sv" ? data.quote_sv : data.quote_en}"
                 </motion.p>
               </AnimatePresence>
             </div>
@@ -131,7 +196,7 @@ export function Biography({ moodData = MOOD_DATA, faqs }: { moodData?: typeof MO
               <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={mood}
+                    key={activeId}
                     initial={{ opacity: 0, scale: 1.06 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
@@ -140,16 +205,22 @@ export function Biography({ moodData = MOOD_DATA, faqs }: { moodData?: typeof MO
                   >
                     <SpotlightImage
                       src={data.image}
-                      alt={`Therese Järvheden — ${mood}`}
+                      alt={`Therese Järvheden — ${lang === "sv" ? data.title_sv : data.title_en}`}
                       className="h-full w-full"
                     />
                   </motion.div>
                 </AnimatePresence>
                 <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
               </div>
-              <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono">
-                <span>Foto: Robert Eldrim</span>
-                <span>Smink: Sara Zetterström</span>
+              <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono whitespace-pre-line">
+                {imageCredits ? (
+                  lang === "sv" ? imageCredits.sv : imageCredits.en
+                ) : (
+                  <>
+                    <span>Foto: Robert Eldrim</span>
+                    <span>Smink: Sara Zetterström</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

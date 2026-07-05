@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { Mail, Check, Send } from "lucide-react";
+import { Mail, Check, Send, Film, Globe, Link as LinkIcon, Video, Award, Briefcase, Music, Phone } from "lucide-react";
 import { useT } from "../../hooks/use-t";
 import { Field } from "../ui/Field";
 
@@ -40,6 +40,42 @@ const Facebook = ({ size = 24, className = "" }) => (
   </svg>
 );
 
+const Youtube = ({ size = 24, className = "" }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+    <polygon points="10 15 15 12 10 9" fill="currentColor" />
+  </svg>
+);
+
+const XLogo = ({ size = 24, className = "" }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
+    <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+  </svg>
+);
+
 type Status =
   | "idle"
   | "shrinking"
@@ -59,10 +95,35 @@ export function Contact({ bioData }: { bioData?: any }) {
     ? JSON.parse(bioData.contact_links) 
     : (bioData?.contact_links || {});
 
-  const agentEmail = links.agentEmail || "jonas@schultzbergagency.com";
-  const voiceEmail = links.voiceEmail || "theresejarvheden@gmail.com";
-  const instagram = links.instagram || "https://www.instagram.com/theresejarvheden/";
-  const facebook = links.facebook || "https://www.facebook.com/therese.jarvhedenfdpersson";
+  const hasLinks = bioData && bioData.contact_links !== undefined && bioData.contact_links !== null;
+
+  const agentEmail = hasLinks ? (links.agentEmail || "") : "jonas@schultzbergagency.com";
+  const voiceEmail = hasLinks ? (links.voiceEmail || "") : "theresejarvheden@gmail.com";
+  const instagram = hasLinks ? (links.instagram || "") : "https://www.instagram.com/theresejarvheden/";
+  const facebook = hasLinks ? (links.facebook || "") : "https://www.facebook.com/therese.jarvhedenfdpersson";
+  const youtube = links.youtube || "";
+  const x = links.x || "";
+  const imdb = links.imdb || "";
+  const wikipedia = links.wikipedia || "";
+  const customLink1Label = links.customLink1Label || "";
+  const customLink1Url = links.customLink1Url || "";
+  const customLink1Icon = links.customLink1Icon || "link";
+  const customLink2Label = links.customLink2Label || "";
+  const customLink2Url = links.customLink2Url || "";
+  const customLink2Icon = links.customLink2Icon || "link";
+
+  const getCustomIcon = (iconName: string) => {
+    switch (iconName) {
+      case "globe": return <Globe size={16} />;
+      case "video": return <Video size={16} />;
+      case "award": return <Award size={16} />;
+      case "briefcase": return <Briefcase size={16} />;
+      case "music": return <Music size={16} />;
+      case "phone": return <Phone size={16} />;
+      case "mail": return <Mail size={16} />;
+      default: return <LinkIcon size={16} />;
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,51 +185,127 @@ export function Contact({ bioData }: { bioData?: any }) {
             </h2>
 
             <div className="mt-12 space-y-10">
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.4em] text-bone/40">
-                  {t.contact.agentLabel}
+              {agentEmail && (
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.4em] text-bone/40">
+                    {t.contact.agentLabel}
+                  </div>
+                  <a
+                    href={`mailto:${agentEmail}`}
+                    data-hover
+                    className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
+                  >
+                    <Mail size={20} /> {agentEmail}
+                  </a>
+                  <div className="mt-1 text-xs text-bone/40">{t.contact.agentSub}</div>
                 </div>
-                <a
-                  href={`mailto:${agentEmail}`}
-                  data-hover
-                  className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
-                >
-                  <Mail size={20} /> {agentEmail}
-                </a>
-                <div className="mt-1 text-xs text-bone/40">{t.contact.agentSub}</div>
-              </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.4em] text-bone/40">
-                  {t.contact.voiceLabel}
+              )}
+              {voiceEmail && (
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.4em] text-bone/40">
+                    {t.contact.voiceLabel}
+                  </div>
+                  <a
+                    href={`mailto:${voiceEmail}`}
+                    data-hover
+                    className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
+                  >
+                    <Mail size={20} /> {voiceEmail}
+                  </a>
                 </div>
-                <a
-                  href={`mailto:${voiceEmail}`}
-                  data-hover
-                  className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
-                >
-                  <Mail size={20} /> {voiceEmail}
-                </a>
-              </div>
-              <div className="flex items-center gap-5 pt-4">
-                <a
-                  href={instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  data-hover
-                  className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
-                >
-                  <Instagram size={16} /> Instagram
-                </a>
-                <a
-                  href={facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  data-hover
-                  className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
-                >
-                  <Facebook size={16} /> Facebook
-                </a>
-              </div>
+              )}
+              {(instagram || facebook || youtube || x || imdb || wikipedia || customLink1Url || customLink2Url) && (
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-4">
+                  {instagram && (
+                    <a
+                      href={instagram}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      <Instagram size={16} /> Instagram
+                    </a>
+                  )}
+                  {facebook && (
+                    <a
+                      href={facebook}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      <Facebook size={16} /> Facebook
+                    </a>
+                  )}
+                  {youtube && (
+                    <a
+                      href={youtube}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      <Youtube size={16} /> YouTube
+                    </a>
+                  )}
+                  {x && (
+                    <a
+                      href={x}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      <XLogo size={16} /> X
+                    </a>
+                  )}
+                  {imdb && (
+                    <a
+                      href={imdb}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      <Film size={16} /> IMDb
+                    </a>
+                  )}
+                  {wikipedia && (
+                    <a
+                      href={wikipedia}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      <Globe size={16} /> Wikipedia
+                    </a>
+                  )}
+                  {customLink1Url && (
+                    <a
+                      href={customLink1Url}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      {getCustomIcon(customLink1Icon)} {customLink1Label || "Länk 1"}
+                    </a>
+                  )}
+                  {customLink2Url && (
+                    <a
+                      href={customLink2Url}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-hover
+                      className="group flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-bone/60 hover:text-ember transition-colors px-2.5 py-1.5 rounded-sm -ml-2.5"
+                    >
+                      {getCustomIcon(customLink2Icon)} {customLink2Label || "Länk 2"}
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

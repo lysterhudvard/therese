@@ -6,6 +6,7 @@ interface StorageFile {
   name: string;
   url: string;
   type: "image" | "video" | "audio" | "other";
+  folder?: string;
 }
 
 interface MediaPickerModalProps {
@@ -18,6 +19,7 @@ interface MediaPickerModalProps {
 export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all" }: MediaPickerModalProps) {
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
 
   useEffect(() => {
     if (isOpen) {
@@ -29,18 +31,29 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
     if (!isSupabaseConfigured()) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.storage.from("portfolio").list("", {
-        limit: 100,
-        sortBy: { column: "created_at", order: "desc" },
-      });
+      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "general"];
+      const results = await Promise.all(
+        folders.map(async (folder) => {
+          const { data, error } = await supabase.storage.from("portfolio").list(folder, {
+            limit: 100,
+            sortBy: { column: "created_at", order: "desc" },
+          });
+          if (error) {
+            console.warn(`Could not list folder '${folder}':`, error.message);
+            return [];
+          }
+          return (data || []).map((file) => ({ ...file, folder }));
+        })
+      );
 
-      if (error) throw error;
+      const allFiles = results.flat();
 
-      if (data) {
-        const mapped: StorageFile[] = data
-          .filter((file) => file.name !== ".emptyFolderPlaceholder")
+      if (allFiles) {
+        const mapped: StorageFile[] = allFiles
+          .filter((file) => file.name !== ".emptyFolderPlaceholder" && file.id !== null && file.metadata)
           .map((file) => {
-            const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(file.name);
+            const filePath = file.folder ? `${file.folder}/${file.name}` : file.name;
+            const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(filePath);
             const ext = file.name.split(".").pop()?.toLowerCase() || "";
             let type: StorageFile["type"] = "other";
             if (["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"].includes(ext)) type = "image";
@@ -51,6 +64,7 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
               name: file.name,
               url: urlData.publicUrl,
               type,
+              folder: file.folder || "general",
             };
           });
         setFiles(mapped);
@@ -64,7 +78,11 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
 
   if (!isOpen) return null;
 
-  const filteredFiles = files.filter((f) => typeFilter === "all" || f.type === typeFilter);
+  const filteredFiles = files.filter(
+    (f) =>
+      (typeFilter === "all" || f.type === typeFilter) &&
+      (selectedFilter === "all" || f.folder === selectedFilter)
+  );
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/80 backdrop-blur-sm">
@@ -75,6 +93,32 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
             <X size={18} />
           </button>
         </div>
+
+        {/* Category tabs */}
+        <div className="flex flex-wrap gap-1 px-6 py-2 bg-ink/20 border-b border-bone/5">
+          {[
+            { id: "all", label: "Alla" },
+            { id: "hero", label: "Hero" },
+            { id: "bio", label: "Bio" },
+            { id: "portfolio", label: "Portfolio" },
+            { id: "showreel", label: "Showreel" },
+            { id: "seo", label: "SEO" },
+            { id: "general", label: "Allmänt" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSelectedFilter(tab.id)}
+              className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider transition-colors cursor-pointer border ${
+                selectedFilter === tab.id
+                  ? "border-ember text-ember bg-ember/5"
+                  : "border-bone/5 text-bone/40 hover:text-bone hover:border-bone/20"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading ? (
@@ -83,7 +127,7 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
             </div>
           ) : filteredFiles.length === 0 ? (
             <div className="text-center py-12 text-bone/40 font-mono text-xs uppercase tracking-wider">
-              Inga {typeFilter !== "all" ? typeFilter : "media"}filer hittades i biblioteket.
+              Inga {typeFilter !== "all" ? typeFilter : "media"}filer hittades i den här kategorin.
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -97,6 +141,11 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
                   className="group relative flex flex-col text-left border border-bone/5 bg-ink/30 rounded-sm overflow-hidden hover:border-ember transition-all"
                 >
                   <div className="aspect-square bg-bone/5 flex items-center justify-center relative overflow-hidden">
+                    {file.folder && (
+                      <div className="absolute top-1.5 left-1.5 bg-ember text-ink font-mono text-[6px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-sm z-10 shadow-sm">
+                        {file.folder}
+                      </div>
+                    )}
                     {file.type === "image" ? (
                       <img src={file.url} alt={file.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : file.type === "video" ? (

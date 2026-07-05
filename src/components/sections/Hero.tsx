@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { IMG } from "../../routes/index";
 
-export function Hero({ onDone, heroDone }: { onDone: () => void; heroDone: boolean }) {
+export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; heroDone: boolean; heroImage?: string }) {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -19,7 +19,7 @@ export function Hero({ onDone, heroDone }: { onDone: () => void; heroDone: boole
     <section id="top" ref={ref} className="relative h-[100svh] w-full overflow-hidden">
       <motion.div style={{ scale, opacity }} className="absolute inset-0">
         <motion.img
-          src={IMG.hero}
+          src={heroImage || IMG.hero}
           alt="Therese Järvheden"
           initial={{ opacity: 0, scale: 1.08 }}
           animate={{ opacity: 1, scale: 1 }}

@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Sparkles, ToggleLeft, ToggleRight, Save } from "lucide-react";
+import { Sparkles, ToggleLeft, ToggleRight, Save, Image } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 export function DashboardHero() {
   const [currentTextSv, setCurrentTextSv] = useState("");
   const [currentTextEn, setCurrentTextEn] = useState("");
   const [isAutomated, setIsAutomated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [heroImage, setHeroImage] = useState("");
+  const [heroRoleSv, setHeroRoleSv] = useState("Skådespelerska");
+  const [heroRoleEn, setHeroRoleEn] = useState("Actress");
+  const [heroBaseSv, setHeroBaseSv] = useState("Malmö · Stockholm");
+  const [heroBaseEn, setHeroBaseEn] = useState("Malmö · Stockholm");
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -15,12 +22,17 @@ export function DashboardHero() {
     const fetchHeroData = async () => {
       const { data: bioData } = await supabase
         .from("biography")
-        .select("hero_text_sv, hero_text_en, is_automated")
+        .select("hero_text_sv, hero_text_en, is_automated, hero_image, hero_role_sv, hero_role_en, hero_base_sv, hero_base_en")
         .eq("id", "main")
         .maybeSingle();
 
       if (bioData) {
         setIsAutomated(bioData.is_automated || false);
+        if (bioData.hero_image) setHeroImage(bioData.hero_image);
+        if (bioData.hero_role_sv) setHeroRoleSv(bioData.hero_role_sv);
+        if (bioData.hero_role_en) setHeroRoleEn(bioData.hero_role_en);
+        if (bioData.hero_base_sv) setHeroBaseSv(bioData.hero_base_sv);
+        if (bioData.hero_base_en) setHeroBaseEn(bioData.hero_base_en);
         
         if (bioData.is_automated) {
           const { data: creditData } = await supabase
@@ -62,6 +74,11 @@ export function DashboardHero() {
         hero_text_sv: currentTextSv,
         hero_text_en: currentTextEn,
         is_automated: isAutomated,
+        hero_image: heroImage,
+        hero_role_sv: heroRoleSv,
+        hero_role_en: heroRoleEn,
+        hero_base_sv: heroBaseSv,
+        hero_base_en: heroBaseEn,
       })
       .eq("id", "main");
 
@@ -203,6 +220,112 @@ export function DashboardHero() {
         </div>
       </div>
 
+      {/* Hero Bakgrundsbild Section */}
+      <div className="border border-bone/10 p-5 bg-ink/10 rounded-sm space-y-6">
+        <h3 className="text-xs font-mono uppercase tracking-widest text-bone border-b border-bone/5 pb-2">Hero Bakgrundsbild</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+          <div className="md:col-span-3 space-y-2">
+            <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+              Bild-URL
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={heroImage}
+                onChange={(e) => setHeroImage(e.target.value)}
+                placeholder="https://..."
+                className="flex-1 bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
+              />
+              <button
+                type="button"
+                onClick={() => setIsMediaPickerOpen(true)}
+                className="px-4 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-xs font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+              >
+                Media
+              </button>
+            </div>
+            <p className="text-[10px] text-bone/40 font-mono">
+              Den bild som visas i fullskärm i Akt I. Klicka på Media för att välja från uppladdade bilder.
+            </p>
+          </div>
+          <div className="md:col-span-1 flex flex-col items-center">
+            <span className="text-[9px] uppercase tracking-widest text-bone/40 font-mono mb-2">Förhandsvisning</span>
+            {heroImage ? (
+              <div className="aspect-[3/4] w-24 border border-bone/10 bg-stage/10 rounded-sm overflow-hidden relative group">
+                <img src={heroImage} alt="Förhandsvisning hero" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="aspect-[3/4] w-24 border border-dashed border-bone/10 bg-stage/5 rounded-sm flex flex-col items-center justify-center text-bone/20 font-mono text-[9px]">
+                <Image size={18} className="mb-1" />
+                Ingen bild
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Hero Subtitle / Location Section */}
+      <div className="border border-bone/10 p-5 bg-ink/10 rounded-sm space-y-6">
+        <h3 className="text-xs font-mono uppercase tracking-widest text-bone border-b border-bone/5 pb-2">Hero Undertitel & Bas (Akt I)</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Subtitle / Role (Svenska & Engelska) */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[9px] uppercase tracking-widest text-bone/40 mb-2 font-mono">
+                Roll / Titel (Svenska)
+              </label>
+              <input
+                type="text"
+                value={heroRoleSv}
+                onChange={(e) => setHeroRoleSv(e.target.value)}
+                placeholder="Skådespelerska"
+                className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
+              />
+            </div>
+            <div>
+              <label className="block text-[9px] uppercase tracking-widest text-bone/40 mb-2 font-mono">
+                Roll / Titel (Engelska)
+              </label>
+              <input
+                type="text"
+                value={heroRoleEn}
+                onChange={(e) => setHeroRoleEn(e.target.value)}
+                placeholder="Actress"
+                className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
+              />
+            </div>
+          </div>
+
+          {/* Base Location (Svenska & Engelska) */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[9px] uppercase tracking-widest text-bone/40 mb-2 font-mono">
+                Stad / Region (Svenska)
+              </label>
+              <input
+                type="text"
+                value={heroBaseSv}
+                onChange={(e) => setHeroBaseSv(e.target.value)}
+                placeholder="Malmö · Stockholm"
+                className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
+              />
+            </div>
+            <div>
+              <label className="block text-[9px] uppercase tracking-widest text-bone/40 mb-2 font-mono">
+                Stad / Region (Engelska)
+              </label>
+              <input
+                type="text"
+                value={heroBaseEn}
+                onChange={(e) => setHeroBaseEn(e.target.value)}
+                placeholder="Malmö · Stockholm"
+                className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
@@ -220,6 +343,13 @@ export function DashboardHero() {
           )}
         </button>
       </div>
+
+      <MediaPickerModal
+        isOpen={isMediaPickerOpen}
+        onClose={() => setIsMediaPickerOpen(false)}
+        onSelect={(url) => setHeroImage(url)}
+        typeFilter="image"
+      />
     </form>
   );
 }

@@ -2,6 +2,17 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, HelpCircle, FileText, Quote, Image, Link2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
+
+interface BioSection {
+  id: string;
+  title_sv: string;
+  title_en: string;
+  quote_sv: string;
+  quote_en: string;
+  image: string;
+  weight?: number;
+}
 
 interface FAQItem {
   id: string;
@@ -22,13 +33,6 @@ interface ReviewQuoteItem {
 }
 
 export function DashboardBio() {
-  const [quoteSv, setQuoteSv] = useState("Drama är något jag känner extra starkt för.");
-  const [quoteEn, setQuoteEn] = useState("Drama is something I feel especially strongly about.");
-  const [quoteComedicSv, setQuoteComedicSv] = useState("Komedi kräver samma precision som tragedi — bara snabbare.");
-  const [quoteComedicEn, setQuoteComedicEn] = useState("Comedy demands the same precision as tragedy — just faster.");
-  const [quoteClassicalSv, setQuoteClassicalSv] = useState("Scenen lärde mig allt jag vet om timing och tystnad.");
-  const [quoteClassicalEn, setQuoteClassicalEn] = useState("The stage taught me everything I know about timing and silence.");
-  
   // Biography Headings & Paragraphs
   const [headingSv, setHeadingSv] = useState("En skådespelerska med bredd — från SVT-drama till komedi och röst.");
   const [headingEn, setHeadingEn] = useState("An actress with range — from SVT drama to comedy and voice.");
@@ -45,10 +49,44 @@ export function DashboardBio() {
   const [languagesSv, setLanguagesSv] = useState("Svenska · Engelska");
   const [languagesEn, setLanguagesEn] = useState("Swedish · English");
 
-  // Biography Section Images
-  const [dramaticImage, setDramaticImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650");
-  const [comedicImage, setComedicImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650");
-  const [classicalImage, setClassicalImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650");
+  // Dynamic Biography Sections (Dramatisk, Komisk, Klassisk, or custom)
+  const [bioSections, setBioSections] = useState<BioSection[]>([
+    {
+      id: "Dramatic",
+      title_sv: "Dramatisk",
+      title_en: "Dramatic",
+      quote_sv: "Drama är något jag känner extra starkt för.",
+      quote_en: "Drama is something I feel especially strongly about.",
+      image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+      weight: 300
+    },
+    {
+      id: "Comedic",
+      title_sv: "Komisk",
+      title_en: "Comedic",
+      quote_sv: "Komedi kräver samma precision som tragedi — bara snabbare.",
+      quote_en: "Comedy demands the same precision as tragedy — just faster.",
+      image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
+      weight: 500
+    },
+    {
+      id: "Classical",
+      title_sv: "Klassisk",
+      title_en: "Classical",
+      quote_sv: "Scenen lärde mig allt jag vet om timing och tystnad.",
+      quote_en: "The stage taught me everything I know about timing and silence.",
+      image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
+      weight: 400
+    }
+  ]);
+
+  // Image credits
+  const [imageCreditsSv, setImageCreditsSv] = useState("Foto: Robert Eldrim\nSmink: Sara Zetterström");
+  const [imageCreditsEn, setImageCreditsEn] = useState("Photo: Robert Eldrim\nMakeup: Sara Zetterström");
+
+  // Media picker helpers
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+  const [activePickingSectionId, setActivePickingSectionId] = useState<string | null>(null);
 
   // FAQs List for AEO Schema
   const [faqs, setFaqs] = useState<FAQItem[]>([
@@ -83,7 +121,7 @@ export function DashboardBio() {
     const fetchBioData = async () => {
       const { data, error } = await supabase
         .from("biography")
-        .select("quote_sv, quote_en, dialects_sv, dialects_en, languages_sv, languages_en, faqs, heading_sv, heading_en, paragraph1_sv, paragraph1_en, paragraph2_sv, paragraph2_en, paragraph3_sv, paragraph3_en, review_quotes, quote_comedic_sv, quote_comedic_en, quote_classical_sv, quote_classical_en, mood_images, footer_image, footer_end_sv, footer_end_en, footer_credits")
+        .select("quote_sv, quote_en, dialects_sv, dialects_en, languages_sv, languages_en, faqs, heading_sv, heading_en, paragraph1_sv, paragraph1_en, paragraph2_sv, paragraph2_en, paragraph3_sv, paragraph3_en, review_quotes, quote_comedic_sv, quote_comedic_en, quote_classical_sv, quote_classical_en, mood_images, footer_image, footer_end_sv, footer_end_en, footer_credits, bio_image_credits_sv, bio_image_credits_en, bio_sections")
         .eq("id", "main")
         .maybeSingle();
 
@@ -91,7 +129,7 @@ export function DashboardBio() {
         console.warn("Could not load full biography schema, trying fallback to core schema:", error.message);
         
         toast.warning(
-          "Vissa biografi-kolumner saknas i databasen. För full funktionalitet, kör 'supabase_migration_3.sql' och 'supabase_migration_2.sql' i din Supabase SQL Editor.",
+          "Vissa biografi-kolumner saknas i databasen. För full funktionalitet, kör 'supabase_migration_5.sql' i din Supabase SQL Editor.",
           { duration: 6000 }
         );
 
@@ -110,8 +148,6 @@ export function DashboardBio() {
         }
 
         if (fallbackData) {
-          setQuoteSv(fallbackData.quote_sv || "");
-          setQuoteEn(fallbackData.quote_en || "");
           setDialectsSv(fallbackData.dialects_sv || "");
           setDialectsEn(fallbackData.dialects_en || "");
           setLanguagesSv(fallbackData.languages_sv || "");
@@ -122,13 +158,6 @@ export function DashboardBio() {
       }
 
       if (data) {
-        if (data.quote_sv) setQuoteSv(data.quote_sv);
-        if (data.quote_en) setQuoteEn(data.quote_en);
-        if (data.quote_comedic_sv) setQuoteComedicSv(data.quote_comedic_sv);
-        if (data.quote_comedic_en) setQuoteComedicEn(data.quote_comedic_en);
-        if (data.quote_classical_sv) setQuoteClassicalSv(data.quote_classical_sv);
-        if (data.quote_classical_en) setQuoteClassicalEn(data.quote_classical_en);
-        
         if (data.heading_sv) setHeadingSv(data.heading_sv);
         if (data.heading_en) setHeadingEn(data.heading_en);
         if (data.paragraph1_sv) setParagraph1Sv(data.paragraph1_sv);
@@ -143,21 +172,64 @@ export function DashboardBio() {
         if (data.languages_sv) setLanguagesSv(data.languages_sv);
         if (data.languages_en) setLanguagesEn(data.languages_en);
         
+        if (data.bio_image_credits_sv) setImageCreditsSv(data.bio_image_credits_sv);
+        if (data.bio_image_credits_en) setImageCreditsEn(data.bio_image_credits_en);
+
+        if (data.bio_sections) {
+          try {
+            const parsed = typeof data.bio_sections === "string"
+              ? JSON.parse(data.bio_sections)
+              : data.bio_sections;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setBioSections(parsed);
+            }
+          } catch (e) {
+            console.error("Failed to parse bio sections:", e);
+          }
+        } else if (data.mood_images) {
+          // Backward compatibility import from mood_images
+          try {
+            const moodImgs = typeof data.mood_images === "string" ? JSON.parse(data.mood_images) : data.mood_images;
+            const updated = [
+              {
+                id: "Dramatic",
+                title_sv: "Dramatisk",
+                title_en: "Dramatic",
+                quote_sv: data.quote_sv || "Drama är något jag känner extra starkt för.",
+                quote_en: data.quote_en || "Drama is something I feel especially strongly about.",
+                image: moodImgs.dramatic || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+                weight: 300
+              },
+              {
+                id: "Comedic",
+                title_sv: "Komisk",
+                title_en: "Comedic",
+                quote_sv: data.quote_comedic_sv || "Komedi kräver samma precision som tragedi — bara snabbare.",
+                quote_en: data.quote_comedic_en || "Comedy demands the same precision as tragedy — just faster.",
+                image: moodImgs.comedic || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
+                weight: 500
+              },
+              {
+                id: "Classical",
+                title_sv: "Klassisk",
+                title_en: "Classical",
+                quote_sv: data.quote_classical_sv || "Scenen lärde mig allt jag vet om timing och tystnad.",
+                quote_en: data.quote_classical_en || "The stage taught me everything I know about timing and silence.",
+                image: moodImgs.classical || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
+                weight: 400
+              }
+            ];
+            setBioSections(updated);
+          } catch (e) {
+            console.error("Failed to merge legacy data:", e);
+          }
+        }
+        
         if (data.faqs && Array.isArray(data.faqs) && data.faqs.length > 0) {
           setFaqs(data.faqs as FAQItem[]);
         }
         if (data.review_quotes && Array.isArray(data.review_quotes) && data.review_quotes.length > 0) {
           setReviewQuotes(data.review_quotes as ReviewQuoteItem[]);
-        }
-        if (data.mood_images) {
-          try {
-            const moodImgs = typeof data.mood_images === "string" ? JSON.parse(data.mood_images) : data.mood_images;
-            if (moodImgs.dramatic) setDramaticImage(moodImgs.dramatic);
-            if (moodImgs.comedic) setComedicImage(moodImgs.comedic);
-            if (moodImgs.classical) setClassicalImage(moodImgs.classical);
-          } catch (e) {
-            console.error("Failed to parse mood images:", e);
-          }
         }
       }
       setIsLoading(false);
@@ -165,6 +237,39 @@ export function DashboardBio() {
 
     fetchBioData();
   }, []);
+
+  const addBioSection = () => {
+    const newSection: BioSection = {
+      id: `section-${Date.now()}`,
+      title_sv: "Ny Sektion",
+      title_en: "New Section",
+      quote_sv: "Skriv citat här...",
+      quote_en: "Write quote here...",
+      image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+      weight: 300
+    };
+    setBioSections([...bioSections, newSection]);
+  };
+
+  const removeBioSection = (id: string) => {
+    setBioSections(bioSections.filter(s => s.id !== id));
+  };
+
+  const updateBioSection = (id: string, updates: Partial<BioSection>) => {
+    setBioSections(bioSections.map(s => s.id === id ? { ...s, ...updates } : s));
+  };
+
+  const openMediaPickerForSection = (id: string) => {
+    setActivePickingSectionId(id);
+    setIsMediaPickerOpen(true);
+  };
+
+  const handleMediaSelect = (url: string) => {
+    if (activePickingSectionId) {
+      updateBioSection(activePickingSectionId, { image: url });
+      setActivePickingSectionId(null);
+    }
+  };
 
   const addReviewQuote = () => {
     const newItem: ReviewQuoteItem = {
@@ -229,19 +334,26 @@ export function DashboardBio() {
       return;
     }
 
-    const moodImagesPayload = {
-      dramatic: dramaticImage,
-      comedic: comedicImage,
-      classical: classicalImage,
+    // Prepare legacy fallback columns
+    const quote_sv = bioSections[0]?.quote_sv || "";
+    const quote_en = bioSections[0]?.quote_en || "";
+    const quote_comedic_sv = bioSections[1]?.quote_sv || "";
+    const quote_comedic_en = bioSections[1]?.quote_en || "";
+    const quote_classical_sv = bioSections[2]?.quote_sv || "";
+    const quote_classical_en = bioSections[2]?.quote_en || "";
+    const mood_images = {
+      dramatic: bioSections[0]?.image || "",
+      comedic: bioSections[1]?.image || "",
+      classical: bioSections[2]?.image || "",
     };
 
     const { error } = await supabase.from("biography").update({
-      quote_sv: quoteSv,
-      quote_en: quoteEn,
-      quote_comedic_sv: quoteComedicSv,
-      quote_comedic_en: quoteComedicEn,
-      quote_classical_sv: quoteClassicalSv,
-      quote_classical_en: quoteClassicalEn,
+      quote_sv,
+      quote_en,
+      quote_comedic_sv,
+      quote_comedic_en,
+      quote_classical_sv,
+      quote_classical_en,
       heading_sv: headingSv,
       heading_en: headingEn,
       paragraph1_sv: paragraph1Sv,
@@ -256,15 +368,18 @@ export function DashboardBio() {
       languages_en: languagesEn,
       faqs: faqs,
       review_quotes: reviewQuotes,
-      mood_images: moodImagesPayload,
+      mood_images,
+      bio_image_credits_sv: imageCreditsSv,
+      bio_image_credits_en: imageCreditsEn,
+      bio_sections: bioSections,
     }).eq('id', 'main');
 
     if (error) {
       console.warn("Full biography update failed, trying core update fallback:", error.message);
       
       const { error: coreError } = await supabase.from("biography").update({
-        quote_sv: quoteSv,
-        quote_en: quoteEn,
+        quote_sv,
+        quote_en,
         dialects_sv: dialectsSv,
         dialects_en: dialectsEn,
         languages_sv: languagesSv,
@@ -275,7 +390,7 @@ export function DashboardBio() {
       if (coreError) {
         toast.error(`Kunde inte spara i databasen: ${coreError.message}`);
       } else {
-        toast.warning("Sparade endast grundläggande fält (citat, dialekter, språk). För full funktionalitet, kör 'supabase_migration_3.sql' och 'supabase_migration_2.sql' i din Supabase SQL Editor.");
+        toast.warning("Sparade endast grundläggande fält (citat, dialekter, språk). För full funktionalitet, kör 'supabase_migration_5.sql' i din Supabase SQL Editor.");
       }
     } else {
       setIsSaving(false);
@@ -303,138 +418,158 @@ export function DashboardBio() {
         </p>
       </div>
 
-      {/* Mood Quotes Section */}
+      {/* Biography Sections List */}
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
-        <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Quote size={14} className="text-ember" /> Stämningscitat / Manuskriptcitat (Mood Quotes)
-        </h3>
-        
-        {/* Dramatic Quote (Core) */}
-        <div className="space-y-3">
-          <h4 className="text-[10px] uppercase tracking-wider text-ember font-mono font-semibold">Dramatiskt Citat (Akt II Drama)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Svenska</label>
-              <input
-                type="text"
-                id="klick-bio-quote-sv"
-                value={quoteSv}
-                onChange={(e) => setQuoteSv(e.target.value)}
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">English</label>
-              <input
-                type="text"
-                id="klick-bio-quote-en"
-                value={quoteEn}
-                onChange={(e) => setQuoteEn(e.target.value)}
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-          </div>
+        <div className="flex items-center justify-between border-b border-bone/5 pb-2">
+          <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
+            <Quote size={14} className="text-ember" /> Biografisektioner (Dynamic Sections)
+          </h3>
+          <button
+            type="button"
+            onClick={addBioSection}
+            className="px-3 py-1 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[9px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
+          >
+            + Lägg till sektion
+          </button>
         </div>
+        <p className="text-[9px] text-bone/45 font-mono uppercase tracking-wider">
+          Anpassa befintliga sektioner eller lägg till nya. Sektionerna sorteras efter vikt (lägre visas först).
+        </p>
 
-        {/* Comedic Quote */}
-        <div className="space-y-3 pt-2 border-t border-bone/5">
-          <h4 className="text-[10px] uppercase tracking-wider text-ember font-mono font-semibold">Komiskt Citat (Akt II Komedi)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Svenska</label>
-              <input
-                type="text"
-                id="klick-bio-quote-comedic-sv"
-                value={quoteComedicSv}
-                onChange={(e) => setQuoteComedicSv(e.target.value)}
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">English</label>
-              <input
-                type="text"
-                id="klick-bio-quote-comedic-en"
-                value={quoteComedicEn}
-                onChange={(e) => setQuoteComedicEn(e.target.value)}
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-          </div>
-        </div>
+        <div className="space-y-6">
+          {[...bioSections]
+            .sort((a, b) => (a.weight || 300) - (b.weight || 300))
+            .map((section, idx) => (
+              <div key={section.id} className="border border-bone/10 bg-stage/15 p-4 rounded-sm space-y-4 relative">
+                <div className="flex justify-between items-center border-b border-bone/5 pb-2">
+                  <span className="text-[10px] font-mono text-ember uppercase tracking-wider">Sektion #{idx + 1}: {section.title_sv || "Namnlös"}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeBioSection(section.id)}
+                    className="text-bone/35 hover:text-red-400 transition-colors cursor-pointer animate-pulse-slow"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
 
-        {/* Classical Quote */}
-        <div className="space-y-3 pt-2 border-t border-bone/5">
-          <h4 className="text-[10px] uppercase tracking-wider text-ember font-mono font-semibold">Klassiskt Citat (Akt II Klassisk)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Svenska</label>
-              <input
-                type="text"
-                id="klick-bio-quote-classical-sv"
-                value={quoteClassicalSv}
-                onChange={(e) => setQuoteClassicalSv(e.target.value)}
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">English</label>
-              <input
-                type="text"
-                id="klick-bio-quote-classical-en"
-                value={quoteClassicalEn}
-                onChange={(e) => setQuoteClassicalEn(e.target.value)}
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Rubrik (Svenska)</label>
+                    <input
+                      type="text"
+                      value={section.title_sv}
+                      onChange={(e) => updateBioSection(section.id, { title_sv: e.target.value })}
+                      placeholder="t.ex. Dramatisk"
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Rubrik (Engelska)</label>
+                    <input
+                      type="text"
+                      value={section.title_en}
+                      onChange={(e) => updateBioSection(section.id, { title_en: e.target.value })}
+                      placeholder="t.ex. Dramatic"
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Citat (Svenska)</label>
+                    <textarea
+                      value={section.quote_sv}
+                      onChange={(e) => updateBioSection(section.id, { quote_sv: e.target.value })}
+                      rows={2}
+                      placeholder="Drama är något jag..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Citat (Engelska)</label>
+                    <textarea
+                      value={section.quote_en}
+                      onChange={(e) => updateBioSection(section.id, { quote_en: e.target.value })}
+                      rows={2}
+                      placeholder="Drama is something..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                  <div className="md:col-span-3 space-y-2">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild-URL</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={section.image}
+                        onChange={(e) => updateBioSection(section.id, { image: e.target.value })}
+                        placeholder="https://..."
+                        className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => openMediaPickerForSection(section.id)}
+                        className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                      >
+                        Media
+                      </button>
+                    </div>
+                  </div>
+                  <div className="md:col-span-1 flex flex-col items-center">
+                    <span className="text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Förhandsvisning</span>
+                    {section.image ? (
+                      <img src={section.image} alt={section.title_sv} className="h-14 w-14 object-cover border border-bone/15 rounded-sm" />
+                    ) : (
+                      <div className="h-14 w-14 border border-dashed border-bone/10 flex items-center justify-center text-bone/20 text-[8px] font-mono">Ingen bild</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="w-32">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Sorteringsvikt</label>
+                  <input
+                    type="number"
+                    value={section.weight || 300}
+                    onChange={(e) => updateBioSection(section.id, { weight: parseInt(e.target.value) || 300 })}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                  />
+                </div>
+              </div>
+            ))}
         </div>
       </div>
 
-      {/* Biography Mood Images Section */}
+      {/* Biography Image Credits Section */}
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
         <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Image size={14} className="text-ember" /> Sektionsbilder (Biografi)
+          <FileText size={14} className="text-ember" /> Fotokredd (Biografibild undertext)
         </h3>
         <p className="text-[9px] text-bone/45 font-mono uppercase tracking-wider">
-          Ange bildlänkar för de tre biografisektionerna (Dramatisk, Komisk, Klassisk).
+          Fotokredd som visas direkt under den stående biografibilden till vänster om texten.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Dramatisk Sektion Bild-URL</label>
-            <input
-              type="text"
-              value={dramaticImage}
-              onChange={(e) => setDramaticImage(e.target.value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-2">Kreditering (Svenska)</label>
+            <textarea
+              value={imageCreditsSv}
+              onChange={(e) => setImageCreditsSv(e.target.value)}
+              rows={2}
+              placeholder="Foto: Robert Eldrim..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
             />
-            {dramaticImage && (
-              <img src={dramaticImage} alt="Dramatisk förhandsvisning" className="w-full h-40 object-cover mt-2 rounded border border-bone/5 opacity-80" />
-            )}
           </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Komisk Sektion Bild-URL</label>
-            <input
-              type="text"
-              value={comedicImage}
-              onChange={(e) => setComedicImage(e.target.value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+          <div>
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-2">Credit (English)</label>
+            <textarea
+              value={imageCreditsEn}
+              onChange={(e) => setImageCreditsEn(e.target.value)}
+              rows={2}
+              placeholder="Photo: Robert Eldrim..."
+              className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
             />
-            {comedicImage && (
-              <img src={comedicImage} alt="Komisk förhandsvisning" className="w-full h-40 object-cover mt-2 rounded border border-bone/5 opacity-80" />
-            )}
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Klassisk Sektion Bild-URL</label>
-            <input
-              type="text"
-              value={classicalImage}
-              onChange={(e) => setClassicalImage(e.target.value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-            {classicalImage && (
-              <img src={classicalImage} alt="Klassisk förhandsvisning" className="w-full h-40 object-cover mt-2 rounded border border-bone/5 opacity-80" />
-            )}
           </div>
         </div>
       </div>
@@ -751,6 +886,13 @@ export function DashboardBio() {
           )}
         </button>
       </div>
+
+      <MediaPickerModal
+        isOpen={isMediaPickerOpen}
+        onClose={() => setIsMediaPickerOpen(false)}
+        onSelect={handleMediaSelect}
+        typeFilter="image"
+      />
     </form>
   );
 }

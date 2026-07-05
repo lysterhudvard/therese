@@ -6,12 +6,14 @@ import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 
 interface StorageFile {
   name: string;
+  path: string;
   id: string;
   url: string;
   isImage: boolean;
   isVideo: boolean;
   size?: number;
   created_at?: string;
+  folder?: string;
 }
 
 export function DashboardMedia() {
@@ -21,6 +23,7 @@ export function DashboardMedia() {
   const [externalUrl, setExternalUrl] = useState("");
   const [externalType, setExternalType] = useState<"image" | "video">("image");
   const [externalAlt, setExternalAlt] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
 
   // Optimizer Modal States
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
@@ -30,40 +33,52 @@ export function DashboardMedia() {
     if (!isSupabaseConfigured()) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.storage.from("portfolio").list("", {
-        limit: 100,
-        sortBy: { column: "created_at", order: "desc" },
-      });
+      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "general"];
+      const results = await Promise.all(
+        folders.map(async (folder) => {
+          const { data, error } = await supabase.storage.from("portfolio").list(folder, {
+            limit: 100,
+            sortBy: { column: "created_at", order: "desc" },
+          });
+          if (error) {
+            console.warn(`Could not list folder '${folder}':`, error.message);
+            return [];
+          }
+          return (data || []).map((file) => ({ ...file, folder }));
+        })
+      );
 
-      if (error) {
-        if (error.message.includes("Bucket not found")) {
-          toast.error("Hinken 'portfolio' hittades inte. Skapa en offentlig hink med namnet 'portfolio' i ditt Supabase Storage.");
-        } else {
-          throw error;
-        }
-        setFiles([]);
-        return;
-      }
+      const allFiles = results.flat();
 
-      if (data) {
-        const mapped: StorageFile[] = data
-          .filter((file) => file.name !== ".emptyFolderPlaceholder")
+      if (allFiles) {
+        const mapped: StorageFile[] = allFiles
+          .filter((file) => file.name !== ".emptyFolderPlaceholder" && file.id !== null && file.metadata)
           .map((file) => {
-            const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(file.name);
+            const filePath = file.folder ? `${file.folder}/${file.name}` : file.name;
+            const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(filePath);
             const ext = file.name.split(".").pop()?.toLowerCase() || "";
             const isImage = ["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"].includes(ext);
             const isVideo = ["mp4", "webm", "ogg", "mov", "m4v"].includes(ext);
 
             return {
               name: file.name,
+              path: filePath,
               id: file.id || "",
               url: urlData.publicUrl,
               isImage,
               isVideo,
               size: file.metadata?.size,
               created_at: file.created_at || undefined,
+              folder: file.folder || "general",
             };
           });
+
+        mapped.sort((a, b) => {
+          const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return timeB - timeA;
+        });
+
         setFiles(mapped);
       }
     } catch (err: any) {
@@ -93,10 +108,10 @@ export function DashboardMedia() {
     }
 
     // Non-images (e.g. videos) go straight to upload
-    await proceedWithUpload(file);
+    await proceedWithUpload(file, "general");
   };
 
-  const proceedWithUpload = async (fileToUpload: File) => {
+  const proceedWithUpload = async (fileToUpload: File, category: string = "general") => {
     setIsOptimizerOpen(false);
     setPendingUploadFile(null);
     setIsUploading(true);
@@ -105,8 +120,9 @@ export function DashboardMedia() {
     try {
       const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const fileFullPath = `${category}/${fileName}`;
       
-      const { error } = await supabase.storage.from("portfolio").upload(fileName, fileToUpload);
+      const { error } = await supabase.storage.from("portfolio").upload(fileFullPath, fileToUpload);
 
       if (error) throw error;
 
@@ -120,13 +136,13 @@ export function DashboardMedia() {
     }
   };
 
-  const handleDeleteFile = async (fileName: string) => {
-    const isConfirmed = window.confirm(`Är du säker på att du vill ta bort "${fileName}" permanent från lagringen?`);
+  const handleDeleteFile = async (filePath: string) => {
+    const isConfirmed = window.confirm(`Är du säker på att du vill ta bort "${filePath}" permanent från lagringen?`);
     if (!isConfirmed) return;
 
     const toastId = toast.loading("Tar bort fil...");
     try {
-      const { error } = await supabase.storage.from("portfolio").remove([fileName]);
+      const { error } = await supabase.storage.from("portfolio").remove([filePath]);
       if (error) throw error;
 
       toast.success("Filen har tagits bort.", { id: toastId });
@@ -393,10 +409,36 @@ export function DashboardMedia() {
 
         {/* Media Grid Column */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="border-b border-bone/5 pb-2">
-            <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-              Filförteckning ({files.length})
-            </h3>
+          <div className="border-b border-bone/5 pb-3 space-y-3">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
+                Filförteckning ({files.filter(f => selectedFilter === "all" || f.folder === selectedFilter).length} / {files.length})
+              </h3>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { id: "all", label: "Alla" },
+                { id: "hero", label: "Hero" },
+                { id: "bio", label: "Bio" },
+                { id: "portfolio", label: "Portfolio" },
+                { id: "showreel", label: "Showreel" },
+                { id: "seo", label: "SEO" },
+                { id: "general", label: "Allmänt" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSelectedFilter(tab.id)}
+                  className={`px-2 py-1 rounded-sm font-mono text-[9px] uppercase tracking-wider transition-colors cursor-pointer border ${
+                    selectedFilter === tab.id
+                      ? "border-ember text-ember bg-ember/5"
+                      : "border-bone/5 text-bone/40 hover:text-bone hover:border-bone/20"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {isLoading ? (
@@ -410,83 +452,94 @@ export function DashboardMedia() {
               <span className="text-xs font-mono text-bone/40 uppercase tracking-widest">Inga sparade filer i molnet</span>
               <span className="text-[9px] font-mono text-bone/30 uppercase">Ladda upp en fil till vänster för att starta</span>
             </div>
+          ) : files.filter(f => selectedFilter === "all" || f.folder === selectedFilter).length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 border border-dashed border-bone/10 bg-stage/5 rounded-sm text-center">
+              <span className="text-xs font-mono text-bone/40 uppercase tracking-widest">Inga filer i denna kategori</span>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {files.map((file, index) => (
-                <div key={file.id} className="border border-bone/10 bg-stage/10 rounded-sm overflow-hidden flex flex-col justify-between">
-                  {/* File preview box */}
-                  <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
-                    {file.isImage ? (
-                      <img src={file.url} alt={file.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
-                    ) : file.isVideo ? (
-                      <video src={file.url} controls className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="flex flex-col items-center gap-2 text-bone/35">
-                        <FileText size={32} />
-                        <span className="text-[10px] font-mono">{file.name.split(".").pop()?.toUpperCase()} Fil</span>
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2 bg-ink/75 px-2 py-0.5 rounded text-[8px] font-mono text-bone/60">
-                      {formatSize(file.size)}
-                    </div>
-                  </div>
-
-                  {/* Details and Operations */}
-                  <div className="p-4 space-y-3">
-                    <div className="truncate">
-                      <span className="block text-[10px] font-mono text-bone/85 truncate" title={file.name}>
-                        {file.name}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        id={index === 0 ? "klick-media-copy-0" : undefined}
-                        onClick={() => handleCopyUrl(file.url)}
-                        className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                        title="Kopiera länk till urklipp"
-                      >
-                        <Copy size={10} />
-                        Kopiera URL
-                      </button>
-                      
+              {files
+                .filter(f => selectedFilter === "all" || f.folder === selectedFilter)
+                .map((file, index) => (
+                  <div key={file.id} className="border border-bone/10 bg-stage/10 rounded-sm overflow-hidden flex flex-col justify-between">
+                    {/* File preview box */}
+                    <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
+                      {file.folder && (
+                        <div className="absolute top-2 left-2 bg-ember text-ink font-mono text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm z-10 shadow-sm">
+                          {file.folder}
+                        </div>
+                      )}
                       {file.isImage ? (
+                        <img src={file.url} alt={file.name} className="w-full h-full object-cover transition-all duration-300" />
+                      ) : file.isVideo ? (
+                        <video src={file.url} controls className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 text-bone/35">
+                          <FileText size={32} />
+                          <span className="text-[10px] font-mono">{file.name.split(".").pop()?.toUpperCase()} Fil</span>
+                        </div>
+                      )}
+                      <div className="absolute top-2 right-2 bg-ink/75 px-2 py-0.5 rounded text-[8px] font-mono text-bone/60">
+                        {formatSize(file.size)}
+                      </div>
+                    </div>
+
+                    {/* Details and Operations */}
+                    <div className="p-4 space-y-3">
+                      <div className="truncate">
+                        <span className="block text-[10px] font-mono text-bone/85 truncate" title={file.name}>
+                          {file.name}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          id={index === 0 ? "klick-media-add-portfolio-0" : undefined}
-                          onClick={() => handleAddToPortfolio(file.url, file.name)}
-                          className="flex items-center justify-center gap-1.5 py-1.5 bg-ember/15 border border-ember/25 text-ember hover:bg-ember hover:text-ink transition-all rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
+                          id={index === 0 ? "klick-media-copy-0" : undefined}
+                          onClick={() => handleCopyUrl(file.url)}
+                          className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
+                          title="Kopiera länk till urklipp"
                         >
-                          <Plus size={10} />
-                          I Portfolio
+                          <Copy size={10} />
+                          Kopiera URL
                         </button>
-                      ) : (
-                        <a
-                          href={file.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-bone text-bone/60 hover:text-bone transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                        >
-                          <ExternalLink size={10} />
-                          Öppna fil
-                        </a>
-                      )}
-                    </div>
+                        
+                        {file.isImage ? (
+                          <button
+                            type="button"
+                            id={index === 0 ? "klick-media-add-portfolio-0" : undefined}
+                            onClick={() => handleAddToPortfolio(file.url, file.name)}
+                            className="flex items-center justify-center gap-1.5 py-1.5 bg-ember/15 border border-ember/25 text-ember hover:bg-ember hover:text-ink transition-all rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
+                          >
+                            <Plus size={10} />
+                            I Portfolio
+                          </button>
+                        ) : (
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-bone text-bone/60 hover:text-bone transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
+                          >
+                            <ExternalLink size={10} />
+                            Öppna fil
+                          </a>
+                        )}
+                      </div>
 
-                    <div className="flex justify-end pt-1">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteFile(file.name)}
-                        className="flex items-center gap-1 text-[8px] font-mono uppercase tracking-widest text-red-400/60 hover:text-red-400 cursor-pointer"
-                      >
-                        <Trash2 size={10} />
-                        Ta bort permanent
-                      </button>
+                      <div className="flex justify-end pt-1">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFile(file.path)}
+                          className="flex items-center gap-1 text-[8px] font-mono uppercase tracking-widest text-red-400/60 hover:text-red-400 cursor-pointer"
+                        >
+                          <Trash2 size={10} />
+                          Ta bort permanent
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>
@@ -499,8 +552,8 @@ export function DashboardMedia() {
           setIsOptimizerOpen(false);
           setPendingUploadFile(null);
         }}
-        onUpload={(finalFile) => {
-          proceedWithUpload(finalFile);
+        onUpload={(finalFile, category) => {
+          proceedWithUpload(finalFile, category);
         }}
       />
     </div>

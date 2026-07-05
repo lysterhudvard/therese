@@ -21,6 +21,7 @@ export function DashboardPortfolio() {
   const [newImageUrl, setNewImageUrl] = useState("");
   const [newImageAlt, setNewImageAlt] = useState("");
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+  const [activePickingImageId, setActivePickingImageId] = useState<string | null>(null);
 
   // Optimizer Modal States
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
@@ -286,9 +287,20 @@ export function DashboardPortfolio() {
               className="flex flex-col md:flex-row md:items-center justify-between border border-bone/10 bg-stage/10 p-4 rounded-sm gap-4"
             >
               <div className="flex items-center gap-4 flex-1">
-                {/* Small thumbnail preview */}
-                <div className="w-16 h-12 rounded bg-stage border border-bone/10 overflow-hidden shrink-0">
-                  <img src={img.url} alt={img.alt} className="w-full h-full object-cover grayscale" />
+                {/* Small thumbnail preview with edit trigger */}
+                <div className="relative w-16 h-12 rounded bg-stage border border-bone/10 overflow-hidden shrink-0 group">
+                  <img src={img.url} alt={img.alt} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActivePickingImageId(img.id);
+                      setIsMediaPickerOpen(true);
+                    }}
+                    className="absolute inset-0 bg-ink/75 opacity-0 group-hover:opacity-100 flex items-center justify-center text-ember transition-opacity duration-300 cursor-pointer"
+                    title="Byt bild från mediebibliotek"
+                  >
+                    <Upload size={10} />
+                  </button>
                 </div>
                 {/* Alt-tag configuration */}
                 <div className="flex-1">
@@ -371,8 +383,18 @@ export function DashboardPortfolio() {
     
     <MediaPickerModal
       isOpen={isMediaPickerOpen}
-      onClose={() => setIsMediaPickerOpen(false)}
-      onSelect={(url) => setNewImageUrl(url)}
+      onClose={() => {
+        setIsMediaPickerOpen(false);
+        setActivePickingImageId(null);
+      }}
+      onSelect={(url) => {
+        if (activePickingImageId) {
+          setImages(images.map((img) => (img.id === activePickingImageId ? { ...img, url } : img)));
+          setActivePickingImageId(null);
+        } else {
+          setNewImageUrl(url);
+        }
+      }}
       typeFilter="image"
     />
     <ImageUploadOptimizer
