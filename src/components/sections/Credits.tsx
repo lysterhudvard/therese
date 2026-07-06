@@ -197,25 +197,30 @@ export function Credits({
                   transition={{ duration: 0.5, delay: i * 0.03 }}
                   className="group relative border-b border-bone/20 transition-colors duration-300 hover:border-bone/45"
                 >
-                  <a
-                    href={c.url ?? "#credits"}
-                    target={c.url ? "_blank" : undefined}
-                    rel={c.url ? "noreferrer" : undefined}
-                    onClick={(e) => {
-                      if (!c.url) e.preventDefault();
-                    }}
+                  <div
                     onMouseEnter={() => setHoveredCredit(c)}
                     onMouseLeave={() => setHoveredCredit(null)}
                     onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
-                    data-hover
                     className="grid grid-cols-12 items-baseline gap-4 py-7 transition-colors hover:bg-bone/[0.06] duration-300"
                   >
-                    <div className="col-span-2 md:col-span-1 font-mono text-xs text-ember/70 group-hover:text-ember transition-colors duration-300">
+                    <div className="col-span-2 md:col-span-1 font-mono text-xs text-ember/80 group-hover:text-ember transition-colors duration-300">
                       {c.year}
                     </div>
                     <div className="col-span-7 md:col-span-5">
                       <div className="font-display text-2xl md:text-3xl text-bone transition-all flex flex-wrap items-center gap-3">
-                        <span>{c.title}</span>
+                        {c.url ? (
+                          <a
+                            href={c.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            data-hover
+                            className="hover:text-ember transition-colors duration-300"
+                          >
+                            {c.title}
+                          </a>
+                        ) : (
+                          <span>{c.title}</span>
+                        )}
                         {c.commentary && (
                           <button
                             onClick={(e) => {
@@ -237,10 +242,10 @@ export function Credits({
                               }
                             }}
                             data-hover
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border transition-all duration-300 font-mono text-[9px] uppercase tracking-wider ${
+                            className={`relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300 font-mono text-[9px] uppercase tracking-wider after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer ${
                               activeCommentaryUrl === c.commentary.url
                                 ? "bg-ember border-ember text-ink font-semibold"
-                                : "border-bone/20 text-bone/60 hover:text-ember hover:border-ember/40 bg-bone/[0.03]"
+                                : "border-bone/35 text-bone/75 hover:text-ember hover:border-ember/40 bg-bone/[0.03]"
                             }`}
                           >
                             <span className="relative flex h-1.5 w-1.5 shrink-0">
@@ -250,7 +255,7 @@ export function Credits({
                               <span
                                 className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
                                   activeCommentaryUrl === c.commentary.url ? "bg-ink" : "bg-ember"
-                                }`}
+                                  }`}
                               ></span>
                             </span>
                             <span>
@@ -265,26 +270,38 @@ export function Credits({
                           </button>
                         )}
                       </div>
-                      <div className="mt-1 text-xs text-bone/50 group-hover:text-bone/80 transition-colors duration-300">
+                      <div className="mt-1 text-xs text-bone/65 group-hover:text-bone/85 transition-colors duration-300">
                         {c.role[lang]}
                       </div>
                     </div>
-                    <div className="hidden md:block md:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/50 group-hover:text-bone/85 transition-colors duration-300">
+                    <div className="hidden md:block md:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.category[lang]}
                     </div>
-                    <div className="hidden md:block md:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/50 group-hover:text-bone/85 transition-colors duration-300">
+                    <div className="hidden md:block md:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.network}
                     </div>
                     <div className="col-span-3 md:col-span-1 flex justify-end">
-                      <ArrowUpRight
-                        size={18}
-                        className="text-bone/30 transition-all group-hover:text-ember group-hover:rotate-45"
-                      />
+                      {c.url ? (
+                        <a
+                          href={c.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          data-hover
+                          className="text-bone/50 hover:text-ember transition-all hover:rotate-45"
+                        >
+                          <ArrowUpRight size={18} />
+                        </a>
+                      ) : (
+                        <ArrowUpRight
+                          size={18}
+                          className="text-bone/20"
+                        />
+                      )}
                     </div>
-                    <div className="col-span-12 text-xs text-bone/40 md:hidden group-hover:text-bone/70 transition-colors duration-300">
+                    <div className="col-span-12 text-xs text-bone/55 md:hidden group-hover:text-bone/80 transition-colors duration-300">
                       {c.network} · {c.category[lang]}
                     </div>
-                  </a>
+                  </div>
                 </motion.li>
               ))}
             </AnimatePresence>

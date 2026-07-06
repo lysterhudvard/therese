@@ -1,21 +1,102 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Page from '../routes/index';
+import Page, { IMG, CREDITS, MOOD_DATA } from '../routes/index';
 import { getPageData } from '../lib/supabase-server';
+import { getImage } from 'astro:assets';
 
 // Server-side fetching from Supabase
 const dbData = await getPageData();
 
+// Helper function to optimize remote images
+async function optimizeImageUrl(url: string, width = 800) {
+  if (!url) return url;
+  if (url.startsWith('data:') || url.startsWith('/') || !url.startsWith('http')) {
+    return url;
+  }
+  try {
+    const optimized = await getImage({ src: url, width, format: 'webp', inferSize: true });
+    return optimized.src;
+  } catch (e) {
+    console.error("Failed to optimize remote image:", url, e);
+    return url;
+  }
+}
+
+// Fallback to default static data if Supabase is empty or unconfigured
+let processedDbData = dbData;
+if (!processedDbData) {
+  processedDbData = {
+    biography: {
+      hero_image: IMG.hero,
+      hero_text_sv: "",
+      hero_text_en: "",
+      mood_images: {
+        dramatic: MOOD_DATA.Dramatic.image,
+        comedic: MOOD_DATA.Comedic.image,
+        classical: MOOD_DATA.Classical.image
+      }
+    },
+    credits: CREDITS,
+    showreels: [],
+    seo: null,
+    portfolioImages: IMG.portfolio.map((url, i) => ({
+      url,
+      alt: `Therese Järvheden portfolio ${i + 1}`,
+      allow_download: true
+    }))
+  };
+}
+
+// Perform server-side image optimizations
+if (processedDbData.biography) {
+  if (processedDbData.biography.hero_image) {
+    processedDbData.biography.hero_image = await optimizeImageUrl(processedDbData.biography.hero_image, 1600);
+  }
+  if (processedDbData.biography.mood_images) {
+    try {
+      const mood = typeof processedDbData.biography.mood_images === 'string'
+        ? JSON.parse(processedDbData.biography.mood_images)
+        : processedDbData.biography.mood_images;
+      if (mood) {
+        if (mood.dramatic) mood.dramatic = await optimizeImageUrl(mood.dramatic, 800);
+        if (mood.comedic) mood.comedic = await optimizeImageUrl(mood.comedic, 800);
+        if (mood.classical) mood.classical = await optimizeImageUrl(mood.classical, 800);
+        processedDbData.biography.mood_images = mood;
+      }
+    } catch (e) {
+      console.error("Failed to parse mood images:", e);
+    }
+  }
+}
+
+if (processedDbData.portfolioImages) {
+  for (let i = 0; i < processedDbData.portfolioImages.length; i++) {
+    processedDbData.portfolioImages[i].url = await optimizeImageUrl(processedDbData.portfolioImages[i].url, 1000);
+  }
+}
+
+if (processedDbData.credits) {
+  for (let i = 0; i < processedDbData.credits.length; i++) {
+    processedDbData.credits[i].img = await optimizeImageUrl(processedDbData.credits[i].img, 600);
+  }
+}
+
+if (processedDbData.showreels) {
+  for (let i = 0; i < processedDbData.showreels.length; i++) {
+    processedDbData.showreels[i].poster = await optimizeImageUrl(processedDbData.showreels[i].poster, 800);
+  }
+}
+
 // Extract SEO data from dbData if available, otherwise use defaults
-const seoTitle = dbData?.seo?.title_sv || "Therese Järvheden — Skådespelerska";
-const seoDesc = dbData?.seo?.description_sv || "Swedish actress Therese Järvheden. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.";
-const seoImage = dbData?.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+const seoTitle = processedDbData?.seo?.title_sv || "Therese Järvheden — Skådespelerska";
+const seoDesc = processedDbData?.seo?.description_sv || "Swedish actress Therese Järvheden. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.";
+const seoImage = processedDbData?.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
 ---
 
 <Layout title={seoTitle} description={seoDesc} image={seoImage}>
   <!-- 
     We mount the entire Page component as a React Island. 
-    By passing initialDbData, the page renders instantly without client-side loading spinners. 
+    By passing processedDbData, the page renders instantly without client-side loading spinners. 
   -->
-  <Page initialDbData={dbData} client:load />
+  <Page initialDbData={processedDbData} client:load />
 </Layout>
