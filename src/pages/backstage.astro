@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Backstage from '../routes/backstage';
+---
+
+<Layout title="Backstage CMS">
+  <!-- We mount the entire CMS as a single React SPA island. -->
+  <!-- client:only="react" ensures Astro doesn't try to server-render it, protecting Auth and form states. -->
+  <Backstage client:only="react" />
+</Layout>

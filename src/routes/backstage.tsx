@@ -7,7 +7,7 @@ export const Route = createFileRoute("/backstage")({
   component: BackstagePage,
 });
 
-function BackstagePage() {
+export default function BackstagePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
 

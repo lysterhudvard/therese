@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Page from '../routes/index';
+import { getPageData } from '../lib/supabase-server';
+
+// Server-side fetching from Supabase
+const dbData = await getPageData();
+
+// Extract SEO data from dbData if available, otherwise use defaults
+const seoTitle = dbData?.seo?.title_sv || "Therese Järvheden — Skådespelerska";
+const seoDesc = dbData?.seo?.description_sv || "Swedish actress Therese Järvheden. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.";
+const seoImage = dbData?.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+---
+
+<Layout title={seoTitle} description={seoDesc} image={seoImage}>
+  <!-- 
+    We mount the entire Page component as a React Island. 
+    By passing initialDbData, the page renders instantly without client-side loading spinners. 
+  -->
+  <Page initialDbData={dbData} client:load />
+</Layout>

@@ -259,7 +259,7 @@ export type Mood = keyof typeof MOOD_DATA;
 export type FilterKey = "Alla" | "Film" | "TV" | "Theater" | "Voice";
 
 /* ---------- Page ---------- */
-function Page() {
+export default function Page({ initialDbData }: { initialDbData?: any }) {
   const [heroDone, setHeroDone] = useState(false);
   const [lang, setLangState] = useState<Lang>("sv");
   const [isInPortfolio, setIsInPortfolio] = useState(false);
@@ -276,8 +276,8 @@ function Page() {
     showreels: VideoItem[];
     seo: any;
     portfolioImages: any[];
-  } | null>(null);
-  const [dbLoaded, setDbLoaded] = useState(false);
+  } | null>(initialDbData || null);
+  const [dbLoaded, setDbLoaded] = useState(!!initialDbData);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -314,6 +314,8 @@ function Page() {
 
   // Load all live Supabase data
   useEffect(() => {
+    if (initialDbData) return;
+    
     if (!isSupabaseConfigured()) {
       setDbLoaded(true);
       return;
