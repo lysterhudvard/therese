@@ -491,6 +491,25 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     return undefined;
   }, [dbData]);
 
+  const voiceImageData = useMemo(() => {
+    let url = IMG.voice;
+    let alt = "Therese — röst";
+    if (dbData?.biography?.voice_settings) {
+      try {
+        const vs = typeof dbData.biography.voice_settings === "string"
+          ? JSON.parse(dbData.biography.voice_settings)
+          : dbData.biography.voice_settings;
+        if (vs) {
+          if (vs.image_url) url = vs.image_url;
+          if (vs.image_alt) alt = vs.image_alt;
+        }
+      } catch (e) {
+        console.error("Failed to parse voice settings image:", e);
+      }
+    }
+    return { url, alt };
+  }, [dbData]);
+
   const imageCredits = useMemo(() => {
     if (dbData?.biography?.bio_image_credits_sv || dbData?.biography?.bio_image_credits_en) {
       return {
@@ -676,7 +695,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           activeCommentaryUrl={activeCommentary?.url}
           onPlayCommentary={setActiveCommentary}
         />
-        <Voice />
+        <Voice imageUrl={voiceImageData.url} imageAlt={voiceImageData.alt} />
         <Contact bioData={dbData?.biography} />
         <Footer bioData={dbData?.biography} />
 

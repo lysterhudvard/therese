@@ -5,7 +5,12 @@ import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
 import { IMG } from "../../routes/index";
 
-export function Voice() {
+interface VoiceProps {
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
+export function Voice({ imageUrl, imageAlt }: VoiceProps) {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -45,7 +50,7 @@ export function Voice() {
             </div>
           </div>
           <div className="relative h-[60svh] md:h-[90svh] overflow-hidden md:order-first">
-            <SpotlightImage src={IMG.voice} alt="Therese — röst" className="h-full w-full" />
+            <SpotlightImage src={imageUrl || IMG.voice} alt={imageAlt || "Therese — röst"} className="h-full w-full" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r pointer-events-none" />
           </div>
         </div>

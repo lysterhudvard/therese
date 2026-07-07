@@ -67,6 +67,19 @@ if (processedDbData.biography) {
       console.error("Failed to parse mood images:", e);
     }
   }
+  if (processedDbData.biography.voice_settings) {
+    try {
+      const vs = typeof processedDbData.biography.voice_settings === 'string'
+        ? JSON.parse(processedDbData.biography.voice_settings)
+        : processedDbData.biography.voice_settings;
+      if (vs && vs.image_url) {
+        vs.image_url = await optimizeImageUrl(vs.image_url, 1000);
+        processedDbData.biography.voice_settings = vs;
+      }
+    } catch (e) {
+      console.error("Failed to parse voice settings image:", e);
+    }
+  }
 }
 
 if (processedDbData.portfolioImages) {

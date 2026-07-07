@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Volume2 } from "lucide-react";
+import { Save, Volume2, Image } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 interface VoiceSettings {
   heading_sv: string;
@@ -12,6 +13,8 @@ interface VoiceSettings {
   cta_en: string;
   demo_sv: string;
   demo_en: string;
+  image_url?: string;
+  image_alt?: string;
 }
 
 export function DashboardVoice() {
@@ -24,9 +27,12 @@ export function DashboardVoice() {
     cta_en: "Book voice",
     demo_sv: "Demo via e-post",
     demo_en: "Demo via email",
+    image_url: "",
+    image_alt: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -207,6 +213,63 @@ export function DashboardVoice() {
         </div>
       </div>
 
+      {/* Röst Bild */}
+      <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
+        <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
+          <Image size={14} className="text-ember" /> Röst Bild
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+          <div className="md:col-span-3 space-y-4">
+            <div className="space-y-2">
+              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild-URL</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={settings.image_url || ""}
+                  onChange={(e) => handleChange("image_url", e.target.value)}
+                  placeholder="Skriv in bild-URL eller välj från mediabiblioteket"
+                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsMediaPickerOpen(true)}
+                  className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                >
+                  Media
+                </button>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild Alt-text (SEO)</label>
+              <input
+                type="text"
+                value={settings.image_alt || ""}
+                onChange={(e) => handleChange("image_alt", e.target.value)}
+                placeholder="t.ex. Therese Järvheden — röstskådespelerska"
+                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+              />
+            </div>
+          </div>
+          
+          <div className="md:col-span-1 flex flex-col items-center">
+            <span className="text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-2">Förhandsvisning</span>
+            {settings.image_url ? (
+              <img
+                src={settings.image_url}
+                alt={settings.image_alt || "Förhandsvisning"}
+                className="h-24 w-24 object-cover border border-bone/15 rounded-sm"
+              />
+            ) : (
+              <div className="h-24 w-24 border border-dashed border-bone/10 flex items-center justify-center text-bone/20 text-[8px] font-mono text-center px-2">
+                Ingen bild vald (standardbild används)
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
@@ -224,6 +287,16 @@ export function DashboardVoice() {
           )}
         </button>
       </div>
+
+      <MediaPickerModal
+        isOpen={isMediaPickerOpen}
+        onClose={() => setIsMediaPickerOpen(false)}
+        onSelect={(url) => {
+          handleChange("image_url", url);
+          setIsMediaPickerOpen(false);
+        }}
+        typeFilter="image"
+      />
     </form>
   );
 }
