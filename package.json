@@ -4,15 +4,14 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "preview": "vite preview",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "astro:dev": "astro dev",
-    "astro:build": "astro build",
-    "astro:preview": "astro preview"
+    "old:dev": "vite dev",
+    "old:build": "vite build",
+    "old:preview": "vite preview"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.1",
