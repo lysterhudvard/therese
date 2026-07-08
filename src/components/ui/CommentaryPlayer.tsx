@@ -123,7 +123,7 @@ export function CommentaryPlayer({
 
       <div className="bg-bone/[0.04] border border-bone/5 p-3 rounded-lg flex flex-col gap-1.5">
         <div className="text-[11px] text-bone font-semibold truncate">
-          {title} <span className="text-bone/40 font-normal">— {role}</span>
+          {title} <span className="text-bone/70 font-normal">— {role}</span>
         </div>
         <p className="text-[11px] text-bone/70 leading-relaxed italic border-t border-bone/5 pt-1.5 select-none">
           "{text}"

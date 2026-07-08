@@ -99,7 +99,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
             <br />
             {t.portfolio.title[1]}
           </div>
-          <div className="mt-4 text-xs text-bone/40 max-w-[180px]">{t.portfolio.hint}</div>
+          <div className="mt-4 text-xs text-bone/70 max-w-[180px]">{t.portfolio.hint}</div>
         </div>
 
         <motion.div
@@ -122,7 +122,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
               <div className="absolute left-3 top-3 font-mono text-[10px] text-bone/60 bg-ink/40 backdrop-blur-xs px-2 py-0.5 rounded-sm">
                 {String(i + 1).padStart(2, "0")} / {String(normalizedImages.length).padStart(2, "0")}
               </div>
-              <div className="absolute bottom-3 left-3 font-mono text-[9px] text-bone/40 tracking-wider">
+              <div className="absolute bottom-3 left-3 font-mono text-[9px] text-bone/70 tracking-wider">
                 THESS · {String(2020 + (i % 4))}
               </div>
 

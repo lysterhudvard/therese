@@ -151,7 +151,7 @@ export function DashboardCredits() {
 
       const { error } = await supabase.storage
         .from("portfolio")
-        .upload(filePath, file);
+        .upload(filePath, file, { cacheControl: "31536000", upsert: true });
 
       if (error) throw error;
 

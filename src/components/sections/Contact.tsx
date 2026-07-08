@@ -187,7 +187,7 @@ export function Contact({ bioData }: { bioData?: any }) {
             <div className="mt-12 space-y-10">
               {agentEmail && (
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.4em] text-bone/40">
+                  <div className="text-[10px] uppercase tracking-[0.4em] text-bone/70">
                     {t.contact.agentLabel}
                   </div>
                   <a
@@ -197,12 +197,12 @@ export function Contact({ bioData }: { bioData?: any }) {
                   >
                     <Mail size={20} /> {agentEmail}
                   </a>
-                  <div className="mt-1 text-xs text-bone/40">{t.contact.agentSub}</div>
+                  <div className="mt-1 text-xs text-bone/70">{t.contact.agentSub}</div>
                 </div>
               )}
               {voiceEmail && (
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.4em] text-bone/40">
+                  <div className="text-[10px] uppercase tracking-[0.4em] text-bone/70">
                     {t.contact.voiceLabel}
                   </div>
                   <a

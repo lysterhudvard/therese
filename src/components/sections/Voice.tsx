@@ -44,7 +44,7 @@ export function Voice({ imageUrl, imageAlt }: VoiceProps) {
                 <Play size={14} className="transition-transform group-hover:translate-x-0.5" />
                 {t.voice.cta}
               </button>
-              <div className="text-[10px] uppercase tracking-[0.3em] text-bone/40">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-bone/70">
                 {t.voice.demo}
               </div>
             </div>

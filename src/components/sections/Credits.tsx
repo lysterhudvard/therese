@@ -91,13 +91,21 @@ export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
               top: `${layout.top}%`,
               ...layout.position,
             }}
-            className={`absolute font-display italic text-bone/[0.05] ${layout.maxWidth} leading-[1.15] ${
+            className={`absolute font-display italic ${layout.maxWidth} leading-[1.15] ${
               layout.isLeft ? "text-left" : "text-right"
             }`}
           >
-            <span style={{ fontSize: layout.fontSize }}>
-              "{q}"
-            </span>
+            <svg className="w-full overflow-visible" style={{ height: "1.3em", fontSize: layout.fontSize }}>
+              <text
+                x={layout.isLeft ? "0" : "100%"}
+                y="0.9em"
+                textAnchor={layout.isLeft ? "start" : "end"}
+                className="fill-bone/[0.05] font-display italic"
+                style={{ fontSize: "1em" }}
+              >
+                "{q}"
+              </text>
+            </svg>
           </motion.div>
         );
       })}
@@ -287,6 +295,7 @@ export function Credits({
                           target="_blank"
                           rel="noreferrer"
                           data-hover
+                          aria-label={lang === "sv" ? `Visa ${c.title}` : `View ${c.title}`}
                           className="text-bone/50 hover:text-ember transition-all hover:rotate-45"
                         >
                           <ArrowUpRight size={18} />

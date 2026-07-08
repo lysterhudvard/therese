@@ -88,7 +88,7 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.6, duration: 0.8 }}
-        className="absolute left-1/2 bottom-3 z-20 -translate-x-1/2 text-[9px] uppercase tracking-[0.5em] text-bone/40"
+        className="absolute left-1/2 bottom-3 z-20 -translate-x-1/2 text-[9px] uppercase tracking-[0.5em] text-bone/70"
       >
         {t.hero.scroll}
       </motion.div>

@@ -151,14 +151,16 @@ export function Biography({
             <div className="mt-14 space-y-7 text-bone/75 leading-relaxed max-w-xl">
               <p>
                 {t.bio.p1Pre}
-                <a
-                  href="https://www.svtplay.se/en-valdsam-karlek"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ember underline-offset-4 hover:underline"
-                >
-                  {t.bio.p1Link}
-                </a>
+                {t.bio.p1Link && (
+                  <a
+                    href="https://www.svtplay.se/en-valdsam-karlek"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-ember underline-offset-4 hover:underline"
+                  >
+                    {t.bio.p1Link}
+                  </a>
+                )}
                 {t.bio.p1Post}
               </p>
               <p>
@@ -180,11 +182,11 @@ export function Biography({
                 {t.bio.p3[4]}
               </p>
             </div>
-
+ 
             <dl className="mt-14 grid grid-cols-3 gap-6 border-t border-bone/10 pt-8 max-w-xl">
               {t.bio.facts.map(([k, v]) => (
                 <div key={k}>
-                  <dt className="text-[9px] uppercase tracking-[0.35em] text-bone/40">{k}</dt>
+                  <dt className="text-[9px] uppercase tracking-[0.35em] text-bone/70">{k}</dt>
                   <dd className="mt-2 font-display text-lg text-bone">{v}</dd>
                 </div>
               ))}

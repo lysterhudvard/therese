@@ -101,7 +101,7 @@ export function Footer({ bioData }: { bioData?: any }) {
         <div className="font-display text-3xl md:text-5xl tracking-[0.25em] uppercase text-bone leading-[1.1]">
           {t.footer.title}
         </div>
-        <div className="mt-4 text-[10px] uppercase tracking-[0.35em] text-bone/50">
+        <div className="mt-4 text-[10px] uppercase tracking-[0.35em] text-bone/70">
           <span className="italic font-light">Therese</span> Järvheden —{" "}
           {lang === "sv" ? (
             <>
@@ -191,7 +191,7 @@ export function Footer({ bioData }: { bioData?: any }) {
                 <div className="credit-scroll-container flex flex-col items-center gap-8 text-center font-mono select-none">
                   {creditsList.map((item: { label: string; value: string; href?: string }, index: number) => (
                     <div key={index} className="flex flex-col items-center">
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-bone/45 mb-1">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-bone/70 mb-1">
                         {item.label}
                       </span>
                       {item.href ? (
@@ -223,7 +223,7 @@ export function Footer({ bioData }: { bioData?: any }) {
       </div>
 
       {/* Bottom metadata row */}
-      <div className="relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/30 z-10">
+      <div className="relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10">
         <div>© {new Date().getFullYear()} Therese Järvheden</div>
         <div>ALL CREDITS DIRECTED BY THERESE JÄRVHEDEN</div>
       </div>
