@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Page, { IMG, CREDITS, MOOD_DATA } from '../routes/index';
+import Page from '../routes/index';
+import { CREDITS } from '../routes/fallbackData';
 import { getPageData } from '../lib/supabase-server';
 import { getImage } from 'astro:assets';
 
