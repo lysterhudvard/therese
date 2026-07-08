@@ -152,3 +152,19 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** Missing values or empty string inputs from the database were not correctly checked, resulting in broken URLs or empty anchors.
 - **Resolution:** Refactored the links extractor inside `Contact.tsx` to conditionally render all social profile anchors. The component now performs strict checks (`if (field)`), ensuring only links with configured values are outputted to the page while empty values are hidden completely.
 
+## 25. Hostinger Deployment Node Engine Warnings and Lockfile Mismatch
+- **Symptom:** The Hostinger GitHub Actions CI/CD deployment failed during the dependency installation step (`npm ci`), throwing `EBADENGINE Unsupported engine` warnings (requesting Node >= 22.12.0) and a `Missing: lru-cache` package-lock discrepancy error.
+- **Root Cause:** The runner was configured to execute on Node 20, whereas Astro 7 requires Node 22. Additionally, strict peer-dependency checks in `npm ci` crashed due to environment-specific lockfile resolution discrepancies.
+- **Resolution:** Upgraded the Node.js setup version in `.github/workflows/deploy.yml` from `20` to `22` and replaced the strict `npm ci` installation command with `npm install` to gracefully resolve package dependencies on the fly.
+
+## 26. FTP Deployment Domain Name Lookup Failure (getaddrinfo ENOTFOUND)
+- **Symptom:** The FTP upload step in GitHub Actions failed immediately with `Error: getaddrinfo ENOTFOUND *** (control socket)` and did not connect to Hostinger.
+- **Root Cause:** The `FTP_SERVER` secret in GitHub was configured with a protocol prefix (e.g. `ftp://191.101.104.182` or `ftp://ftp.theresejarvheden.se`), which caused the DNS client to treat the entire protocol string as part of the hostname, failing the resolution.
+- **Resolution:** Removed the `ftp://` and `ftps://` prefixes from the GitHub Secrets configuration, leaving only the raw IP address (`191.101.104.182`) or hostname, allowing the DNS lookup to resolve correctly.
+
+## 27. Nested public_html Subfolder Duplication on Hostinger Uploads
+- **Symptom:** Files successfully uploaded over FTP, but the website remained blank or showed Hostinger's default landing page. Checking the server files showed a second `public_html` directory nested inside the main one (`public_html/public_html/...`).
+- **Root Cause:** Hostinger FTP accounts created for specific domains are automatically mapped to that domain's `public_html/` root by default. Having `server-dir: ./public_html/` in the workflow config pushed the assets into a duplicate subdirectory rather than the actual web root.
+- **Resolution:** Updated `.github/workflows/deploy.yml` to set `server-dir: ./`, directing files to upload directly into the FTP account's root directory, which correctly maps to the website's public web root.
+
+

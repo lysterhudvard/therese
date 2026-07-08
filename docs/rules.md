@@ -8,6 +8,7 @@
 - **No Code Truncation:** Never output code containing placeholders like
   `// TODO: Rest of the code here` or `// ... existing logic ...`. You must
   output the entire modified block or file fully written out.
+- **No Git Pushing (CRITICAL):** Never execute any `git push` commands. The user will push and sync files with GitHub manually. This constraint must never be edited or removed unless explicitly instructed by the user.
 
 ## 2. Scope & Modification Constraints
 
