@@ -1,38 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Upload, Link as LinkIcon, Copy, Trash2, Video, Image as ImageIcon, ExternalLink, Plus, RefreshCw, FileText } from "lucide-react";
+import { ImageIcon, RefreshCw } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
-
-interface StorageFile {
-  name: string;
-  path: string;
-  id: string;
-  url: string;
-  isImage: boolean;
-  isVideo: boolean;
-  size?: number;
-  created_at?: string;
-  folder?: string;
-  alt?: string;
-  title?: string;
-  caption?: string;
-  description?: string;
-  filename?: string;
-}
-
-const folderLabels: Record<string, string> = {
-  hero: "Hero",
-  bio: "Bio",
-  portfolio: "Portfolio",
-  showreel: "Showreel",
-  posters: "Showreel",
-  seo: "SEO",
-  credits: "Meriter",
-  voice: "Röst",
-  curtain: "Ridåfall",
-  general: "Allmänt"
-};
+import { StorageFile } from "./media/types";
+import { MediaUploadColumn } from "./media/MediaUploadColumn";
+import { MediaCardItem } from "./media/MediaCardItem";
 
 export function DashboardMedia() {
   const [files, setFiles] = useState<StorageFile[]>([]);
@@ -153,10 +126,10 @@ export function DashboardMedia() {
     }
 
     // Non-images (e.g. videos) go straight to upload
-    await proceedWithUpload(file, "allmänt");
+    await proceedWithUpload(file, "general");
   };
 
-  const proceedWithUpload = async (fileToUpload: File, category: string = "allmänt") => {
+  const proceedWithUpload = async (fileToUpload: File, category: string = "general") => {
     setIsOptimizerOpen(false);
     setPendingUploadFile(null);
     setIsUploading(true);
@@ -402,114 +375,17 @@ export function DashboardMedia() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Upload Column */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Supabase Upload */}
-          <div className="bg-stage/15 border border-bone/5 p-6 rounded-sm space-y-4">
-            <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-              <Upload size={14} className="text-ember" /> Molnuppladdning
-            </h3>
-            <p className="text-[10px] text-bone/50 leading-relaxed">
-              Välj filer från din lokala hårddisk för att spara dem permanent i Supabase molnlagring. Både bilder och videor stöds.
-            </p>
-
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/*,video/*"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-                className="hidden"
-                id="media-library-upload"
-              />
-              <label
-                htmlFor="media-library-upload"
-                id="klick-media-dropzone"
-                className={`w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed border-bone/20 hover:border-ember/40 bg-stage/20 py-8 rounded-sm text-xs font-mono text-bone/50 hover:text-bone cursor-pointer transition-colors ${
-                  isUploading ? "pointer-events-none opacity-55" : ""
-                }`}
-              >
-                {isUploading ? (
-                  <RefreshCw size={24} className="animate-spin text-ember" />
-                ) : (
-                  <Upload size={24} className="text-bone/30" />
-                )}
-                <div className="text-center">
-                  <span className="block text-bone font-semibold">Välj en fil</span>
-                  <span className="block text-[9px] text-bone/35 mt-0.5">Bilder eller MP4-videor</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {/* External URL Form */}
-          <form onSubmit={handleAddExternal} className="bg-stage/15 border border-bone/5 p-6 rounded-sm space-y-4">
-            <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-              <LinkIcon size={14} className="text-ember" /> Lägg till extern URL
-            </h3>
-            <p className="text-[10px] text-bone/50 leading-relaxed">
-              Lägg till media från externa länkar direkt till hemsidan (t.ex. bilder från casting-byråer eller videolänkar).
-            </p>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Medietyp</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setExternalType("image")}
-                    className={`py-1 rounded-sm text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer border ${
-                      externalType === "image" ? "border-ember text-ember bg-ember/5" : "border-bone/10 text-bone/50 hover:text-bone"
-                    }`}
-                  >
-                    Bild (Portfolio)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setExternalType("video")}
-                    className={`py-1 rounded-sm text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer border ${
-                      externalType === "video" ? "border-ember text-ember bg-ember/5" : "border-bone/10 text-bone/50 hover:text-bone"
-                    }`}
-                  >
-                    Video (Showreel)
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Medie-URL</label>
-                <input
-                  type="text"
-                  value={externalUrl}
-                  onChange={(e) => setExternalUrl(e.target.value)}
-                  placeholder="https://exempel.com/media.mp4"
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                  {externalType === "image" ? "Alt-beskrivning (SEO)" : "Titel (Svenska)"}
-                </label>
-                <input
-                  type="text"
-                  value={externalAlt}
-                  onChange={(e) => setExternalAlt(e.target.value)}
-                  placeholder={externalType === "image" ? "T.ex: Therese svartvitt porträtt" : "T.ex: Beck - Scenklipp"}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-2 py-2 bg-ember text-ink font-semibold font-mono text-[9px] uppercase tracking-widest rounded-sm hover:bg-ember/90 transition-all cursor-pointer"
-              >
-                <Plus size={11} />
-                Skapa Länkpost
-              </button>
-            </div>
-          </form>
-        </div>
+        <MediaUploadColumn
+          handleFileUpload={handleFileUpload}
+          isUploading={isUploading}
+          handleAddExternal={handleAddExternal}
+          externalType={externalType}
+          setExternalType={setExternalType}
+          externalUrl={externalUrl}
+          setExternalUrl={setExternalUrl}
+          externalAlt={externalAlt}
+          setExternalAlt={setExternalAlt}
+        />
 
         {/* Media Grid Column */}
         <div className="lg:col-span-2 space-y-4">
@@ -568,199 +444,21 @@ export function DashboardMedia() {
               {files
                 .filter(f => selectedFilter === "all" || f.folder === selectedFilter)
                 .map((file, index) => (
-                  <div key={file.id} className="border border-bone/10 bg-stage/10 rounded-sm overflow-hidden flex flex-col justify-between">
-                    {/* File preview box */}
-                    <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
-                      {file.folder && (
-                        <div className="absolute top-2 left-2 bg-ember text-ink font-mono text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm z-10 shadow-sm">
-                          {(folderLabels[file.folder] || file.folder).toUpperCase()}
-                        </div>
-                      )}
-                      {file.isImage ? (
-                        <img src={file.url} alt={file.name} className="w-full h-full object-cover transition-all duration-300" />
-                      ) : file.isVideo ? (
-                        <video src={file.url} controls className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="flex flex-col items-center gap-2 text-bone/35">
-                          <FileText size={32} />
-                          <span className="text-[10px] font-mono">{file.name.split(".").pop()?.toUpperCase()} Fil</span>
-                        </div>
-                      )}
-                      <div className="absolute top-2 right-2 bg-ink/75 px-2 py-0.5 rounded text-[8px] font-mono text-bone/60">
-                        {formatSize(file.size)}
-                      </div>
-                    </div>
-
-                    {/* Details and Operations */}
-                    <div className="p-4 space-y-3">
-                      <div className="truncate">
-                        <span className="block text-[10px] font-mono text-bone/85 truncate" title={file.name}>
-                          {file.name}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          id={index === 0 ? "klick-media-copy-0" : undefined}
-                          onClick={() => handleCopyUrl(file.url)}
-                          className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                          title="Kopiera länk till urklipp"
-                        >
-                          <Copy size={10} />
-                          Kopiera URL
-                        </button>
-                        
-                        {file.isImage ? (
-                          <button
-                            type="button"
-                            id={index === 0 ? "klick-media-add-portfolio-0" : undefined}
-                            onClick={() => handleAddToPortfolio(file)}
-                            className="flex items-center justify-center gap-1.5 py-1.5 bg-ember/15 border border-ember/25 text-ember hover:bg-ember hover:text-ink transition-all rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                          >
-                            <Plus size={10} />
-                            I Portfolio
-                          </button>
-                        ) : (
-                          <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center justify-center gap-1.5 py-1.5 border border-bone/10 hover:border-bone text-bone/60 hover:text-bone transition-colors rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                          >
-                            <ExternalLink size={10} />
-                            Öppna fil
-                          </a>
-                        )}
-                      </div>
-
-                      {/* SEO / Metadata Drawer */}
-                      <div className="border-t border-bone/5 pt-2 mt-2">
-                        {editingMetaPath === file.path ? (
-                          <div className="space-y-2 bg-black/20 p-2 rounded-sm border border-bone/5">
-                            <span className="block text-[8px] font-mono uppercase tracking-widest text-ember font-bold">Redigera Metadata</span>
-                            <div>
-                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Alt-text (SEO)</label>
-                              <input
-                                type="text"
-                                value={editMetaValues.alt}
-                                onChange={(e) => setEditMetaValues({ ...editMetaValues, alt: e.target.value })}
-                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Titel (Title Tag)</label>
-                              <input
-                                type="text"
-                                value={editMetaValues.title}
-                                onChange={(e) => setEditMetaValues({ ...editMetaValues, title: e.target.value })}
-                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Bildtext (Caption)</label>
-                              <input
-                                type="text"
-                                value={editMetaValues.caption}
-                                onChange={(e) => setEditMetaValues({ ...editMetaValues, caption: e.target.value })}
-                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Beskrivning (Description)</label>
-                              <textarea
-                                value={editMetaValues.description}
-                                onChange={(e) => setEditMetaValues({ ...editMetaValues, description: e.target.value })}
-                                rows={2}
-                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember resize-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Sökoptimerat Filnamn</label>
-                              <input
-                                type="text"
-                                value={editMetaValues.filename}
-                                onChange={(e) => setEditMetaValues({ ...editMetaValues, filename: e.target.value })}
-                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
-                              />
-                            </div>
-                            <div className="flex gap-2 justify-end pt-1">
-                              <button
-                                type="button"
-                                onClick={() => setEditingMetaPath(null)}
-                                className="px-2 py-0.5 border border-bone/10 hover:border-bone text-bone/60 hover:text-bone text-[8px] font-mono uppercase tracking-widest rounded-sm cursor-pointer"
-                              >
-                                Avbryt
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleSaveMetadata(file.path)}
-                                className="px-2 py-0.5 bg-ember text-ink text-[8px] font-mono font-bold uppercase tracking-widest rounded-sm hover:bg-ember/90 cursor-pointer"
-                              >
-                                Spara
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between">
-                            <span className="text-[8px] text-bone/40 font-mono max-w-[150px] truncate" title={file.alt}>
-                              {file.alt ? `SEO: ${file.alt}` : "Saknar SEO metadata"}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingMetaPath(file.path);
-                                setEditMetaValues({
-                                  alt: file.alt || "",
-                                  title: file.title || "",
-                                  caption: file.caption || "",
-                                  description: file.description || "",
-                                  filename: file.filename || file.name
-                                });
-                              }}
-                              className="text-[8px] font-mono uppercase tracking-widest text-ember hover:underline cursor-pointer"
-                            >
-                              Redigera SEO
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-1.5 justify-between border-t border-bone/5 pt-2 mt-2">
-                        <span className="text-[8px] uppercase tracking-widest text-bone/40 font-mono">
-                          Flytta till:
-                        </span>
-                        <select
-                          value={file.folder || ""}
-                          onChange={(e) => handleMoveFile(file, e.target.value)}
-                          className="bg-stage/35 border border-bone/10 text-bone text-[9px] font-mono rounded px-1.5 py-0.5 focus:outline-none focus:border-ember cursor-pointer"
-                        >
-                          <option value="">Roten</option>
-                          <option value="hero">Hero</option>
-                          <option value="bio">Bio (Moods)</option>
-                          <option value="portfolio">Portfolio</option>
-                          <option value="showreel">Showreel</option>
-                          <option value="posters">Showreel (Posters)</option>
-                          <option value="seo">SEO</option>
-                          <option value="credits">Meriter</option>
-                          <option value="voice">Röst</option>
-                          <option value="curtain">Ridåfall</option>
-                          <option value="general">Allmänt</option>
-                        </select>
-                      </div>
-
-                      <div className="flex justify-end pt-2">
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteFile(file.path)}
-                          className="flex items-center gap-1 text-[8px] font-mono uppercase tracking-widest text-red-400/60 hover:text-red-400 cursor-pointer"
-                        >
-                          <Trash2 size={10} />
-                          Ta bort permanent
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <MediaCardItem
+                    key={file.id}
+                    file={file}
+                    index={index}
+                    formatSize={formatSize}
+                    handleCopyUrl={handleCopyUrl}
+                    handleAddToPortfolio={handleAddToPortfolio}
+                    editingMetaPath={editingMetaPath}
+                    setEditingMetaPath={setEditingMetaPath}
+                    editMetaValues={editMetaValues}
+                    setEditMetaValues={setEditMetaValues}
+                    handleSaveMetadata={handleSaveMetadata}
+                    handleMoveFile={handleMoveFile}
+                    handleDeleteFile={handleDeleteFile}
+                  />
                 ))}
             </div>
           )}

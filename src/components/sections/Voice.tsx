@@ -3,7 +3,6 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Play } from "lucide-react";
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
-import { IMG } from "../../routes/index";
 
 interface VoiceProps {
   imageUrl?: string;

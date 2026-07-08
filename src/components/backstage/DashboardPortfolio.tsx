@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, ArrowUp, ArrowDown, Image as ImageIcon, Trash2, Plus, Upload, Link } from "lucide-react";
+import { Save, Image as ImageIcon, Plus, Upload } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 import { MediaPickerModal } from "./MediaPickerModal";
 import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
-
-interface GalleryImage {
-  id: string;
-  url: string;
-  alt: string;
-  caption?: string;
-  title?: string;
-  filename?: string;
-  description?: string;
-  allow_download: boolean;
-  download_url?: string;
-  sort_order: number;
-}
+import { GalleryImage } from "./portfolio/types";
+import { PortfolioCardItem } from "./portfolio/PortfolioCardItem";
 
 export function DashboardPortfolio() {
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -241,312 +230,199 @@ export function DashboardPortfolio() {
 
   return (
     <>
-    <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
-      <div className="border-b border-bone/10 pb-4 mb-6">
-        <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
-          Akt III — <span className="italic text-ember">Portfolio Bilder</span>
-        </h2>
-        <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
-          Hantera portfoliobilder (ordning och alt-texter för sökoptimering).
-        </p>
-      </div>
-
-      {/* Gallery Section */}
-      <div className="space-y-4">
-        <div className="border-b border-bone/5 pb-2">
-          <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-            <ImageIcon size={14} className="text-ember" /> Gällande Portfoliobilder & Sortering
-          </h3>
-        </div>
-
-        {/* Add photo tool - Redesigned for clarity */}
-        <div className="bg-stage/15 border border-bone/10 p-6 rounded-md space-y-4">
-          <h4 className="text-[11px] uppercase tracking-widest text-bone font-mono text-center">Lägg till ny bild i portfolion</h4>
-          <p className="text-[10px] text-bone/50 max-w-sm mx-auto pb-2 text-center">
-            Välj om du vill ladda upp en helt ny fil från din dator, hämta en bild du redan laddat upp i Mediebiblioteket, eller ange en direktlänk.
+      <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
+        <div className="border-b border-bone/10 pb-4 mb-6">
+          <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
+            Akt III — <span className="italic text-ember">Portfolio Bilder</span>
+          </h2>
+          <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
+            Hantera portfoliobilder (ordning och alt-texter för sökoptimering).
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {/* Direct Upload Button */}
-            <div className="relative w-full sm:w-auto">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-                className="hidden"
-                id="portfolio-file-upload-main"
-              />
-              <label
-                htmlFor="portfolio-file-upload-main"
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-ember/10 hover:bg-ember/20 border border-ember/30 text-ember text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full"
-              >
-                <Upload size={14} />
-                {isUploading ? "Laddar upp..." : "Ladda upp från dator"}
-              </label>
-            </div>
-
-            <span className="text-bone/30 text-xs italic">eller</span>
-
-            {/* Media Library Button */}
-            <button
-              type="button"
-              onClick={() => setIsMediaPickerOpen(true)}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full sm:w-auto"
-            >
-              <ImageIcon size={14} />
-              Välj från Mediebibliotek
-            </button>
-          </div>
-
-          {/* Direct URL Inputs */}
-          <div className="border-t border-bone/5 pt-4 mt-2 max-w-lg mx-auto text-left space-y-3">
-            <h5 className="text-[9px] uppercase tracking-widest text-bone/60 font-mono">Eller ange en direkt länk:</h5>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1 font-mono">Bild-URL</label>
-                <input
-                  type="text"
-                  placeholder="https://exempel.se/bild.jpg"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                />
-              </div>
-              <div>
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1 font-mono">Alt-text (SEO)</label>
-                <input
-                  type="text"
-                  placeholder="Therese Järvheden porträtt..."
-                  value={newImageAlt}
-                  onChange={(e) => setNewImageAlt(e.target.value)}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleAddImageUrl}
-              className="w-full py-1.5 bg-bone/10 hover:bg-bone/20 text-bone text-[9px] font-mono uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
-            >
-              Lägg till URL
-            </button>
-          </div>
         </div>
 
-        <div id="klick-portfolio-grid" className="space-y-3">
-          {images.map((img, index) => (
-            <div
-              key={img.id}
-              className="flex flex-col border border-bone/10 bg-stage/10 p-4 rounded-sm gap-4"
-            >
-              <div className="flex flex-col md:flex-row md:items-start gap-4">
-                {/* Small thumbnail preview with edit trigger */}
-                <div className="relative w-20 aspect-[3/4] rounded bg-stage border border-bone/10 overflow-hidden shrink-0 group mx-auto md:mx-0">
-                  <img src={img.url} alt={img.alt} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActivePickingImageId(img.id);
-                      setIsMediaPickerOpen(true);
-                    }}
-                    className="absolute inset-0 bg-ink/75 opacity-0 group-hover:opacity-100 flex items-center justify-center text-ember transition-opacity duration-300 cursor-pointer"
-                    title="Byt bild från mediebibliotek"
-                  >
-                    <Upload size={12} />
-                  </button>
-                </div>
-                
-                {/* Form fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                      Bild-URL
-                    </label>
-                    <input
-                      type="text"
-                      value={img.url}
-                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, url: e.target.value } : x))}
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                      Alt-Text (SEO - Sökoptimering)
-                    </label>
-                    <input
-                      type="text"
-                      value={img.alt}
-                      onChange={(e) => handleAltChange(img.id, e.target.value)}
-                      placeholder="Beskriv bilden för Google..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                      Titel (Title tag)
-                    </label>
-                    <input
-                      type="text"
-                      value={img.title || ""}
-                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, title: e.target.value } : x))}
-                      placeholder="Titel..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                      Bildtext (Caption)
-                    </label>
-                    <input
-                      type="text"
-                      value={img.caption || ""}
-                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, caption: e.target.value } : x))}
-                      placeholder="Kort bildtext..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                      Beskrivning (Description - Längre bakgrund/anteckningar)
-                    </label>
-                    <textarea
-                      value={img.description || ""}
-                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, description: e.target.value } : x))}
-                      placeholder="Längre beskrivning, anteckningar, licens eller historia om bilden..."
-                      rows={2}
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                      Filnamn (SEO filnamn, t.ex. therese-jarvheden-drama.webp)
-                    </label>
-                    <input
-                      type="text"
-                      value={img.filename || ""}
-                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, filename: e.target.value } : x))}
-                      placeholder="Sökordsoptimerat filnamn..."
-                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
- 
-              {/* Sorting and controls */}
-              <div className="flex items-center justify-between border-t border-bone/5 pt-3">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={img.allow_download}
-                    onChange={() => handleDownloadToggle(img.id)}
-                    className="rounded border-bone/20 text-ember focus:ring-0 focus:ring-offset-0 bg-transparent w-3.5 h-3.5"
-                  />
-                  <span className="text-[10px] uppercase tracking-widest text-bone/60 font-mono">
-                    Nedladdning tillåten
-                  </span>
+        {/* Gallery Section */}
+        <div className="space-y-4">
+          <div className="border-b border-bone/5 pb-2">
+            <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
+              <ImageIcon size={14} className="text-ember" /> Gällande Portfoliobilder & Sortering
+            </h3>
+          </div>
+
+          {/* Add photo tool */}
+          <div className="bg-stage/15 border border-bone/10 p-6 rounded-md space-y-4">
+            <h4 className="text-[11px] uppercase tracking-widest text-bone font-mono text-center">
+              Lägg till ny bild i portfolion
+            </h4>
+            <p className="text-[10px] text-bone/50 max-w-sm mx-auto pb-2 text-center">
+              Välj om du vill ladda upp en helt ny fil från din dator, hämta en bild du redan laddat upp i
+              Mediebiblioteket, eller ange en direktlänk.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="relative w-full sm:w-auto">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                  className="hidden"
+                  id="portfolio-file-upload-main"
+                />
+                <label
+                  htmlFor="portfolio-file-upload-main"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-ember/10 hover:bg-ember/20 border border-ember/30 text-ember text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full"
+                >
+                  <Upload size={14} />
+                  {isUploading ? "Laddar upp..." : "Ladda upp från dator"}
                 </label>
- 
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    disabled={index === 0}
-                    onClick={() => moveImage(index, "up")}
-                    className="p-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 transition-all rounded cursor-pointer"
-                  >
-                    <ArrowUp size={12} />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={index === images.length - 1}
-                    onClick={() => moveImage(index, "down")}
-                    className="p-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 transition-all rounded cursor-pointer"
-                  >
-                    <ArrowDown size={12} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteImage(img.id)}
-                    className="p-1.5 border border-bone/10 hover:border-red-400 text-bone/40 hover:text-red-400 transition-all rounded cursor-pointer"
-                  >
-                    <Trash2 size={12} />
-                  </button>
+              </div>
+
+              <span className="text-bone/30 text-xs italic">eller</span>
+
+              <button
+                type="button"
+                onClick={() => setIsMediaPickerOpen(true)}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full sm:w-auto"
+              >
+                <ImageIcon size={14} />
+                Välj från Mediebibliotek
+              </button>
+            </div>
+
+            {/* Direct URL Inputs */}
+            <div className="border-t border-bone/5 pt-4 mt-2 max-w-lg mx-auto text-left space-y-3">
+              <h5 className="text-[9px] uppercase tracking-widest text-bone/60 font-mono">
+                Eller ange en direkt länk:
+              </h5>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                    Bild-URL
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://exempel.se/bild.jpg"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                    Alt-text (SEO)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Therese Järvheden porträtt..."
+                    value={newImageAlt}
+                    onChange={(e) => setNewImageAlt(e.target.value)}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                  />
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={handleAddImageUrl}
+                className="w-full py-1.5 bg-bone/10 hover:bg-bone/20 text-bone text-[9px] font-mono uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
+              >
+                Lägg till URL
+              </button>
             </div>
-          ))}
+          </div>
+
+          <div id="klick-portfolio-grid" className="space-y-3">
+            {images.map((img, index) => (
+              <PortfolioCardItem
+                key={img.id}
+                img={img}
+                index={index}
+                images={images}
+                setImages={setImages}
+                handleAltChange={handleAltChange}
+                handleDownloadToggle={handleDownloadToggle}
+                handleDeleteImage={handleDeleteImage}
+                moveImage={moveImage}
+                setActivePickingImageId={setActivePickingImageId}
+                setIsMediaPickerOpen={setIsMediaPickerOpen}
+              />
+            ))}
+          </div>
         </div>
-      </div>
- 
-      <div className="flex justify-end pt-4 border-t border-bone/10">
-        <button
-          type="submit"
-          id="klick-portfolio-save"
-          disabled={isSaving}
-          className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
-        >
-          {isSaving ? (
-            <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <>
-              <Save size={12} />
-              Spara ändringar
-            </>
-          )}
-        </button>
-      </div>
-    </form>
-     
-    <MediaPickerModal
-      isOpen={isMediaPickerOpen}
-      onClose={() => {
-        setIsMediaPickerOpen(false);
-        setActivePickingImageId(null);
-      }}
-      onSelect={(url, metadata) => {
-        if (activePickingImageId) {
-          setImages(images.map((img) => (img.id === activePickingImageId ? {
-            ...img,
-            url,
-            alt: metadata?.alt || img.alt || "",
-            title: metadata?.title || img.title || "",
-            caption: metadata?.caption || img.caption || "",
-            description: metadata?.description || img.description || "",
-            filename: metadata?.filename || img.filename || ""
-          } : img)));
+
+        <div className="flex justify-end pt-4 border-t border-bone/10">
+          <button
+            type="submit"
+            id="klick-portfolio-save"
+            disabled={isSaving}
+            className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
+          >
+            {isSaving ? (
+              <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                <Save size={12} />
+                Spara ändringar
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+
+      <MediaPickerModal
+        isOpen={isMediaPickerOpen}
+        onClose={() => {
+          setIsMediaPickerOpen(false);
           setActivePickingImageId(null);
-        } else {
-          // Instantly add the picked media library image to the portfolio list
-          const newImg: GalleryImage = {
-            id: `temp-${Date.now()}`,
-            url: url,
-            download_url: url,
-            alt: metadata?.alt || "Porträtt från mediebibliotek",
-            title: metadata?.title || "",
-            caption: metadata?.caption || "",
-            description: metadata?.description || "",
-            filename: metadata?.filename || "",
-            allow_download: true,
-            sort_order: images.length,
-          };
-          setImages([...images, newImg]);
-          toast.success("Bild tillagd från mediebiblioteket. Klicka på Spara för att bekräfta.");
-        }
-      }}
-      typeFilter="image"
-    />
-    <ImageUploadOptimizer
-      isOpen={isOptimizerOpen}
-      file={pendingUploadFile}
-      defaultSection="portfolio"
-      onCancel={() => {
-        setIsOptimizerOpen(false);
-        setPendingUploadFile(null);
-      }}
-      onUpload={(finalFile) => {
-        proceedWithUpload(finalFile);
-      }}
-    />
+        }}
+        onSelect={(url, metadata) => {
+          if (activePickingImageId) {
+            setImages(
+              images.map((img) =>
+                img.id === activePickingImageId
+                  ? {
+                      ...img,
+                      url,
+                      alt: metadata?.alt || img.alt || "",
+                      title: metadata?.title || img.title || "",
+                      caption: metadata?.caption || img.caption || "",
+                      description: metadata?.description || img.description || "",
+                      filename: metadata?.filename || img.filename || "",
+                    }
+                  : img
+              )
+            );
+            setActivePickingImageId(null);
+          } else {
+            const newImg: GalleryImage = {
+              id: `temp-${Date.now()}`,
+              url: url,
+              download_url: url,
+              alt: metadata?.alt || "Porträtt från mediebibliotek",
+              title: metadata?.title || "",
+              caption: metadata?.caption || "",
+              description: metadata?.description || "",
+              filename: metadata?.filename || "",
+              allow_download: true,
+              sort_order: images.length,
+            };
+            setImages([...images, newImg]);
+            toast.success("Bild tillagd från mediebiblioteket. Klicka på Spara för att bekräfta.");
+          }
+        }}
+        typeFilter="image"
+      />
+      <ImageUploadOptimizer
+        isOpen={isOptimizerOpen}
+        file={pendingUploadFile}
+        defaultSection="portfolio"
+        onCancel={() => {
+          setIsOptimizerOpen(false);
+          setPendingUploadFile(null);
+        }}
+        onUpload={(finalFile) => {
+          proceedWithUpload(finalFile);
+        }}
+      />
     </>
   );
 }

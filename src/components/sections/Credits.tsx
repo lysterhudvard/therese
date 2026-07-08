@@ -8,7 +8,7 @@ import {
   REVIEW_QUOTES_SV,
   type Credit,
   type FilterKey,
-} from "../../routes/index";
+} from "../../routes/fallbackData";
 
 export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
   const ref = useRef<HTMLDivElement>(null);

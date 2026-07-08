@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Download } from "lucide-react";
 import { useT } from "../../hooks/use-t";
-import { IMG } from "../../routes/index";
+import { Download } from "lucide-react";
 
 export interface PortfolioImage {
   url: string;

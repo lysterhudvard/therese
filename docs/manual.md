@@ -191,3 +191,19 @@ graph TD
   4. `gemini-2.5-flash-lite`
 * **API-nyckel:** Klicka på kugghjuls-/inställningsikonen (**Sliders**) i guidens rubrikrad. Här kan du ange och spara din personliga Gemini API-nyckel. Nyckeln sparas säkert lokalt i din webbläsare.
 * **Offline-läge:** Om ingen API-nyckel har angetts, eller om anropen till alla modeller blockeras, använder Klick-guiden en inbyggd offline-simulering som kan matcha och guida dig igenom alla vanliga CMS-sysslor utan avbrott eller krascher!
+
+---
+
+## 🛠️ Kodunderhåll & Filarkitektur (Utvecklarinfo)
+
+För att hålla projektet lättläst, effektivt och underhållbart tillämpas en strikt regel om att **ingen källkodsfil får överskrida 500 rader**. Tunga moduler har delats upp i logiska underkomponenter:
+
+* **Startsida (`src/routes/index.tsx`)**: Använder `src/routes/fallbackData.ts` för alla standardbilder och translationsresurser.
+* **Biografi (`src/components/sections/Biography.tsx` / `DashboardBio.tsx`)**: Delad i undermappen `src/components/backstage/bio/` för formulär, FAQ-byggare och quotes-listor.
+* **Meriter (`DashboardCredits.tsx`)**: Isolerar radinmatningskortet till `src/components/backstage/credits/CreditItemCard.tsx`.
+* **Portfölj (`DashboardPortfolio.tsx`)**: Isolerar bildkorten och dess SEO-fältskomponenter till `src/components/backstage/portfolio/PortfolioCardItem.tsx`.
+* **Showreels (`src/components/sections/Showreels.tsx` / `DashboardShowreels.tsx`)**:
+  - Hemsidans teaterläge och videospelare ligger i `src/components/sections/showreels/TheaterPlayer.tsx`.
+  - Backstage konfigurationsrader ligger i `src/components/backstage/showreels/ShowreelCardItem.tsx`.
+* **Mediebibliotek (`DashboardMedia.tsx`)**: Delad under `src/components/backstage/media/` i `MediaUploadColumn.tsx` och `MediaCardItem.tsx`.
+* **Klick-guide (`KlickGuideWidget.tsx`)**: Delad under `src/components/backstage/klickguide/` i `KlickGuideOverlay.tsx` och `KlickGuideChat.tsx`.

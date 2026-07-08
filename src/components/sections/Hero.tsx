@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
-import { IMG } from "../../routes/index";
 
 export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; heroDone: boolean; heroImage?: string }) {
   const { t } = useT();

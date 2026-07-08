@@ -1,7 +1,6 @@
 import { supabase } from "./supabase";
 import { VIDEOS } from "../components/sections/ShowreelsData";
-import { CREDITS } from "../routes/index";
-import { IMG } from "../routes/index";
+import { CREDITS, IMG } from "../routes/fallbackData";
 
 export interface BiographyData {
   quote_sv: string;
@@ -133,7 +132,7 @@ export async function seedDatabaseWithCurrentContent(): Promise<{ success: boole
     if (showreelsErr) throw new Error(`Showreels seeding failed: ${showreelsErr.message}`);
 
     // 4. Seed Credits
-    const creditsData = CREDITS.map((c, index) => ({
+    const creditsData = CREDITS.map((c: any, index: number) => ({
       year: c.year,
       title: c.title,
       role_sv: c.role.sv,
@@ -162,7 +161,7 @@ export async function seedDatabaseWithCurrentContent(): Promise<{ success: boole
     if (creditsErr) throw new Error(`Credits seeding failed: ${creditsErr.message}`);
 
     // 5. Seed Portfolio Images
-    const portfolioData = IMG.portfolio.map((url, index) => ({
+    const portfolioData = IMG.portfolio.map((url: string, index: number) => ({
       url,
       alt: `Therese Järvheden headshot ${index + 1}`,
       allow_download: true,

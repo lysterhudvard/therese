@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { IMG } from '../routes/index';
 
 export async function getPageData() {
   if (!isSupabaseConfigured()) {

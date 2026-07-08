@@ -210,9 +210,7 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Symptom:** When uploading a file, the "Flytta till:" select menu showed "Roten" (the root directory) as the default selection, preventing users from actually relocating the file to the root.
 - **Root Cause:** The file list parsed folder paths using translated Swedish labels, but the option tags used ASCII values. Because the values didn't match, the browser fell back to selecting the first option ("Roten").
 - **Resolution:** Unified the components to track and select folders strictly using ASCII keys, and mapped UI rendering tags to Swedish display strings. This aligns the select values and lets the user relocate files to "Roten" as intended.
-
-
-
-
-
-
+## 36. TypeScript Import Errors from index.tsx Refactoring
+- **Symptom:** Rerunning the TypeScript check crashed with multiple `TS2614` errors: `Module '"../routes/index"' has no exported member 'IMG' / 'CREDITS' / 'FilterKey' / 'MOOD_DATA'`.
+- **Root Cause:** Moving all static values and typings out of `src/routes/index.tsx` into `src/routes/fallbackData.ts` broke old imports in multiple sections (`Biography.tsx`, `Credits.tsx`, `Footer.tsx`, `Hero.tsx`, `Portfolio.tsx`, `Voice.tsx`) and database helpers (`supabase-server.ts`, `supabase-sync.ts`) which still tried to fetch from `index.tsx`.
+- **Resolution:** Re-pointed all instances of static variables and structural types (`IMG`, `CREDITS`, `FilterKey`, `MOOD_DATA`, `Mood`, etc.) to import from the clean `fallbackData.ts` file. Removed redundant unused imports, successfully returning compilation errors to zero (Exit code 0).

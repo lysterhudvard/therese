@@ -182,3 +182,33 @@ This document tracks completed features, animation systems, layout updates, and 
 ### 31. Åtgärdad dropdown-matchning för att flytta filer
 - **ASCII-baserad select-matchning:** Uppdaterat flytta-mapp-dropdowns och flikfilter att arbeta direkt med ASCII-nycklar. Detta löser problemet där uppladdade filer felaktigt tolkades ligga i "Roten" (vilket hindrade flytt till Roten) och gör flytt av filer helt driftsäkert och användarvänligt.
 
+### 32. Modularisering av biografspanelen (DashboardBio.tsx)
+- **Komponentuppdelning:** Delat upp biografimodulen (`DashboardBio.tsx`) som var 965 rader i sex separata läsbara underkomponenter (`BioSectionsList.tsx`, `BioImageCredits.tsx`, `BioTextsForm.tsx`, `BioQuickFacts.tsx`, `BioReviewQuotes.tsx`, `BioFaqBuilder.tsx`) i en ny undermapp `src/components/backstage/bio/`.
+- **Radminskning:** Minskade huvudfilen `DashboardBio.tsx` till ~430 rader för att tillgodose gränserna i `rules.md`.
+
+### 33. Modularisering av meritspanelen (DashboardCredits.tsx)
+- **Komponentuppdelning:** Delat upp meritförteckningspanelen (`DashboardCredits.tsx`) som var 843 rader i en ren underkomponent `CreditItemCard.tsx` under mappen `src/components/backstage/credits/`. Detta sänkte huvudfilen till under 300 rader.
+
+### 34. Modularisering av mediebiblioteket (DashboardMedia.tsx)
+- **Komponentuppdelning:** Delat upp mediebiblioteket (`DashboardMedia.tsx`) som var 783 rader i underkomponenter (`MediaUploadColumn.tsx`, `MediaCardItem.tsx`) under mappen `src/components/backstage/media/`. Huvudfilen krympte till ~160 rader.
+
+### 35. Modularisering av Klick-guiden (KlickGuideWidget.tsx)
+- **Komponentuppdelning:** Delat upp Klick-guide-assistenten (`KlickGuideWidget.tsx`) som var 832 rader i underkomponenter (`KlickGuideOverlay.tsx`, `KlickGuideChat.tsx`) under mappen `src/components/backstage/klickguide/`. Huvudfilen reducerades till under 380 rader.
+
+### 36. Mappningsoptimering och fallbacks (index.tsx)
+- **Datautbrytning:** Flyttat alla statiska fallbacks, bildkonstanter och gränssnittstyper från startsidans router (`src/routes/index.tsx`, som var 775 rader) till en dedikerad fil `src/routes/fallbackData.ts`, vilket gjorde att startsidan krympte till 572 rader.
+
+### 37. Modularisering av kontaktsektionen (Contact.tsx)
+- **Komponentuppdelning:** Delat upp kontaktsektionen (`src/components/sections/Contact.tsx`, som var 568 rader) i två renodlade underkomponenter (`SocialIcons.tsx` för tunga inline SVG:er, samt `EnvelopeAnimation.tsx` för den 3D-animerade brevlådan) i undermappen `src/components/sections/contact/`. Detta sänkte filstorleken till 359 rader.
+
+### 38. Modularisering av portföljpanelen (DashboardPortfolio.tsx)
+- **Komponentuppdelning:** Bröt ut de enskilda bildkorten och inmatningsfälten för sortering och SEO-metadata från portföljredigeraren (`DashboardPortfolio.tsx`, som var 552 rader) till en underkomponent `PortfolioCardItem.tsx` under mappen `src/components/backstage/portfolio/`. Huvudfilen reducerades till under 285 rader.
+
+### 39. Modularisering av showreels-visaren (Showreels.tsx)
+- **Komponentuppdelning:** Bröt ut hela videospelaren (med stöd för lokala HTML5-klipp samt inbäddade Vimeo- och YouTube-spelare) från showreels-sektionen (`src/components/sections/Showreels.tsx`, som var 550 rader) till en återanvändbar modul `TheaterPlayer.tsx` i mappen `src/components/sections/showreels/`. Detta sänkte filstorleken till 150 rader.
+
+### 40. Modularisering av showreels-dashboard (DashboardShowreels.tsx)
+- **Komponentuppdelning:** Bröt ut de enskilda videokonfigurationskorten och SEO-metadatafälten från showreels-panelen (`DashboardShowreels.tsx`, som var 517 rader) till en underkomponent `ShowreelCardItem.tsx` i mappen `src/components/backstage/showreels/`. Detta sänkte huvudfilen till under 240 rader.
+
+
+

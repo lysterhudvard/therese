@@ -1,0 +1,216 @@
+export const IMG = {
+  hero: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+  bioA: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000012-8d9138d916/Thess0822_lowres.jpg?ph=a6c2528650",
+  voice:
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650",
+  feature:
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000031-558e7558ea/image-crop-200000013-8.jpeg?ph=a6c2528650",
+  portfolio: [
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000028-5883458837/image-crop-200000014-6.jpeg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000032-c5f44c5f47/Thess0972_bw_highres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000015-689df689e2/Thess0903_lowres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000036-5c2c05c2c2/Thess1110_lowres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000013-289ef289f3/Thess0862_lowres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000010-3743037433/Thess0609_lowres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000037-4aeb44aeb6/Thess1093_lowres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000044-20e3320e36/Thess0564_highres.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000045-8549a8549d/Thess0972_highres-5.jpg?ph=a6c2528650",
+    "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000046-2484224845/Thess1078_lowres.jpg?ph=a6c2528650",
+  ],
+};
+
+export type Credit = {
+  year: string;
+  title: string;
+  role: { sv: string; en: string };
+  type: "TV" | "Film" | "Voice" | "Theater";
+  category: { sv: string; en: string };
+  network: string;
+  url?: string;
+  img: string;
+  is_current_production?: boolean;
+  commentary?: {
+    url: string;
+    duration: string;
+    svText: string;
+    enText: string;
+  };
+  script?: {
+    scene: string;
+    dialogue: {
+      char: string;
+      line: { sv: string; en: string };
+    };
+  };
+};
+
+export const CREDITS: Credit[] = [
+  {
+    year: "2024",
+    title: "En våldsam kärlek",
+    role: { sv: "Ensemble — en av fyra kvinnor", en: "Ensemble — one of four women" },
+    type: "TV",
+    category: { sv: "Drama", en: "Drama" },
+    network: "SVT",
+    url: "https://www.svtplay.se/en-valdsam-karlek",
+    img: IMG.hero,
+    commentary: {
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      duration: "0:15",
+      svText:
+        "Det var en emotionellt utmanande roll, men oerhört viktig att berätta för att uppmärksamma kvinnofrid och våld i nära relationer.",
+      enText:
+        "It was an emotionally challenging role, but incredibly important to tell to draw attention to domestic abuse and relationship violence.",
+    },
+    script: {
+      scene: "SCENE 4 - INT. APARTMENT - NIGHT",
+      dialogue: {
+        char: "THERESE",
+        line: {
+          sv: "Vi måste prata om det här. Vi kan inte låtsas som ingenting längre.",
+          en: "We need to talk about this. We can't pretend it's nothing anymore.",
+        },
+      },
+    },
+  },
+  {
+    year: "2023",
+    title: "Beck — Utan uppsåt",
+    role: { sv: "Nora (lärare)", en: "Nora (teacher)" },
+    type: "Film",
+    category: { sv: "Drama", en: "Drama" },
+    network: "Filmlance / C More",
+    img: IMG.bioA,
+    commentary: {
+      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      duration: "0:12",
+      svText:
+        "Att spela Nora i Beck var fantastiskt. Hon bär på en tyst intensitet som gör varje blick laddad.",
+      enText:
+        "Playing Nora in Beck was fantastic. She carries a quiet intensity that makes every look charged.",
+    },
+    script: {
+      scene: "SCENE 17 - INT. CLASSROOM - DAY",
+      dialogue: {
+        char: "NORA",
+        line: {
+          sv: "Alla slår upp sidan fyrtiotvå. Vi har inte mycket tid kvar.",
+          en: "Everyone open to page forty-two. We don't have much time left.",
+        },
+      },
+    },
+  },
+  {
+    year: "2021",
+    title: "Karatefylla",
+    role: { sv: "Återkommande roll", en: "Recurring role" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.feature,
+    script: {
+      scene: "SCENE 8 - INT. BAR - NIGHT",
+      dialogue: {
+        char: "TJEJEN",
+        line: {
+          sv: "Ska du ha en stor stark eller ska du bara stå där och titta?",
+          en: "Are you having a big beer or are you just going to stand there and watch?",
+        },
+      },
+    },
+  },
+  {
+    year: "2020",
+    title: "Jävla klåpare",
+    role: { sv: "Återkommande roll", en: "Recurring role" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.portfolio[3],
+    script: {
+      scene: "SCENE 12 - INT. OFFICE - DAY",
+      dialogue: {
+        char: "KUNDEN",
+        line: {
+          sv: "Det här är helt oacceptabelt. Vem är ansvarig här?",
+          en: "This is completely unacceptable. Who is in charge here?",
+        },
+      },
+    },
+  },
+  {
+    year: "2019",
+    title: "Anna Blomberg show",
+    role: { sv: "Sketch ensemble", en: "Sketch ensemble" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.portfolio[5],
+  },
+  {
+    year: "2018",
+    title: "Jobbtjuven",
+    role: { sv: "Återkommande roll", en: "Recurring role" },
+    type: "TV",
+    category: { sv: "Komedi", en: "Comedy" },
+    network: "SVT",
+    img: IMG.portfolio[7],
+  },
+  {
+    year: "—",
+    title: "Familjen Valentin",
+    role: { sv: "Mamman (röst, dubb)", en: "The mother (voice, dub)" },
+    type: "Voice",
+    category: { sv: "Animation", en: "Animation" },
+    network: "Barnkanalen",
+    img: IMG.voice,
+  },
+  {
+    year: "—",
+    title: "Radio- & TV-reklam",
+    role: { sv: "Röst (skånsk dialekt)", en: "Voice (Scanian dialect)" },
+    type: "Voice",
+    category: { sv: "Reklam", en: "Commercials" },
+    network: "Diverse",
+    img: IMG.portfolio[1],
+  },
+  {
+    year: "—",
+    title: "Teater & Musikal",
+    role: { sv: "Diverse roller", en: "Various roles" },
+    type: "Theater",
+    category: { sv: "Scen", en: "Stage" },
+    network: "Diverse uppsättningar",
+    img: IMG.portfolio[10],
+  },
+];
+
+export const REVIEW_QUOTES_SV = [
+  "en närvaro som river ner väggar",
+  "en av fyra kvinnor vi får följa",
+  "skånsk röst — varm, rå, omedelbar",
+  "drama som hon känner extra starkt för",
+  "närvarande, sårbar, exakt",
+];
+export const REVIEW_QUOTES_EN = [
+  "a presence that tears down walls",
+  "one of four women we follow",
+  "Scanian voice — warm, raw, immediate",
+  "drama she feels especially strongly about",
+  "present, vulnerable, precise",
+];
+
+export const MOOD_DATA = {
+  Dramatic: { image: IMG.hero, weight: 300 },
+  Comedic: {
+    image:
+      "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000044-20e3320e36/Thess0564_highres.jpg?ph=a6c2528650",
+    weight: 500,
+  },
+  Classical: { image: IMG.feature, weight: 400 },
+} as const;
+
+export type Mood = keyof typeof MOOD_DATA;
+export type FilterKey = "Alla" | "Film" | "TV" | "Theater" | "Voice";
