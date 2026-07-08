@@ -33,6 +33,19 @@ interface MediaPickerModalProps {
   typeFilter?: "image" | "video" | "audio" | "all";
 }
 
+const folderLabels: Record<string, string> = {
+  hero: "Hero",
+  bio: "Bio",
+  portfolio: "Portfolio",
+  showreel: "Showreel",
+  posters: "Showreel",
+  seo: "SEO",
+  credits: "Meriter",
+  voice: "Röst",
+  curtain: "Ridåfall",
+  general: "Allmänt"
+};
+
 export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all" }: MediaPickerModalProps) {
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +70,7 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
         });
       }
 
-      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "credits", "voice", "curtain", "general", "meriter", "röst", "ridåfall", "allmänt"];
+      const folders = ["", "hero", "bio", "portfolio", "showreel", "posters", "seo", "credits", "voice", "curtain", "general"];
       const results = await Promise.all(
         folders.map(async (folder) => {
           const { data, error } = await supabase.storage.from("portfolio").list(folder, {
@@ -75,13 +88,6 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
       const allFiles = results.flat();
 
       if (allFiles) {
-        const folderMapping: Record<string, string> = {
-          credits: "meriter",
-          voice: "röst",
-          curtain: "ridåfall",
-          general: "allmänt"
-        };
-
         const mapped: StorageFile[] = allFiles
           .filter((file) => file.name !== ".emptyFolderPlaceholder" && file.id !== null && file.metadata)
           .map((file) => {
@@ -93,14 +99,14 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
             else if (["mp4", "webm", "ogg", "mov", "m4v"].includes(ext)) type = "video";
             else if (["mp3", "wav", "aac", "m4a", "flac"].includes(ext)) type = "audio";
 
-            const normalizedFolder = folderMapping[file.folder || ""] || file.folder || "allmänt";
+            const finalFolder = file.folder === "posters" ? "showreel" : (file.folder || "");
             const fileMeta = metaMap.get(filePath) || {};
 
             return {
               name: file.name,
               url: urlData.publicUrl,
               type,
-              folder: normalizedFolder,
+              folder: finalFolder,
               filePath,
               metadata: {
                 alt: fileMeta.alt || "",
@@ -147,10 +153,10 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
             { id: "portfolio", label: "Portfolio" },
             { id: "showreel", label: "Showreel" },
             { id: "seo", label: "SEO" },
-            { id: "meriter", label: "Meriter" },
-            { id: "röst", label: "Röst" },
-            { id: "ridåfall", label: "Ridåfall" },
-            { id: "allmänt", label: "Allmänt" },
+            { id: "credits", label: "Meriter" },
+            { id: "voice", label: "Röst" },
+            { id: "curtain", label: "Ridåfall" },
+            { id: "general", label: "Allmänt" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -190,7 +196,7 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
                   <div className="aspect-square bg-bone/5 flex items-center justify-center relative overflow-hidden">
                     {file.folder && (
                       <div className="absolute top-1.5 left-1.5 bg-ember text-ink font-mono text-[6px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-sm z-10 shadow-sm">
-                        {file.folder.toUpperCase()}
+                        {(folderLabels[file.folder] || file.folder).toUpperCase()}
                       </div>
                     )}
                     {file.type === "image" ? (

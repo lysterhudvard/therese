@@ -21,6 +21,19 @@ interface StorageFile {
   filename?: string;
 }
 
+const folderLabels: Record<string, string> = {
+  hero: "Hero",
+  bio: "Bio",
+  portfolio: "Portfolio",
+  showreel: "Showreel",
+  posters: "Showreel",
+  seo: "SEO",
+  credits: "Meriter",
+  voice: "Röst",
+  curtain: "Ridåfall",
+  general: "Allmänt"
+};
+
 export function DashboardMedia() {
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +70,7 @@ export function DashboardMedia() {
         });
       }
 
-      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "credits", "voice", "curtain", "general", "meriter", "röst", "ridåfall", "allmänt"];
+      const folders = ["", "hero", "bio", "portfolio", "showreel", "posters", "seo", "credits", "voice", "curtain", "general"];
       const results = await Promise.all(
         folders.map(async (folder) => {
           const { data, error } = await supabase.storage.from("portfolio").list(folder, {
@@ -75,13 +88,6 @@ export function DashboardMedia() {
       const allFiles = results.flat();
 
       if (allFiles) {
-        const folderMapping: Record<string, string> = {
-          credits: "meriter",
-          voice: "röst",
-          curtain: "ridåfall",
-          general: "allmänt"
-        };
-
         const mapped: StorageFile[] = allFiles
           .filter((file) => file.name !== ".emptyFolderPlaceholder" && file.id !== null && file.metadata)
           .map((file) => {
@@ -91,7 +97,7 @@ export function DashboardMedia() {
             const isImage = ["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"].includes(ext);
             const isVideo = ["mp4", "webm", "ogg", "mov", "m4v"].includes(ext);
 
-            const normalizedFolder = folderMapping[file.folder || ""] || file.folder || "allmänt";
+            const finalFolder = file.folder === "posters" ? "showreel" : (file.folder || "");
             const fileMeta = metaMap.get(filePath) || {};
 
             return {
@@ -103,7 +109,7 @@ export function DashboardMedia() {
               isVideo,
               size: file.metadata?.size,
               created_at: file.created_at || undefined,
-              folder: normalizedFolder,
+              folder: finalFolder,
               alt: fileMeta.alt || "",
               title: fileMeta.title || "",
               caption: fileMeta.caption || "",
@@ -521,10 +527,10 @@ export function DashboardMedia() {
                 { id: "portfolio", label: "Portfolio" },
                 { id: "showreel", label: "Showreel" },
                 { id: "seo", label: "SEO" },
-                { id: "meriter", label: "Meriter" },
-                { id: "röst", label: "Röst" },
-                { id: "ridåfall", label: "Ridåfall" },
-                { id: "allmänt", label: "Allmänt" },
+                { id: "credits", label: "Meriter" },
+                { id: "voice", label: "Röst" },
+                { id: "curtain", label: "Ridåfall" },
+                { id: "general", label: "Allmänt" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -567,7 +573,7 @@ export function DashboardMedia() {
                     <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
                       {file.folder && (
                         <div className="absolute top-2 left-2 bg-ember text-ink font-mono text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm z-10 shadow-sm">
-                          {file.folder.toUpperCase()}
+                          {(folderLabels[file.folder] || file.folder).toUpperCase()}
                         </div>
                       )}
                       {file.isImage ? (
@@ -734,11 +740,12 @@ export function DashboardMedia() {
                           <option value="bio">Bio (Moods)</option>
                           <option value="portfolio">Portfolio</option>
                           <option value="showreel">Showreel</option>
+                          <option value="posters">Showreel (Posters)</option>
                           <option value="seo">SEO</option>
-                          <option value="meriter">Meriter</option>
-                          <option value="röst">Röst</option>
-                          <option value="ridåfall">Ridåfall</option>
-                          <option value="allmänt">Allmänt</option>
+                          <option value="credits">Meriter</option>
+                          <option value="voice">Röst</option>
+                          <option value="curtain">Ridåfall</option>
+                          <option value="general">Allmänt</option>
                         </select>
                       </div>
 
@@ -762,7 +769,7 @@ export function DashboardMedia() {
       <ImageUploadOptimizer
         isOpen={isOptimizerOpen}
         file={pendingUploadFile}
-        defaultSection="allmänt"
+        defaultSection="general"
         onCancel={() => {
           setIsOptimizerOpen(false);
           setPendingUploadFile(null);

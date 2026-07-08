@@ -4,7 +4,7 @@ import { X, Sparkles, Check, AlertTriangle, Info, ArrowRight, FileImage } from "
 interface ImageUploadOptimizerProps {
   isOpen: boolean;
   file: File | null;
-  defaultSection?: "hero" | "bio" | "portfolio" | "showreel" | "seo" | "meriter" | "röst" | "ridåfall" | "allmänt";
+  defaultSection?: "hero" | "bio" | "portfolio" | "showreel" | "seo" | "credits" | "voice" | "curtain" | "general";
   onCancel: () => void;
   onUpload: (finalFile: File, category: string) => void;
 }
@@ -59,7 +59,7 @@ const SECTION_PROFILES: Record<string, ImageProfile> = {
     description: "Bilden som visas i förhandsvisningen när länken delas på Facebook, LinkedIn, i SMS eller Slack.",
     seoGuideline: "Måste ha exakt 1.91:1 i bildförhållande (t.ex. 1200x630px) för att inte beskäras fult av sociala medier. Använd PNG eller högkvalitativ JPG.",
   },
-  meriter: {
+  credits: {
     name: "Akt V: Meriter (Meritbilder)",
     maxWidth: 1200,
     maxHeight: 1200,
@@ -67,7 +67,7 @@ const SECTION_PROFILES: Record<string, ImageProfile> = {
     description: "Bilder som visas för dina olika meriter/roller.",
     seoGuideline: "Håll filstorlekar under kontroll för att spara bandbredd vid rullning av meritlistan.",
   },
-  röst: {
+  voice: {
     name: "Akt VI: Röst (Bakgrundsbild)",
     maxWidth: 1600,
     maxHeight: 1200,
@@ -75,7 +75,7 @@ const SECTION_PROFILES: Record<string, ImageProfile> = {
     description: "Bakgrundsbild för röstsektionen.",
     seoGuideline: "Komprimering säkerställer snabb inläsning när besökaren scrollar ner till röstaktören.",
   },
-  ridåfall: {
+  curtain: {
     name: "Akt VII: Ridåfall (Stängningsbild)",
     maxWidth: 1600,
     maxHeight: 1200,
@@ -83,7 +83,7 @@ const SECTION_PROFILES: Record<string, ImageProfile> = {
     description: "Slutbild som visas i slutet av webbplatsen.",
     seoGuideline: "Skapar ett mjukt avslut på sidan utan onödig laddningstid.",
   },
-  allmänt: {
+  general: {
     name: "Generell / Annan Bild",
     maxWidth: 1920,
     maxHeight: 1920,
@@ -96,7 +96,7 @@ const SECTION_PROFILES: Record<string, ImageProfile> = {
 export function ImageUploadOptimizer({
   isOpen,
   file,
-  defaultSection = "allmänt",
+  defaultSection = "general",
   onCancel,
   onUpload,
 }: ImageUploadOptimizerProps) {
@@ -140,7 +140,7 @@ export function ImageUploadOptimizer({
     setIsCompiling(true);
     setErrorMsg("");
 
-    const profile = SECTION_PROFILES[selectedSection] || SECTION_PROFILES.allmänt;
+    const profile = SECTION_PROFILES[selectedSection] || SECTION_PROFILES.general;
 
     try {
       const result = await new Promise<{ blob: Blob; width: number; height: number }>((resolve, reject) => {
@@ -208,7 +208,7 @@ export function ImageUploadOptimizer({
 
   if (!isOpen || !file) return null;
 
-  const currentProfile = SECTION_PROFILES[selectedSection];
+  const currentProfile = SECTION_PROFILES[selectedSection] || SECTION_PROFILES.general;
 
   const handleUploadOptimized = () => {
     if (!optimizedBlob) return;

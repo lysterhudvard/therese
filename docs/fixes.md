@@ -201,6 +201,17 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** In both client/server loaders, the showreel mapping logic fell back to an Unsplash poster URL if none was set in the database, and the voice settings mapper overrode empty strings with `IMG.voice`.
 - **Resolution:** Removed the hardcoded Unsplash fallback for showreels and modified the voice settings image parser in `index.tsx` to preserve empty image URLs. Updated `Showreels.tsx` to render clean, dark background layouts with generic video icons when no posters exist. Refactored both `Voice.tsx` and `Biography.tsx` to dynamically switch to a beautiful centered single-column layout when their respective section images are deleted or cleared in the CMS, preventing broken links and blank visual gaps while maintaining high-end visual aesthetics. Also set the default image URL for new custom biography sections in `DashboardBio.tsx` to a blank string `""` instead of forcing a default portrait URL.
 
+## 34. Media Upload 'Invalid key' Error on Swedish Named Folders
+- **Symptom:** Uploading files under "Röst", "Ridåfall", "Meriter", and "Allmänt" options failed with `StorageApiError: Invalid key` and status 400.
+- **Root Cause:** Supabase Storage rejected paths containing non-ASCII characters (e.g. `ö` in `röst` or `å` in `ridåfall`).
+- **Resolution:** Standardized backend storage folders to pure ASCII (`voice`, `curtain`, `credits`, `general`). Transformed `file.folder` assignments to keep files mapped using ASCII folders, while introducing a `folderLabels` translation helper to cleanly present the Swedish equivalents ("Röst", "Ridåfall", "Meriter", "Allmänt") in the UI.
+
+## 35. Media Moving Dropdown Default Value and Roten Relocation Issue
+- **Symptom:** When uploading a file, the "Flytta till:" select menu showed "Roten" (the root directory) as the default selection, preventing users from actually relocating the file to the root.
+- **Root Cause:** The file list parsed folder paths using translated Swedish labels, but the option tags used ASCII values. Because the values didn't match, the browser fell back to selecting the first option ("Roten").
+- **Resolution:** Unified the components to track and select folders strictly using ASCII keys, and mapped UI rendering tags to Swedish display strings. This aligns the select values and lets the user relocate files to "Roten" as intended.
+
+
 
 
 

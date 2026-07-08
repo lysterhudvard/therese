@@ -136,6 +136,9 @@ För att komma till adminpanelen:
   * Ladda upp filer direkt härifrån.
   * Klicka på **Kopiera URL** för att snabbt kunna klistra in bild- eller ljudlänkar i övriga fält i CMS-panelen.
   * Klicka på **+ Lägg till i Portfolio** för att skicka en bild direkt till bildgalleriet utan extra krångel.
+  * **Mappstruktur & Säkerhet:** Filer lagras under huven i mappar med ASCII-namn (t.ex. `voice`, `curtain`, `credits`, `general`) för att garantera att inga teckenfel uppstår mot Supabase-servern. Panelerna översätter dessa automatiskt till "Röst", "Ridåfall", "Meriter" och "Allmänt" i gränssnittet.
+  * **Flytta filer:** Du kan enkelt byta mapp på en fil med dropdown-menyn *"Flytta till:"*. Mappen som filen för närvarande ligger i visas som standard. Om du väljer *"Roten"* flyttas filen till lagringsutrymmets toppnivå.
+
 
 ### ⚡ Bildoptimering & SEO-validering (Nyhet)
 Varje gång du laddar upp en bild i CMS (i Mediebiblioteket, Portfolio, Showreels eller SEO-inställningar) öppnas automatiskt ett **optimeringsverktyg** direkt i Backstage:

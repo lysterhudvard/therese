@@ -174,3 +174,11 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Återställda SEO-fält i Portfölj-CMS:** Lagt tillbaka inmatningsfält för alt-text, title-tagg, bildtext (caption) och sökoptimerat filnamn i `DashboardPortfolio.tsx` som tidigare raderats.
 - **SEO-rendering på front-end:** Kopplat fälten (`alt`, `title`, `filename`, `caption`) på startsidan och i galleriet (`Portfolio.tsx`, `Voice.tsx` och `Footer.tsx`) så att webbläsare och sökmotorer får fullständig tillgång till SEO-metadata.
 - **Högkvalitativ nedladdning:** Nedladdningsknappen i portföljen använder nu det sökoptimerade filnamnet för nedladdade pressbilder.
+
+### 30. Synkronisering av ASCII-namngivna mediamappar
+- **ASCII-sökvägar i bakgrunden:** Standardiserat Supabase Storage-mappsökvägar till ren ASCII (`voice`, `curtain`, `credits`, `general`) för att helt förhindra "Invalid key"-felmeddelanden (statuskod 400) vid bilduppladdning från gränssnittet.
+- **Lokalisering och etiketter:** Implementerat en global `folderLabels`-ordlista som översätter ASCII-nycklarna till vackra svenska etiketter ("Röst", "Ridåfall", "Meriter", "Allmänt") på alla ställen i gränssnittet och medieplockaren.
+
+### 31. Åtgärdad dropdown-matchning för att flytta filer
+- **ASCII-baserad select-matchning:** Uppdaterat flytta-mapp-dropdowns och flikfilter att arbeta direkt med ASCII-nycklar. Detta löser problemet där uppladdade filer felaktigt tolkades ligga i "Roten" (vilket hindrade flytt till Roten) och gör flytt av filer helt driftsäkert och användarvänligt.
+
