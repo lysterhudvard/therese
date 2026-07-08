@@ -85,11 +85,11 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
     <section 
       id="portfolio" 
       ref={ref} 
-      className={`relative ${normalizedImages.length > 0 ? "h-auto md:h-[320vh]" : "h-auto md:h-[100svh]"}`}
+      className={`relative ${normalizedImages.length > 0 ? "h-auto lg:h-[320vh]" : "h-auto lg:h-[100svh]"}`}
     >
       <motion.div
         style={{ opacity: exitOpacity, scale: exitScale }}
-        className="relative md:sticky top-0 h-auto md:h-[100svh] w-full overflow-hidden bg-ink"
+        className="relative lg:sticky top-0 h-auto lg:h-[100svh] w-full overflow-hidden bg-ink"
       >
         <div className="absolute inset-x-0 top-0 z-20 flex h-6 items-center gap-3 overflow-hidden px-2">
           {Array.from({ length: 60 }).map((_, i) => (
@@ -104,10 +104,10 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
 
         {/* Dark barrier on the left to fade out images as they approach the text */}
         {normalizedImages.length > 0 && (
-          <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden md:block" />
+          <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden lg:block" />
         )}
 
-        <div className="absolute left-6 top-1/2 z-30 -translate-y-1/2 md:left-12 hidden md:block">
+        <div className="absolute left-6 top-1/2 z-30 -translate-y-1/2 lg:left-12 hidden lg:block">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-1.5">
             {t.portfolio.act}
           </div>
@@ -123,7 +123,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
 
         {/* Desktop Image Track / Placeholder */}
         {normalizedImages.length === 0 ? (
-          <div className="hidden md:flex absolute left-[45vw] top-1/2 -translate-y-1/2 items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow">
+          <div className="hidden lg:flex absolute left-[45vw] top-1/2 -translate-y-1/2 items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow">
             <span>//</span>
             <span>{lang === "sv" ? "Bilder kommer snart" : "Images coming soon"}</span>
           </div>
@@ -131,7 +131,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
           <motion.div
             ref={trackRef}
             style={{ x }}
-            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
+            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
           >
             {normalizedImages.map((img, i) => (
               <div
@@ -167,11 +167,11 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
             ))}
           </motion.div>
         )}
-
         {/* Mobile / Tablet layout - natural height, does not lock page scrolling */}
-        <div className="md:hidden relative z-10 flex flex-col py-16">
+        <div className="lg:hidden relative z-10 flex flex-col py-16">
           <div className="px-6 pb-6">
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">
+
               {t.portfolio.act}
             </div>
             <h3 className="mt-2 font-display text-4xl text-bone leading-none">

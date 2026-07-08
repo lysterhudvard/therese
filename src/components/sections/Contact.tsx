@@ -74,8 +74,8 @@ export function Contact({ bioData }: { bioData?: any }) {
 
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0.5, 0.95], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.95], [1, 1.05]);
+  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
+  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
 
   const [isSpotlightActive, setIsSpotlightActive] = useState(false);
   const formCardRef = useRef<HTMLDivElement>(null);
@@ -101,12 +101,14 @@ export function Contact({ bioData }: { bioData?: any }) {
   }, []);
 
   return (
-    <section id="contact" ref={ref} className="relative px-6 py-28 md:px-12 md:py-40">
-      <motion.div style={{ opacity, scale }} className="w-full h-full">
-        <div className="mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-14">
-          <div className="md:col-span-5">
+    <section id="contact" ref={ref} className="relative px-6 py-16 md:px-12 md:py-36">
+      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
+        <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-14">
+
+
+          <div className="lg:col-span-5">
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.contact.act}</div>
-            <h2 className="mt-4 font-display text-5xl md:text-7xl text-bone leading-[0.92]">
+            <h2 className="mt-4 font-display text-5xl lg:text-7xl text-bone leading-[0.92]">
               {t.contact.heading[0]}
               <span className="italic">{t.contact.heading[1]}</span>
               {t.contact.heading[2]}
@@ -121,7 +123,7 @@ export function Contact({ bioData }: { bioData?: any }) {
                   <a
                     href={`mailto:${agentEmail}`}
                     data-hover
-                    className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
+                    className="mt-2 inline-flex items-center gap-3 font-display text-xl sm:text-2xl lg:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3 break-all"
                   >
                     <Mail size={20} /> {agentEmail}
                   </a>
@@ -136,7 +138,7 @@ export function Contact({ bioData }: { bioData?: any }) {
                   <a
                     href={`mailto:${voiceEmail}`}
                     data-hover
-                    className="mt-2 inline-flex items-center gap-3 font-display text-2xl md:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3"
+                    className="mt-2 inline-flex items-center gap-3 font-display text-xl sm:text-2xl lg:text-3xl text-bone hover:text-ember transition-colors px-3 py-2 rounded-sm -ml-3 break-all"
                   >
                     <Mail size={20} /> {voiceEmail}
                   </a>
@@ -237,7 +239,7 @@ export function Contact({ bioData }: { bioData?: any }) {
             </div>
           </div>
 
-          <div className="md:col-span-7">
+          <div className="lg:col-span-7">
             <div
               ref={formCardRef}
               style={{

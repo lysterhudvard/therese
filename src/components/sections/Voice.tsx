@@ -15,16 +15,20 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption }: VoicePro
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0.5, 0.95], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.95], [1, 1.05]);
+  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
+
+  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
 
   return (
     <section id="voice" ref={ref} className="relative overflow-hidden bg-ink">
-      <motion.div style={{ opacity, scale }} className="w-full h-full">
-        <div className={imageUrl ? "grid grid-cols-1 md:grid-cols-2" : "max-w-4xl mx-auto flex flex-col items-center justify-center text-center px-6 py-24 md:py-36"}>
-          <div className={`flex flex-col justify-center ${imageUrl ? "px-6 py-20 md:px-16 md:py-32" : "items-center max-w-2xl"}`}>
+      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
+        <div className={imageUrl ? "grid grid-cols-1 lg:grid-cols-2" : "max-w-4xl mx-auto flex flex-col items-center justify-center text-center px-6 py-16 lg:py-36"}>
+          <div className={`flex flex-col justify-center ${imageUrl ? "px-6 py-16 lg:px-16 lg:py-36" : "items-center max-w-2xl"}`}>
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.voice.act}</div>
-            <h2 className="mt-4 font-display text-5xl md:text-6xl text-bone leading-[0.95]">
+
+
+
+            <h2 className="mt-4 font-display text-4xl sm:text-5xl lg:text-6xl text-bone leading-[0.95]">
               {t.voice.heading[0]}
               <span className="italic">{t.voice.heading[1]}</span>
               {t.voice.heading[2]}
@@ -51,14 +55,14 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption }: VoicePro
             </div>
           </div>
           {imageUrl && (
-            <div className="relative h-[60svh] md:h-[90svh] overflow-hidden md:order-first">
+            <div className="relative h-[60svh] lg:h-[90svh] overflow-hidden lg:order-first">
               <SpotlightImage 
                 src={imageUrl} 
                 alt={imageAlt || "Therese — röst"} 
                 title={imageTitle}
                 className="h-full w-full" 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent lg:bg-gradient-to-r pointer-events-none" />
               {imageCaption && (
                 <div className="absolute bottom-4 left-6 z-10 text-[9px] uppercase tracking-[0.3em] text-bone/40 font-mono">
                   {imageCaption}

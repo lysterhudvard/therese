@@ -133,7 +133,7 @@ export function Credits({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -153,34 +153,35 @@ export function Credits({
     return rows.slice(0, limit);
   }, [rows, showAllCredits, isMobile]);
   const filters: FilterKey[] = ["Alla", "Film", "TV", "Theater", "Voice"];
-
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0.5, 0.95], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.95], [1, 1.05]);
+  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
 
+  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
   return (
-    <section id="credits" ref={ref} className="relative px-6 py-28 md:px-12 md:py-40">
-      <motion.div style={{ opacity, scale }} className="w-full h-full">
+    <section id="credits" ref={ref} className="relative px-6 py-16 md:px-12 md:py-36">
+      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <ParallaxQuotes quotes={activeQuotes} />
+
+
         <div className="relative mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
             <div>
               <div className="text-[10px] uppercase tracking-[0.5em] text-ember">
                 {t.credits.act}
               </div>
-              <h2 className="mt-4 font-display text-5xl md:text-7xl text-bone leading-[0.95]">
+              <h2 className="mt-4 font-display text-4xl sm:text-5xl lg:text-7xl text-bone leading-[0.95]">
                 {t.credits.heading[0]}
                 <span className="italic">{t.credits.heading[1]}</span>
               </h2>
             </div>
-            <div className="flex flex-wrap gap-1 border-t border-bone/10 pt-4">
+            <div className="flex overflow-x-auto no-scrollbar whitespace-nowrap gap-1 border-t border-bone/10 pt-4 max-w-full">
               {filters.map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
                   data-hover
-                  className={`px-4 py-2 text-[11px] uppercase tracking-[0.3em] transition-colors ${
+                  className={`flex-shrink-0 px-4 py-2 text-[11px] uppercase tracking-[0.3em] transition-colors ${
                     filter === f ? "text-ember" : "text-bone/50 hover:text-bone"
                   }`}
                 >
@@ -211,11 +212,11 @@ export function Credits({
                     onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
                     className="grid grid-cols-12 items-baseline gap-4 py-7 transition-colors hover:bg-bone/[0.06] duration-300"
                   >
-                    <div className="col-span-2 md:col-span-1 font-mono text-xs text-ember/80 group-hover:text-ember transition-colors duration-300">
+                    <div className="col-span-2 lg:col-span-1 font-mono text-xs text-ember/80 group-hover:text-ember transition-colors duration-300">
                       {c.year}
                     </div>
-                    <div className="col-span-7 md:col-span-5">
-                      <div className="font-display text-2xl md:text-3xl text-bone transition-all flex flex-wrap items-center gap-3">
+                    <div className="col-span-7 lg:col-span-5">
+                      <div className="font-display text-xl sm:text-2xl lg:text-3xl text-bone transition-all flex flex-wrap items-center gap-3">
                         {c.url ? (
                           <a
                             href={c.url}
@@ -282,13 +283,13 @@ export function Credits({
                         {c.role[lang]}
                       </div>
                     </div>
-                    <div className="hidden md:block md:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
+                    <div className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.category[lang]}
                     </div>
-                    <div className="hidden md:block md:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
+                    <div className="hidden lg:block lg:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.network}
                     </div>
-                    <div className="col-span-3 md:col-span-1 flex justify-end">
+                    <div className="col-span-3 lg:col-span-1 flex justify-end">
                       {c.url ? (
                         <a
                           href={c.url}
@@ -307,7 +308,7 @@ export function Credits({
                         />
                       )}
                     </div>
-                    <div className="col-span-12 text-xs text-bone/55 md:hidden group-hover:text-bone/80 transition-colors duration-300">
+                    <div className="col-span-12 text-xs text-bone/55 lg:hidden group-hover:text-bone/80 transition-colors duration-300">
                       {c.network} · {c.category[lang]}
                     </div>
                   </div>

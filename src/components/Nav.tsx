@@ -64,13 +64,13 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
       }`}
     >
       <div
-        className={`flex items-center justify-between pl-4 pr-6 md:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-3.5" : "py-5"}`}
+        className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-3.5" : "py-5"}`}
       >
         {heroDone ? (
           <motion.button
             layoutId="header-logo"
             onClick={() => go("top")}
-            className="font-display text-[14px] md:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5"
+            className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5"
             transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
           >
             <span className="italic font-light">Therese</span>
@@ -85,7 +85,7 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
           transition={{ duration: 0.5 }}
           className={`flex items-center ${!heroDone ? "pointer-events-none" : ""}`}
         >
-          <nav className="hidden md:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
+          <nav className="hidden lg:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
             {links.map((l) => (
               <button
                 key={l.id}
@@ -109,7 +109,7 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
               )}
             </AnimatePresence>
           </nav>
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center lg:hidden">
             <AnimatePresence>
               {!scrolled && (
                 <motion.div
@@ -147,7 +147,7 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden border-t border-bone/15 bg-stage/95 backdrop-blur-md"
+            className="lg:hidden border-t border-bone/15 bg-stage/95 backdrop-blur-md"
           >
             <div className="flex flex-col px-6 py-6 gap-4">
               {links.map((l) => (

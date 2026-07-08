@@ -92,17 +92,17 @@ export function Biography({
       return q?.trim() && a?.trim();
     });
   }, [faqs, lang]);
-
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0.5, 0.95], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.95], [1, 1.05]);
+  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
 
+  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
   return (
-    <section id="bio" ref={ref} className="relative px-6 py-28 md:px-12 md:py-40">
-      <motion.div style={{ opacity, scale }} className="w-full h-full">
-        <div className={data.image ? "mx-auto grid max-w-7xl grid-cols-1 gap-14 md:grid-cols-12" : "mx-auto max-w-4xl flex flex-col items-center justify-center text-center"}>
-          <div className={data.image ? "md:col-span-7" : "w-full flex flex-col items-center max-w-3xl"}>
+    <section id="bio" ref={ref} className="relative px-6 py-16 md:px-12 md:py-36">
+      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
+        <div className={data.image ? "mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-12" : "mx-auto max-w-4xl flex flex-col items-center justify-center text-center"}>
+
+          <div className={data.image ? "lg:col-span-7" : "w-full flex flex-col items-center max-w-3xl"}>
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.bio.act}</div>
             <h2
               className="mt-5 font-display leading-[0.95] text-bone transition-all duration-700"
@@ -117,13 +117,13 @@ export function Biography({
               <div className="text-[10px] uppercase tracking-[0.4em] text-bone/50 mb-3 font-mono">
                 {t.bio.director}
               </div>
-              <div className="inline-flex hairline border-t-0 border border-bone/15 flex-wrap gap-y-2">
+              <div className="inline-flex hairline border-t-0 border border-bone/15 overflow-x-auto no-scrollbar whitespace-nowrap max-w-full">
                 {activeSections.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => setActiveId(s.id)}
                     data-hover
-                    className={`relative px-5 py-3 text-[11px] uppercase tracking-[0.32em] transition-colors ${
+                    className={`relative flex-shrink-0 px-5 py-3 text-[11px] uppercase tracking-[0.32em] transition-colors ${
                       activeId === s.id ? "text-ink" : "text-bone/70 hover:text-bone"
                     }`}
                   >
@@ -145,7 +145,7 @@ export function Biography({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4 }}
-                  className={`mt-5 font-display italic text-bone/80 text-xl md:text-2xl max-w-lg ${data.image ? "" : "mx-auto"}`}
+                  className={`mt-5 font-display italic text-bone/80 text-xl lg:text-2xl max-w-lg ${data.image ? "" : "mx-auto"}`}
                 >
                   "{lang === "sv" ? data.quote_sv : data.quote_en}"
                 </motion.p>
@@ -198,7 +198,7 @@ export function Biography({
           </div>
 
           {data.image && (
-            <div className="md:col-span-5 md:order-first">
+            <div className="lg:col-span-5 lg:order-first">
               <div className="sticky top-28">
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
                   <AnimatePresence mode="wait">

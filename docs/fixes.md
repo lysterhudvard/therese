@@ -220,3 +220,33 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Symptom:** Deployment failed at the `npm run build` step with a `MISSING_EXPORT` error: `[MISSING_EXPORT] "CREDITS" is not exported by "src/routes/index.tsx"` imported in `src/pages/index.astro`.
 - **Root Cause:** In the initial refactoring phase, static fallback constants were moved out of `src/routes/index.tsx` into `src/routes/fallbackData.ts`. However, the root entry point `src/pages/index.astro` was still trying to import `CREDITS` from `src/routes/index.tsx` instead of `src/routes/fallbackData.ts`.
 - **Resolution:** Re-pointed the `CREDITS` import in `src/pages/index.astro` to load from `../routes/fallbackData` and removed the unused `IMG` and `MOOD_DATA` import tokens, allowing the production build to compile successfully.
+
+## 38. Biography & Credits Tab Buttons Wrapping and Distorting Layout on Mobile
+- **Symptom:** On mobile screens, tab buttons ("Dramatisk", "Komisk", "Klassisk" in Biography, and merit categories in Credits) wrapped onto multiple lines. Because Biography uses an outline container with an absolute-positioned active sliding pill indicator (`moodPill`), wrapping the buttons broke the layout box bounds, text alignments, and indicator animations.
+- **Root Cause:** The tab containers utilized `flex-wrap` and lacked constraints to preserve a single-line horizontal layout when screen space was restricted.
+- **Resolution:** Removed the `flex-wrap` properties from the button containers in `Biography.tsx` and `Credits.tsx`, replacing them with horizontal scroll utilities (`overflow-x-auto no-scrollbar whitespace-nowrap max-w-full`). Added `flex-shrink-0` to the button elements to prevent font compression on small viewports, ensuring the buttons remain on a clean single line.
+## 39. Inconsistent Section Padding, Large Spacing around Reels/Showreels Section, and Compressed Mobile Player
+- **Symptom:** The vertical space (gaps) between some sections looked uneven, especially on mobile where the Reels section had a very large gap before and after it compared to other sections. Additionally, the video player aspect ratio looked extremely squished/compressed on mobile screens.
+- **Root Cause:** 
+  1. Section containers used mixed padding values. Some sections used `py-28 md:py-40`, others used `py-16` on mobile.
+  2. The `TheaterPlayer` container had a hardcoded `aspect-[21/9]` ratio, which makes the player height extremely small on narrow vertical mobile viewports.
+  3. When only one video was present, an empty selector grid container was still rendered under the video player, adding an extra `mt-12` margin-top placeholder.
+  4. The scroll transitions faded sections out as early as `0.5` scroll progress, which left empty dark gaps as the page scrolled.
+- **Resolution:** 
+  1. Standardized vertical section padding across all sections (Biography, Portfolio mobile, Showreels, Credits, Voice, and Contact) to a consistent **`py-16`** on mobile/tablet and **`py-36`** on desktop.
+  2. Adjusted the video player element to use a responsive aspect ratio (**`aspect-[16/9] md:aspect-[21/9]`**), preserving the premium ultrawide format on desktop while scaling the video height up on mobile.
+  3. Added a conditional check (`displayedVideos.length > 0`) to completely omit the thumbnails grid when no additional videos exist.
+  4. Deferred the scroll exit animation start threshold from `0.5` to `0.75`, keeping sections fully opaque until they are nearly scrolled off-screen.
+
+## 40. Tablet Layout and Responsive Breakpoint Optimizations
+- **Symptom:** On tablet view (768px to 1023px, typical iPad portrait sizes), multiple layout issues occurred:
+  1. The navigation header displayed the full desktop list of links, which clashed with the logo and looked cluttered.
+  2. The `Portfolio` section locked scroll and forced a desktop-style horizontal track, which is clumsy and unintuitive on touch tablets.
+  3. Grid columns split into dual-column layouts too early (using `md:`), causing text overlay and element collisions (such as the contact form card overlapping the contact emails).
+  4. Large font size clamp rules caused text to look oversized and wrap awkwardly on tablet screens.
+- **Root Cause:** Responsive layout and grid columns switched from stacked mobile view to multi-column desktop formats at the `md` (768px) breakpoint instead of the `lg` (1024px) breakpoint.
+- **Resolution:**
+  1. **Navigation:** Shifted the menu collapse breakpoint in `Nav.tsx` from `md` to `lg`. The hamburger menu now remains active on all tablet widths, keeping the header clean.
+  2. **Portfolio Scroll:** Moved the horizontal scroll-lock layout breakpoint in `Portfolio.tsx` from `md` to `lg`. Tablets now use the same natural height, touch-friendly vertical scroll as mobile devices.
+  3. **Grid Layout Splits:** Postponed multi-column grid splits in `Biography.tsx`, `Voice.tsx`, and `Contact.tsx` to `lg` and above. Elements stack vertically on tablets, providing full screen width for content blocks.
+  4. **Email & Heading Sizes:** Adjusted typography classes across all headings (`Showreels.tsx`, `Credits.tsx`, `Voice.tsx`, and `Contact.tsx`) to scale smoothly from mobile to tablet and desktop sizes. Added `break-all` styling to contact emails to guarantee they never overflow container margins.

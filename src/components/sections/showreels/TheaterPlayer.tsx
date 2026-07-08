@@ -155,17 +155,14 @@ export function TheaterPlayer({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Video end handler
   const handleEnded = () => {
     setIsPlaying(false);
     setProgress(100);
   };
 
   return (
-    <div className="relative mx-auto max-w-[1400px] aspect-[21/9]">
-      {/* Reservation space layout placeholder when enlarged */}
+    <div className="relative mx-auto max-w-[1400px] aspect-[16/9] md:aspect-[21/9]">
       {isEnlarged && <div className="w-full h-full bg-transparent" />}
-
       <motion.div
         layout
         data-no-spotlight

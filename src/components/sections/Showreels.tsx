@@ -29,14 +29,14 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
     target: sectionRef,
     offset: ["start start", "end start"],
   });
-  const opacity = useTransform(scrollYProgress, [0.5, 0.95], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.95], [1, 1.05]);
+  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
+  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
 
   return (
     <section
       id="showreels"
       ref={sectionRef}
-      className={`relative px-6 py-28 md:px-12 md:py-40 bg-ink overflow-hidden ${
+      className={`relative px-6 py-16 md:px-12 md:py-36 bg-ink overflow-hidden ${
         isEnlarged ? "z-[999]" : ""
       }`}
     >
@@ -49,15 +49,16 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
       />
 
       <motion.div
-        style={{ opacity, scale, zIndex: isEnlarged ? 999 : 10 }}
+        style={{ opacity: exitOpacity, scale: exitScale, zIndex: isEnlarged ? 999 : 10 }}
         className="relative mx-auto max-w-7xl"
       >
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 md:mb-16">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember">
+
             {lang === "sv" ? "Akt IV — Showreels" : "Act IV — Showreels"}
           </div>
-          <h2 className="mt-4 font-display text-5xl md:text-7xl text-bone leading-none">
+          <h2 className="mt-4 font-display text-4xl sm:text-5xl lg:text-7xl text-bone leading-none">
             {lang === "sv" ? "Rörligt " : "Moving "}
             <span className="italic">{lang === "sv" ? "material" : "Pictures"}</span>
           </h2>
@@ -77,98 +78,101 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
         />
 
         {/* Thumbnails Selector Row */}
-        <div
-          className={`mt-12 grid gap-6 max-w-[1400px] mx-auto ${
-            showAllVideos
-              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-              : hasMoreVideos
-                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
-                : "grid-cols-1 md:grid-cols-3"
-          }`}
-        >
-          {displayedVideos.map((item) => {
-            const isHovered = hoveredCardId === item.id;
-            const isSelected = activeVideo.id === item.id;
+        {displayedVideos.length > 0 && (
+          <div
+            className={`mt-12 grid gap-6 max-w-[1400px] mx-auto ${
+              showAllVideos
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                : hasMoreVideos
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            }`}
+          >
+            {displayedVideos.map((item) => {
+              const isHovered = hoveredCardId === item.id;
+              const isSelected = activeVideo.id === item.id;
 
-            return (
-              <div
-                key={item.id}
-                onMouseEnter={() => setHoveredCardId(item.id)}
-                onMouseLeave={() => setHoveredCardId(null)}
-                onClick={() => setActiveVideo(item)}
-                className={`relative border cursor-pointer rounded-sm overflow-hidden transition-all duration-500 bg-stage/20 ${
-                  isSelected ? "border-ember" : "border-bone/10 hover:border-bone/30"
-                }`}
-              >
-                {/* Visual Thumbnail Frame */}
-                <div className="relative aspect-[16/9] w-full overflow-hidden">
-                  {/* Real video looping silent preview on hover */}
-                  {isHovered && item.url ? (
-                    <video
-                      src={item.url}
-                      muted
-                      autoPlay
-                      loop
-                      playsInline
-                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                    />
-                  ) : item.poster ? (
-                    <img
-                      src={item.poster}
-                      alt={item.title[lang]}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 w-full h-full bg-stage/40 flex items-center justify-center">
-                      <Video className="w-6 h-6 text-bone/20" />
+              return (
+                <div
+                  key={item.id}
+                  onMouseEnter={() => setHoveredCardId(item.id)}
+                  onMouseLeave={() => setHoveredCardId(null)}
+                  onClick={() => setActiveVideo(item)}
+                  className={`relative border cursor-pointer rounded-sm overflow-hidden transition-all duration-500 bg-stage/20 ${
+                    isSelected ? "border-ember" : "border-bone/10 hover:border-bone/30"
+                  }`}
+                >
+                  {/* Visual Thumbnail Frame */}
+                  <div className="relative aspect-[16/9] w-full overflow-hidden">
+                    {/* Real video looping silent preview on hover */}
+                    {isHovered && item.url ? (
+                      <video
+                        src={item.url}
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                      />
+                    ) : item.poster ? (
+                      <img
+                        src={item.poster}
+                        alt={item.title[lang]}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 w-full h-full bg-stage/40 flex items-center justify-center">
+                        <Video className="w-6 h-6 text-bone/20" />
+                      </div>
+                    )}
+                    {/* Ambient dim overlay */}
+                    <div className="absolute inset-0 bg-ink/30" />
+
+                    {/* Genre Badge */}
+                    <div className="absolute bottom-2 left-2 bg-ink/75 border border-bone/15 px-2 py-0.5 font-mono text-[8px] tracking-widest text-bone">
+                      {item.genre}
                     </div>
-                  )}
-                  {/* Ambient dim overlay */}
-                  <div className="absolute inset-0 bg-ink/30" />
+                  </div>
 
-                  {/* Genre Badge */}
-                  <div className="absolute bottom-2 left-2 bg-ink/75 border border-bone/15 px-2 py-0.5 font-mono text-[8px] tracking-widest text-bone">
-                    {item.genre}
+                  {/* Text Metadata */}
+                  <div className="p-4">
+                    <h3 className="font-display text-lg text-bone leading-tight">
+                      {item.title[lang]}
+                    </h3>
+                    <p className="mt-1 text-[10px] text-bone/50 tracking-wide">{item.sub[lang]}</p>
                   </div>
                 </div>
+              );
+            })}
 
-                {/* Text Metadata */}
-                <div className="p-4">
-                  <h3 className="font-display text-lg text-bone leading-tight">
-                    {item.title[lang]}
-                  </h3>
-                  <p className="mt-1 text-[10px] text-bone/50 tracking-wide">{item.sub[lang]}</p>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Toggle card for show more/less */}
-          {hasMoreVideos && (
-            <div
-              onClick={() => setShowAllVideos(!showAllVideos)}
-              className="relative border border-bone/10 hover:border-ember bg-stage/10 cursor-pointer rounded-sm overflow-hidden flex flex-col items-center justify-center p-6 text-center group transition-all duration-500 min-h-[150px] md:h-auto"
-            >
-              <motion.div
-                animate={{ x: showAllVideos ? 0 : [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                className="w-10 h-10 rounded-full border border-bone/20 flex items-center justify-center text-bone/60 group-hover:text-ember group-hover:border-ember transition-colors mb-2"
+            {/* Toggle card for show more/less */}
+            {hasMoreVideos && (
+              <div
+                onClick={() => setShowAllVideos(!showAllVideos)}
+                className="relative border border-bone/10 hover:border-ember bg-stage/10 cursor-pointer rounded-sm overflow-hidden flex flex-col items-center justify-center p-6 text-center group transition-all duration-500 min-h-[150px] md:h-auto"
               >
-                {showAllVideos ? (
-                  <ArrowLeft size={16} className="rotate-90 md:rotate-0" />
-                ) : (
-                  <ArrowRight size={16} className="rotate-90 md:rotate-0" />
-                )}
-              </motion.div>
-              <span className="font-mono text-[9px] tracking-widest text-bone/60 group-hover:text-bone transition-colors uppercase">
-                {showAllVideos
-                  ? (lang === "sv" ? "Visa färre" : "Show Less")
-                  : (lang === "sv" ? "Visa fler" : "Show More")}
-              </span>
-            </div>
-          )}
-        </div>
+                <motion.div
+                  animate={{ x: showAllVideos ? 0 : [0, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                  className="w-10 h-10 rounded-full border border-bone/20 flex items-center justify-center text-bone/60 group-hover:text-ember group-hover:border-ember transition-colors mb-2"
+                >
+                  {showAllVideos ? (
+                    <ArrowLeft size={16} className="rotate-90 md:rotate-0" />
+                  ) : (
+                    <ArrowRight size={16} className="rotate-90 md:rotate-0" />
+                  )}
+                </motion.div>
+                <span className="font-mono text-[9px] tracking-widest text-bone/60 group-hover:text-bone transition-colors uppercase">
+                  {showAllVideos
+                    ? (lang === "sv" ? "Visa färre" : "Show Less")
+                    : (lang === "sv" ? "Visa fler" : "Show More")}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
+
     </section>
   );
 }
