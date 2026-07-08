@@ -37,7 +37,7 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
       id="showreels"
       ref={sectionRef}
       className={`relative px-6 py-16 md:px-12 md:py-36 bg-ink overflow-hidden ${
-        isEnlarged ? "z-[999]" : ""
+        isEnlarged ? "z-[9999]" : ""
       }`}
     >
       {/* Immersive Atmospheric Ambient Backdrop Glow */}
@@ -49,7 +49,7 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
       />
 
       <motion.div
-        style={{ opacity: exitOpacity, scale: exitScale, zIndex: isEnlarged ? 999 : 10 }}
+        style={{ opacity: exitOpacity, scale: exitScale, zIndex: isEnlarged ? 9999 : 10 }}
         className="relative mx-auto max-w-7xl"
       >
         {/* Section Header */}

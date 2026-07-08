@@ -64,7 +64,7 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
       }`}
     >
       <div
-        className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-3.5" : "py-5"}`}
+        className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-5 lg:py-3.5" : "py-7 lg:py-5"}`}
       >
         {heroDone ? (
           <motion.button

@@ -250,3 +250,36 @@ This document details critical bugs, layout errors, and interaction blocks found
   2. **Portfolio Scroll:** Moved the horizontal scroll-lock layout breakpoint in `Portfolio.tsx` from `md` to `lg`. Tablets now use the same natural height, touch-friendly vertical scroll as mobile devices.
   3. **Grid Layout Splits:** Postponed multi-column grid splits in `Biography.tsx`, `Voice.tsx`, and `Contact.tsx` to `lg` and above. Elements stack vertically on tablets, providing full screen width for content blocks.
   4. **Email & Heading Sizes:** Adjusted typography classes across all headings (`Showreels.tsx`, `Credits.tsx`, `Voice.tsx`, and `Contact.tsx`) to scale smoothly from mobile to tablet and desktop sizes. Added `break-all` styling to contact emails to guarantee they never overflow container margins.
+
+## 41. Theater Player Overlay, Transition Flickering, and Navbar Heights
+- **Symptom:** Three minor visual bugs occurred on mobile and tablet views:
+  1. The close (`X`) button of the expanded theater video player rendered behind the fixed navigation bar, making it impossible to close the player.
+  2. Brief glimpses or flashes of the underlying poster image occurred during the video loading transition when cinema mode was activated.
+  3. The navbar height on mobile/tablet screens was too short, making links feel cramped.
+- **Root Cause:**
+  1. The overlay z-index (`z-[100]`) inside the `Showreels` nested stacking context was lower than the fixed header (`z-[70]`).
+  2. The widescreen canvas container lacked a background color, and the static poster image instantly disappeared when switching branches instead of fading out smoothly.
+  3. The vertical padding on the mobile/tablet navigation bar was too tight.
+- **Resolution:**
+  1. **Z-Index:** Raised the enlarged player overlay z-index to `z-[9999]` and the close button to `z-[99999]`. Raised the parent `Showreels` section and inner motion block to `z-[9999]` when enlarged.
+  2. **Poster Transition:** Set a solid `bg-black` background on the player screen canvas and converted the static poster image to a `motion.img` that fades out smoothly over 2.2 seconds as the screen enlarges, leaving a solid black canvas behind the video fade-in.
+  3. **Navbar Height:** Increased the mobile/tablet vertical padding in `Nav.tsx` from `py-3.5` to `py-5` (when scrolled) and `py-5` to `py-7` (when unscrolled), while keeping desktop heights untouched (`lg:py-3.5` / `lg:py-5`).
+
+## 42. Mobile Landscape Staggering and Aspect Distortion Fixes
+- **Symptom:** Two visual scaling bugs occurred when viewing the enlarged video player on mobile:
+  1. Turning the device to landscape view stretched the player out of bounds, hiding controls.
+  2. Rotating back from landscape to portrait view while a video was playing distorted the layout, exposing the underlying page content.
+- **Root Cause:** In CSS, any ancestor containing a `transform`, `scale`, or `opacity` attribute (such as Framer Motion's wrappers in `Showreels.tsx`) establishes a new stacking context. This causes `position: fixed` elements to anchor relative to that container rather than the browser window viewport, making the layout break and distort during orientation shifts.
+- **Resolution:**
+  1. **React Portal Integration:** Refactored `TheaterPlayer.tsx` to mount the enlarged modal via a React Portal directly inside `document.body` (on the client side). This isolates the player from any container `transform` constraints.
+  2. **Shared Layout Animation:** Retained Framer Motion's shared transition logic by matching the `layoutId="theater-player-canvas"` across the inline box and the portal element, resulting in clean viewport-relative scaling.
+  3. **Snappy Timers:** Accelerated the layout scaling transition to a snappy `0.5s` duration, syncing the video start trigger to match.
+  4. **Landscape Resilience:** Ensured that standard video player resizing and close hooks adjust dynamically to portrait/landscape viewport measurements. Added `controls` to the local HTML5 `<video>` player in enlarged mode to enable native browser playback interface.
+
+## 43. Page Content Hiding in Enlarged Cinema Mode
+- **Symptom:** Elements like the navigation header, spotlight cursors, and other page sections could bleed, flicker, or show visual overlap when the video player expanded.
+- **Root Cause:** Standard overlay rendering covers background content visually, but underlying elements still draw, consuming rendering cycles and risking subpixel positioning conflicts (e.g., headers or scroll layouts peeking through at the edges of the screen).
+- **Resolution:**
+  - Added a DOM toggle within the `isEnlarged` layout hook inside `TheaterPlayer.tsx`.
+  - When the player is active, the `<main>` root element is styled with `visibility: hidden`. Since the enlarged player mounts via React Portal directly into `document.body` (outside the `<main>` tag), it remains fully visible.
+  - When closed, `<main>` visibility is restored to default. Using `visibility: hidden` hides all page contents while preserving scroll offsets, preventing jumpiness when the overlay is dismissed.
