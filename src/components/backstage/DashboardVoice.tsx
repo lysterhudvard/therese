@@ -15,6 +15,10 @@ interface VoiceSettings {
   demo_en: string;
   image_url?: string;
   image_alt?: string;
+  image_caption?: string;
+  image_title?: string;
+  image_filename?: string;
+  image_description?: string;
 }
 
 export function DashboardVoice() {
@@ -29,6 +33,10 @@ export function DashboardVoice() {
     demo_en: "Demo via email",
     image_url: "",
     image_alt: "",
+    image_caption: "",
+    image_title: "",
+    image_filename: "",
+    image_description: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -241,15 +249,61 @@ export function DashboardVoice() {
               </div>
             </div>
             
-            <div className="space-y-2">
-              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild Alt-text (SEO)</label>
-              <input
-                type="text"
-                value={settings.image_alt || ""}
-                onChange={(e) => handleChange("image_alt", e.target.value)}
-                placeholder="t.ex. Therese Järvheden — röstskådespelerska"
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild Alt-text (SEO)</label>
+                <input
+                  type="text"
+                  value={settings.image_alt || ""}
+                  onChange={(e) => handleChange("image_alt", e.target.value)}
+                  placeholder="t.ex. Therese Järvheden — röstskådespelerska"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Titel (Title Tag)</label>
+                <input
+                  type="text"
+                  value={settings.image_title || ""}
+                  onChange={(e) => handleChange("image_title", e.target.value)}
+                  placeholder="t.ex. Therese Järvheden Röst"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bildtext (Caption)</label>
+                <input
+                  type="text"
+                  value={settings.image_caption || ""}
+                  onChange={(e) => handleChange("image_caption", e.target.value)}
+                  placeholder="Kort bildbeskrivning..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Sökoptimerat Filnamn</label>
+                <input
+                  type="text"
+                  value={settings.image_filename || ""}
+                  onChange={(e) => handleChange("image_filename", e.target.value)}
+                  placeholder="ex. therese-rost.webp"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Beskrivning (Description - WordPress-stil)</label>
+                <textarea
+                  value={settings.image_description || ""}
+                  onChange={(e) => handleChange("image_description", e.target.value)}
+                  placeholder="Längre beskrivning för mediabiblioteket/SEO..."
+                  rows={2}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                />
+              </div>
             </div>
           </div>
           
@@ -291,8 +345,16 @@ export function DashboardVoice() {
       <MediaPickerModal
         isOpen={isMediaPickerOpen}
         onClose={() => setIsMediaPickerOpen(false)}
-        onSelect={(url) => {
-          handleChange("image_url", url);
+        onSelect={(url, metadata) => {
+          setSettings((prev) => ({
+            ...prev,
+            image_url: url,
+            image_alt: metadata?.alt || prev.image_alt || "",
+            image_title: metadata?.title || prev.image_title || "",
+            image_caption: metadata?.caption || prev.image_caption || "",
+            image_description: metadata?.description || prev.image_description || "",
+            image_filename: metadata?.filename || prev.image_filename || ""
+          }));
           setIsMediaPickerOpen(false);
         }}
         typeFilter="image"

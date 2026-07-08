@@ -166,5 +166,11 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Säker SQL-migrering:** Lagt till ALTER TABLE-skript och uppdaterat det kompletta schemat för att inkludera `download_url TEXT` i Supabase.
 - **SSR- & Klient-mappning:** Uppdaterat datahämtningen på både servernivå (Astro SSR i `supabase-server.ts`) och klientnivå (`index.tsx`) för att skicka vidare nedladdningslänken.
 
+### 28. Svensk namngivning för mediamappar
+- **Lokalisering till svenska:** Justerat namnen på mapparna i mediebiblioteket från engelska till svenska i gränssnittet och API-förfrågningarna (`Credits` -> `Meriter`, `Curtain` -> `Ridåfall`, `Voice` -> `Röst`, `General` -> `Allmänt`, `Hero` -> `Akt I (Hero)`).
+- **Synkroniserad lagring:** Säkerställt att mapparna matchar Supabase-databasschemat och lagringsstrukturen för att undvika filförlust.
 
-
+### 29. Återställd och utökad SEO-bildinmatning
+- **Återställda SEO-fält i Portfölj-CMS:** Lagt tillbaka inmatningsfält för alt-text, title-tagg, bildtext (caption) och sökoptimerat filnamn i `DashboardPortfolio.tsx` som tidigare raderats.
+- **SEO-rendering på front-end:** Kopplat fälten (`alt`, `title`, `filename`, `caption`) på startsidan och i galleriet (`Portfolio.tsx`, `Voice.tsx` och `Footer.tsx`) så att webbläsare och sökmotorer får fullständig tillgång till SEO-metadata.
+- **Högkvalitativ nedladdning:** Nedladdningsknappen i portföljen använder nu det sökoptimerade filnamnet för nedladdade pressbilder.

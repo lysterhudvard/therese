@@ -14,6 +14,11 @@ interface StorageFile {
   size?: number;
   created_at?: string;
   folder?: string;
+  alt?: string;
+  title?: string;
+  caption?: string;
+  description?: string;
+  filename?: string;
 }
 
 export function DashboardMedia() {
@@ -29,11 +34,30 @@ export function DashboardMedia() {
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
   const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
 
+  // Metadata Edit States
+  const [editingMetaPath, setEditingMetaPath] = useState<string | null>(null);
+  const [editMetaValues, setEditMetaValues] = useState({
+    alt: "",
+    title: "",
+    caption: "",
+    description: "",
+    filename: ""
+  });
+
   const fetchFiles = async () => {
     if (!isSupabaseConfigured()) return;
     setIsLoading(true);
     try {
-      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "general"];
+      // Fetch metadata from DB
+      const { data: metaRows } = await supabase.from("media_metadata").select("*");
+      const metaMap = new Map();
+      if (metaRows) {
+        metaRows.forEach((row) => {
+          metaMap.set(row.file_path, row);
+        });
+      }
+
+      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "credits", "voice", "curtain", "general", "meriter", "röst", "ridåfall", "allmänt"];
       const results = await Promise.all(
         folders.map(async (folder) => {
           const { data, error } = await supabase.storage.from("portfolio").list(folder, {
@@ -51,6 +75,13 @@ export function DashboardMedia() {
       const allFiles = results.flat();
 
       if (allFiles) {
+        const folderMapping: Record<string, string> = {
+          credits: "meriter",
+          voice: "röst",
+          curtain: "ridåfall",
+          general: "allmänt"
+        };
+
         const mapped: StorageFile[] = allFiles
           .filter((file) => file.name !== ".emptyFolderPlaceholder" && file.id !== null && file.metadata)
           .map((file) => {
@@ -59,6 +90,9 @@ export function DashboardMedia() {
             const ext = file.name.split(".").pop()?.toLowerCase() || "";
             const isImage = ["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"].includes(ext);
             const isVideo = ["mp4", "webm", "ogg", "mov", "m4v"].includes(ext);
+
+            const normalizedFolder = folderMapping[file.folder || ""] || file.folder || "allmänt";
+            const fileMeta = metaMap.get(filePath) || {};
 
             return {
               name: file.name,
@@ -69,7 +103,12 @@ export function DashboardMedia() {
               isVideo,
               size: file.metadata?.size,
               created_at: file.created_at || undefined,
-              folder: file.folder || "general",
+              folder: normalizedFolder,
+              alt: fileMeta.alt || "",
+              title: fileMeta.title || "",
+              caption: fileMeta.caption || "",
+              description: fileMeta.description || "",
+              filename: fileMeta.filename || ""
             };
           });
 
@@ -108,10 +147,10 @@ export function DashboardMedia() {
     }
 
     // Non-images (e.g. videos) go straight to upload
-    await proceedWithUpload(file, "general");
+    await proceedWithUpload(file, "allmänt");
   };
 
-  const proceedWithUpload = async (fileToUpload: File, category: string = "general") => {
+  const proceedWithUpload = async (fileToUpload: File, category: string = "allmänt") => {
     setIsOptimizerOpen(false);
     setPendingUploadFile(null);
     setIsUploading(true);
@@ -153,19 +192,74 @@ export function DashboardMedia() {
     }
   };
 
+  const handleMoveFile = async (file: StorageFile, newFolder: string) => {
+    if (!isSupabaseConfigured()) return;
+    
+    const newPath = newFolder ? `${newFolder}/${file.name}` : file.name;
+    if (file.path === newPath) return;
+
+    const FOLDER_LABELS: Record<string, string> = {
+      hero: "Hero",
+      bio: "Bio (Moods)",
+      portfolio: "Portfolio",
+      showreel: "Showreel",
+      seo: "SEO",
+      meriter: "Meriter",
+      röst: "Röst",
+      ridåfall: "Ridåfall",
+      allmänt: "Allmänt"
+    };
+    const folderLabel = FOLDER_LABELS[newFolder] || newFolder || "roten";
+    const toastId = toast.loading(`Flyttar ${file.name} till ${folderLabel}...`);
+    try {
+      const { error } = await supabase.storage
+        .from("portfolio")
+        .move(file.path, newPath);
+
+      if (error) throw error;
+
+      toast.success(`Filen flyttades till ${folderLabel}.`, { id: toastId });
+      fetchFiles();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Kunde inte flytta fil: ${err.message}`, { id: toastId });
+    }
+  };
+
   const handleCopyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
     toast.success("URL kopierad till urklipp!");
   };
 
-  const handleAddToPortfolio = async (url: string, name: string) => {
+  const handleSaveMetadata = async (filePath: string) => {
+    try {
+      const { error } = await supabase
+        .from("media_metadata")
+        .upsert({
+          file_path: filePath,
+          alt: editMetaValues.alt,
+          title: editMetaValues.title,
+          caption: editMetaValues.caption,
+          description: editMetaValues.description,
+          filename: editMetaValues.filename,
+          updated_at: new Date().toISOString()
+        }, { onConflict: "file_path" });
+
+      if (error) throw error;
+      toast.success("Metadata sparad för filen!");
+      setEditingMetaPath(null);
+      fetchFiles();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Kunde inte spara metadata: ${err.message}`);
+    }
+  };
+
+  const handleAddToPortfolio = async (file: StorageFile) => {
     if (!isSupabaseConfigured()) {
       toast.error("Supabase är inte anslutet.");
       return;
     }
-
-    const altText = prompt("Ange alt-beskrivning för bilden (bra för Google SEO):", name.split(".")[0]);
-    if (altText === null) return; // cancelled
 
     const toastId = toast.loading("Lägger till bild i Portfolio-galleri...");
     try {
@@ -179,8 +273,12 @@ export function DashboardMedia() {
       const nextOrder = currentImages && currentImages.length > 0 ? currentImages[0].sort_order + 1 : 0;
 
       const { error } = await supabase.from("portfolio_images").insert({
-        url,
-        alt: altText || "Therese Järvheden portfolio",
+        url: file.url,
+        alt: file.alt || file.name.split(".")[0],
+        title: file.title || "",
+        caption: file.caption || "",
+        description: file.description || "",
+        filename: file.filename || file.name,
         allow_download: true,
         sort_order: nextOrder,
       });
@@ -423,7 +521,10 @@ export function DashboardMedia() {
                 { id: "portfolio", label: "Portfolio" },
                 { id: "showreel", label: "Showreel" },
                 { id: "seo", label: "SEO" },
-                { id: "general", label: "Allmänt" },
+                { id: "meriter", label: "Meriter" },
+                { id: "röst", label: "Röst" },
+                { id: "ridåfall", label: "Ridåfall" },
+                { id: "allmänt", label: "Allmänt" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -466,7 +567,7 @@ export function DashboardMedia() {
                     <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
                       {file.folder && (
                         <div className="absolute top-2 left-2 bg-ember text-ink font-mono text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm z-10 shadow-sm">
-                          {file.folder}
+                          {file.folder.toUpperCase()}
                         </div>
                       )}
                       {file.isImage ? (
@@ -508,7 +609,7 @@ export function DashboardMedia() {
                           <button
                             type="button"
                             id={index === 0 ? "klick-media-add-portfolio-0" : undefined}
-                            onClick={() => handleAddToPortfolio(file.url, file.name)}
+                            onClick={() => handleAddToPortfolio(file)}
                             className="flex items-center justify-center gap-1.5 py-1.5 bg-ember/15 border border-ember/25 text-ember hover:bg-ember hover:text-ink transition-all rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer"
                           >
                             <Plus size={10} />
@@ -527,7 +628,121 @@ export function DashboardMedia() {
                         )}
                       </div>
 
-                      <div className="flex justify-end pt-1">
+                      {/* SEO / Metadata Drawer */}
+                      <div className="border-t border-bone/5 pt-2 mt-2">
+                        {editingMetaPath === file.path ? (
+                          <div className="space-y-2 bg-black/20 p-2 rounded-sm border border-bone/5">
+                            <span className="block text-[8px] font-mono uppercase tracking-widest text-ember font-bold">Redigera Metadata</span>
+                            <div>
+                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Alt-text (SEO)</label>
+                              <input
+                                type="text"
+                                value={editMetaValues.alt}
+                                onChange={(e) => setEditMetaValues({ ...editMetaValues, alt: e.target.value })}
+                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Titel (Title Tag)</label>
+                              <input
+                                type="text"
+                                value={editMetaValues.title}
+                                onChange={(e) => setEditMetaValues({ ...editMetaValues, title: e.target.value })}
+                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Bildtext (Caption)</label>
+                              <input
+                                type="text"
+                                value={editMetaValues.caption}
+                                onChange={(e) => setEditMetaValues({ ...editMetaValues, caption: e.target.value })}
+                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Beskrivning (Description)</label>
+                              <textarea
+                                value={editMetaValues.description}
+                                onChange={(e) => setEditMetaValues({ ...editMetaValues, description: e.target.value })}
+                                rows={2}
+                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember resize-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[7px] uppercase tracking-widest text-bone/45 font-mono mb-0.5">Sökoptimerat Filnamn</label>
+                              <input
+                                type="text"
+                                value={editMetaValues.filename}
+                                onChange={(e) => setEditMetaValues({ ...editMetaValues, filename: e.target.value })}
+                                className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
+                              />
+                            </div>
+                            <div className="flex gap-2 justify-end pt-1">
+                              <button
+                                type="button"
+                                onClick={() => setEditingMetaPath(null)}
+                                className="px-2 py-0.5 border border-bone/10 hover:border-bone text-bone/60 hover:text-bone text-[8px] font-mono uppercase tracking-widest rounded-sm cursor-pointer"
+                              >
+                                Avbryt
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSaveMetadata(file.path)}
+                                className="px-2 py-0.5 bg-ember text-ink text-[8px] font-mono font-bold uppercase tracking-widest rounded-sm hover:bg-ember/90 cursor-pointer"
+                              >
+                                Spara
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[8px] text-bone/40 font-mono max-w-[150px] truncate" title={file.alt}>
+                              {file.alt ? `SEO: ${file.alt}` : "Saknar SEO metadata"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingMetaPath(file.path);
+                                setEditMetaValues({
+                                  alt: file.alt || "",
+                                  title: file.title || "",
+                                  caption: file.caption || "",
+                                  description: file.description || "",
+                                  filename: file.filename || file.name
+                                });
+                              }}
+                              className="text-[8px] font-mono uppercase tracking-widest text-ember hover:underline cursor-pointer"
+                            >
+                              Redigera SEO
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5 justify-between border-t border-bone/5 pt-2 mt-2">
+                        <span className="text-[8px] uppercase tracking-widest text-bone/40 font-mono">
+                          Flytta till:
+                        </span>
+                        <select
+                          value={file.folder || ""}
+                          onChange={(e) => handleMoveFile(file, e.target.value)}
+                          className="bg-stage/35 border border-bone/10 text-bone text-[9px] font-mono rounded px-1.5 py-0.5 focus:outline-none focus:border-ember cursor-pointer"
+                        >
+                          <option value="">Roten</option>
+                          <option value="hero">Hero</option>
+                          <option value="bio">Bio (Moods)</option>
+                          <option value="portfolio">Portfolio</option>
+                          <option value="showreel">Showreel</option>
+                          <option value="seo">SEO</option>
+                          <option value="meriter">Meriter</option>
+                          <option value="röst">Röst</option>
+                          <option value="ridåfall">Ridåfall</option>
+                          <option value="allmänt">Allmänt</option>
+                        </select>
+                      </div>
+
+                      <div className="flex justify-end pt-2">
                         <button
                           type="button"
                           onClick={() => handleDeleteFile(file.path)}
@@ -547,7 +762,7 @@ export function DashboardMedia() {
       <ImageUploadOptimizer
         isOpen={isOptimizerOpen}
         file={pendingUploadFile}
-        defaultSection="general"
+        defaultSection="allmänt"
         onCancel={() => {
           setIsOptimizerOpen(false);
           setPendingUploadFile(null);

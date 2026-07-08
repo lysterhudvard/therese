@@ -11,6 +11,11 @@ interface BioSection {
   quote_sv: string;
   quote_en: string;
   image: string;
+  image_alt?: string;
+  image_caption?: string;
+  image_title?: string;
+  image_filename?: string;
+  description?: string;
   weight?: number;
 }
 
@@ -264,9 +269,16 @@ export function DashboardBio() {
     setIsMediaPickerOpen(true);
   };
 
-  const handleMediaSelect = (url: string) => {
+  const handleMediaSelect = (url: string, metadata?: any) => {
     if (activePickingSectionId) {
-      updateBioSection(activePickingSectionId, { image: url });
+      updateBioSection(activePickingSectionId, {
+        image: url,
+        image_alt: metadata?.alt || "",
+        image_title: metadata?.title || "",
+        image_caption: metadata?.caption || "",
+        description: metadata?.description || "",
+        image_filename: metadata?.filename || ""
+      });
       setActivePickingSectionId(null);
     }
   };
@@ -499,23 +511,78 @@ export function DashboardBio() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                  <div className="md:col-span-3 space-y-2">
-                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild-URL</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={section.image}
-                        onChange={(e) => updateBioSection(section.id, { image: e.target.value })}
-                        placeholder="https://..."
-                        className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => openMediaPickerForSection(section.id)}
-                        className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
-                      >
-                        Media
-                      </button>
+                  <div className="md:col-span-3 space-y-4">
+                    <div className="space-y-2">
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild-URL</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={section.image}
+                          onChange={(e) => updateBioSection(section.id, { image: e.target.value })}
+                          placeholder="https://..."
+                          className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => openMediaPickerForSection(section.id)}
+                          className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                        >
+                          Media
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Alt-Text (SEO)</label>
+                        <input
+                          type="text"
+                          value={section.image_alt || ""}
+                          onChange={(e) => updateBioSection(section.id, { image_alt: e.target.value })}
+                          placeholder="Alt-text för Google..."
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Titel (Title Tag)</label>
+                        <input
+                          type="text"
+                          value={section.image_title || ""}
+                          onChange={(e) => updateBioSection(section.id, { image_title: e.target.value })}
+                          placeholder="Titel..."
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Bildtext (Caption)</label>
+                        <input
+                          type="text"
+                          value={section.image_caption || ""}
+                          onChange={(e) => updateBioSection(section.id, { image_caption: e.target.value })}
+                          placeholder="Bildtext..."
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Sökoptimerat Filnamn</label>
+                        <input
+                          type="text"
+                          value={section.image_filename || ""}
+                          onChange={(e) => updateBioSection(section.id, { image_filename: e.target.value })}
+                          placeholder="ex. therese-comedic.webp"
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Beskrivning (Description)</label>
+                        <textarea
+                          value={section.description || ""}
+                          onChange={(e) => updateBioSection(section.id, { description: e.target.value })}
+                          placeholder="Längre beskrivning..."
+                          rows={2}
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div className="md:col-span-1 flex flex-col items-center">

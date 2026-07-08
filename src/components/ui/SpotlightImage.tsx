@@ -3,11 +3,13 @@ import { useEffect, useRef } from "react";
 export function SpotlightImage({
   src,
   alt,
+  title,
   className = "",
   style = {},
 }: {
   src: string;
   alt: string;
+  title?: string;
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -105,6 +107,7 @@ export function SpotlightImage({
       <img
         src={src}
         alt={alt}
+        title={title}
         className="h-full w-full object-cover filter grayscale brightness-[0.22] transition-all duration-500"
       />
       {/* Foreground: Fully colored under spotlight mask */}
@@ -112,6 +115,7 @@ export function SpotlightImage({
         ref={maskRef}
         src={src}
         alt=""
+        title={title}
         aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-all duration-300"
       />

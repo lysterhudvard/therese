@@ -10,6 +10,11 @@ export function DashboardHero() {
   const [isAutomated, setIsAutomated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [heroImage, setHeroImage] = useState("");
+  const [heroImageAlt, setHeroImageAlt] = useState("");
+  const [heroImageCaption, setHeroImageCaption] = useState("");
+  const [heroImageTitle, setHeroImageTitle] = useState("");
+  const [heroImageFilename, setHeroImageFilename] = useState("");
+  const [heroImageDescription, setHeroImageDescription] = useState("");
   const [heroRoleSv, setHeroRoleSv] = useState("Skådespelerska");
   const [heroRoleEn, setHeroRoleEn] = useState("Actress");
   const [heroBaseSv, setHeroBaseSv] = useState("Malmö · Stockholm");
@@ -22,13 +27,18 @@ export function DashboardHero() {
     const fetchHeroData = async () => {
       const { data: bioData } = await supabase
         .from("biography")
-        .select("hero_text_sv, hero_text_en, is_automated, hero_image, hero_role_sv, hero_role_en, hero_base_sv, hero_base_en")
+        .select("hero_text_sv, hero_text_en, is_automated, hero_image, hero_image_alt, hero_image_caption, hero_image_title, hero_image_filename, hero_image_description, hero_role_sv, hero_role_en, hero_base_sv, hero_base_en")
         .eq("id", "main")
         .maybeSingle();
 
       if (bioData) {
         setIsAutomated(bioData.is_automated || false);
         if (bioData.hero_image) setHeroImage(bioData.hero_image);
+        if (bioData.hero_image_alt) setHeroImageAlt(bioData.hero_image_alt);
+        if (bioData.hero_image_caption) setHeroImageCaption(bioData.hero_image_caption);
+        if (bioData.hero_image_title) setHeroImageTitle(bioData.hero_image_title);
+        if (bioData.hero_image_filename) setHeroImageFilename(bioData.hero_image_filename);
+        if (bioData.hero_image_description) setHeroImageDescription(bioData.hero_image_description);
         if (bioData.hero_role_sv) setHeroRoleSv(bioData.hero_role_sv);
         if (bioData.hero_role_en) setHeroRoleEn(bioData.hero_role_en);
         if (bioData.hero_base_sv) setHeroBaseSv(bioData.hero_base_sv);
@@ -75,6 +85,11 @@ export function DashboardHero() {
         hero_text_en: currentTextEn,
         is_automated: isAutomated,
         hero_image: heroImage,
+        hero_image_alt: heroImageAlt,
+        hero_image_caption: heroImageCaption,
+        hero_image_title: heroImageTitle,
+        hero_image_filename: heroImageFilename,
+        hero_image_description: heroImageDescription,
         hero_role_sv: heroRoleSv,
         hero_role_en: heroRoleEn,
         hero_base_sv: heroBaseSv,
@@ -224,26 +239,96 @@ export function DashboardHero() {
       <div className="border border-bone/10 p-5 bg-ink/10 rounded-sm space-y-6">
         <h3 className="text-xs font-mono uppercase tracking-widest text-bone border-b border-bone/5 pb-2">Hero Bakgrundsbild</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
-          <div className="md:col-span-3 space-y-2">
-            <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
-              Bild-URL
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={heroImage}
-                onChange={(e) => setHeroImage(e.target.value)}
-                placeholder="https://..."
-                className="flex-1 bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
-              />
-              <button
-                type="button"
-                onClick={() => setIsMediaPickerOpen(true)}
-                className="px-4 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-xs font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
-              >
-                Media
-              </button>
+          <div className="md:col-span-3 space-y-4">
+            <div className="space-y-2">
+              <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+                Bild-URL
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={heroImage}
+                  onChange={(e) => setHeroImage(e.target.value)}
+                  placeholder="https://..."
+                  className="flex-1 bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsMediaPickerOpen(true)}
+                  className="px-4 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-xs font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                >
+                  Media
+                </button>
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+                  Alt-Text (SEO - Sökbarhet)
+                </label>
+                <input
+                  type="text"
+                  value={heroImageAlt}
+                  onChange={(e) => setHeroImageAlt(e.target.value)}
+                  placeholder="t.ex. Therese Järvheden skådespelare porträtt"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+                  Titel (Title Tag)
+                </label>
+                <input
+                  type="text"
+                  value={heroImageTitle}
+                  onChange={(e) => setHeroImageTitle(e.target.value)}
+                  placeholder="t.ex. Therese Järvheden Hero"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+                  Bildtext (Caption)
+                </label>
+                <input
+                  type="text"
+                  value={heroImageCaption}
+                  onChange={(e) => setHeroImageCaption(e.target.value)}
+                  placeholder="Kort bildbeskrivning..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300"
+                />
+              </div>
+
+              <div className="space-y-2 sm:col-span-2">
+                <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+                  Beskrivning (Description - WordPress-stil)
+                </label>
+                <textarea
+                  value={heroImageDescription}
+                  onChange={(e) => setHeroImageDescription(e.target.value)}
+                  placeholder="Längre beskrivning för mediabiblioteket/SEO..."
+                  rows={2}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300 resize-none"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[9px] uppercase tracking-widest text-bone/40 font-mono">
+                  Sökoptimerat Filnamn
+                </label>
+                <input
+                  type="text"
+                  value={heroImageFilename}
+                  onChange={(e) => setHeroImageFilename(e.target.value)}
+                  placeholder="t.ex. therese-jarvheden-skadespelerska.webp"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300 font-mono"
+                />
+              </div>
+            </div>
+
             <p className="text-[10px] text-bone/40 font-mono">
               Den bild som visas i fullskärm i Akt I. Klicka på Media för att välja från uppladdade bilder.
             </p>
@@ -347,7 +432,16 @@ export function DashboardHero() {
       <MediaPickerModal
         isOpen={isMediaPickerOpen}
         onClose={() => setIsMediaPickerOpen(false)}
-        onSelect={(url) => setHeroImage(url)}
+        onSelect={(url, metadata) => {
+          setHeroImage(url);
+          if (metadata) {
+            if (metadata.alt) setHeroImageAlt(metadata.alt);
+            if (metadata.title) setHeroImageTitle(metadata.title);
+            if (metadata.caption) setHeroImageCaption(metadata.caption);
+            if (metadata.description) setHeroImageDescription(metadata.description);
+            if (metadata.filename) setHeroImageFilename(metadata.filename);
+          }
+        }}
         typeFilter="image"
       />
     </form>

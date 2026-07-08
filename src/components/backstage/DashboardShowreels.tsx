@@ -15,6 +15,11 @@ interface ShowreelItem {
   youtube_id?: string;
   url?: string;
   poster: string;
+  poster_alt?: string;
+  poster_caption?: string;
+  poster_title?: string;
+  poster_filename?: string;
+  poster_description?: string;
   genre: string;
   specs: string;
   glow: string;
@@ -97,6 +102,11 @@ export function DashboardShowreels() {
       youtube_id: "",
       url: "",
       poster: "",
+      poster_alt: "",
+      poster_caption: "",
+      poster_title: "",
+      poster_filename: "",
+      poster_description: "",
       genre: "DRAMA / SCENKLIPP",
       specs: "16:9 // HD",
       glow: "rgba(235, 94, 40, 0.15)",
@@ -354,7 +364,7 @@ export function DashboardShowreels() {
                 />
               </div>
 
-              <div className="md:col-span-2 space-y-2">
+              <div className="md:col-span-2 space-y-4">
                 <label className="block text-[8px] uppercase tracking-widest text-bone/45 mb-1 font-mono">Posterbild (URL)</label>
                 <div className="flex gap-2">
                   <input
@@ -387,6 +397,60 @@ export function DashboardShowreels() {
                     <Upload size={12} />
                   </label>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Alt-Text (SEO)</label>
+                    <input
+                      type="text"
+                      value={reel.poster_alt || ""}
+                      onChange={(e) => handleReelChange(reel.id, "poster_alt", e.target.value)}
+                      placeholder="Alt-text för Google..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Titel (Title Tag)</label>
+                    <input
+                      type="text"
+                      value={reel.poster_title || ""}
+                      onChange={(e) => handleReelChange(reel.id, "poster_title", e.target.value)}
+                      placeholder="Titel..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Bildtext (Caption)</label>
+                    <input
+                      type="text"
+                      value={reel.poster_caption || ""}
+                      onChange={(e) => handleReelChange(reel.id, "poster_caption", e.target.value)}
+                      placeholder="Bildtext..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Sökoptimerat Filnamn</label>
+                    <input
+                      type="text"
+                      value={reel.poster_filename || ""}
+                      onChange={(e) => handleReelChange(reel.id, "poster_filename", e.target.value)}
+                      placeholder="ex. therese-showreel.webp"
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Beskrivning (Description - WordPress-stil)</label>
+                    <textarea
+                      value={reel.poster_description || ""}
+                      onChange={(e) => handleReelChange(reel.id, "poster_description", e.target.value)}
+                      placeholder="Längre beskrivning för mediabiblioteket/SEO..."
+                      rows={2}
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                    />
+                  </div>
+                </div>
+
                 {reel.poster && (
                   <img src={reel.poster} alt="Poster preview" className="w-48 aspect-video object-cover rounded mt-2 border border-bone/10" />
                 )}
@@ -418,9 +482,16 @@ export function DashboardShowreels() {
     <MediaPickerModal
       isOpen={activePickerId !== null}
       onClose={() => setActivePickerId(null)}
-      onSelect={(url) => {
+      onSelect={(url, metadata) => {
         if (activePickerId) {
           handleReelChange(activePickerId, "poster", url);
+          if (metadata) {
+            if (metadata.alt) handleReelChange(activePickerId, "poster_alt", metadata.alt);
+            if (metadata.title) handleReelChange(activePickerId, "poster_title", metadata.title);
+            if (metadata.caption) handleReelChange(activePickerId, "poster_caption", metadata.caption);
+            if (metadata.description) handleReelChange(activePickerId, "poster_description", metadata.description);
+            if (metadata.filename) handleReelChange(activePickerId, "poster_filename", metadata.filename);
+          }
         }
       }}
       typeFilter="image"

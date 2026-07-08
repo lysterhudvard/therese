@@ -7,6 +7,9 @@ import { IMG } from "../../routes/index";
 export interface PortfolioImage {
   url: string;
   alt?: string;
+  title?: string;
+  caption?: string;
+  filename?: string;
   allow_download?: boolean;
   download_url?: string;
 }
@@ -29,6 +32,9 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
         url: img,
         download_url: img,
         alt: `Therese Järvheden portfolio ${idx + 1}`,
+        title: "",
+        caption: "",
+        filename: "",
         allow_download: true,
       };
     }
@@ -36,6 +42,9 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
       url: img.url,
       download_url: img.download_url || img.url,
       alt: img.alt || `Therese Järvheden portfolio ${idx + 1}`,
+      title: img.title || "",
+      caption: img.caption || "",
+      filename: img.filename || "",
       allow_download: img.allow_download !== false,
     };
   });
@@ -134,6 +143,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
                 <img
                   src={img.url}
                   alt={img.alt}
+                  title={img.title || undefined}
                   loading="lazy"
                   className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.02]"
                 />
@@ -147,7 +157,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
                 {img.allow_download && (
                   <button
                     type="button"
-                    onClick={() => triggerDownload(img.download_url || img.url, `therese-jarvheden-press-${i + 1}.jpg`)}
+                    onClick={() => triggerDownload(img.download_url || img.url, img.filename || `therese-jarvheden-press-${i + 1}.jpg`)}
                     className="absolute bottom-3 right-3 p-2 bg-ink/75 hover:bg-ember border border-bone/10 hover:border-ember text-bone hover:text-ink rounded-full transition-all duration-300 shadow-md flex items-center justify-center cursor-pointer scale-90 group-hover:scale-100 opacity-0 group-hover:opacity-100"
                     title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
                   >
@@ -183,6 +193,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
                     <img
                       src={img.url}
                       alt={img.alt}
+                      title={img.title || undefined}
                       loading="lazy"
                       className="h-full w-full object-cover"
                     />
@@ -193,7 +204,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
                     {img.allow_download && (
                       <button
                         type="button"
-                        onClick={() => triggerDownload(img.download_url || img.url, `therese-jarvheden-press-${i + 1}.jpg`)}
+                        onClick={() => triggerDownload(img.download_url || img.url, img.filename || `therese-jarvheden-press-${i + 1}.jpg`)}
                         className="absolute bottom-2 right-2 p-2 bg-black/60 text-bone hover:text-ember rounded-full transition-colors flex items-center justify-center cursor-pointer"
                         title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
                       >

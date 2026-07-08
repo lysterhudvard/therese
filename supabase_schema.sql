@@ -95,3 +95,31 @@ CREATE POLICY "Allow all actions on credits" ON credits FOR ALL USING (true) WIT
 CREATE POLICY "Allow all actions on showreels" ON showreels FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all actions on seo_settings" ON seo_settings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all actions on portfolio_images" ON portfolio_images FOR ALL USING (true) WITH CHECK (true);
+
+-- Ensure storage bucket and policies are set up for Jarvheden portfolio
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('portfolio', 'portfolio', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for the portfolio bucket to allow public read and full write permissions
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+CREATE POLICY "Public Access" ON storage.objects
+    FOR SELECT
+    USING (bucket_id = 'portfolio');
+
+DROP POLICY IF EXISTS "Admin Upload Access" ON storage.objects;
+CREATE POLICY "Admin Upload Access" ON storage.objects
+    FOR INSERT
+    WITH CHECK (bucket_id = 'portfolio');
+
+DROP POLICY IF EXISTS "Admin Update Access" ON storage.objects;
+CREATE POLICY "Admin Update Access" ON storage.objects
+    FOR UPDATE
+    USING (bucket_id = 'portfolio')
+    WITH CHECK (bucket_id = 'portfolio');
+
+DROP POLICY IF EXISTS "Admin Delete Access" ON storage.objects;
+CREATE POLICY "Admin Delete Access" ON storage.objects
+    FOR DELETE
+    USING (bucket_id = 'portfolio');
+

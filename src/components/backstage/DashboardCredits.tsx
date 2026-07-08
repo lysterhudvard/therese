@@ -16,6 +16,11 @@ interface CreditRow {
   type: string;
   url?: string;
   img: string;
+  img_alt?: string;
+  img_caption?: string;
+  img_title?: string;
+  img_filename?: string;
+  img_description?: string;
   is_current_production: boolean;
   sort_order: number;
   // Audio commentary / röst
@@ -93,6 +98,11 @@ export function DashboardCredits() {
       network: "",
       type: "Film",
       img: "",
+      img_alt: "",
+      img_caption: "",
+      img_title: "",
+      img_filename: "",
+      img_description: "",
       is_current_production: false,
       sort_order: credits.length,
       commentary_url: "",
@@ -212,6 +222,11 @@ export function DashboardCredits() {
           network: c.network,
           type: c.type,
           img: c.img || "",
+          img_alt: c.img_alt || "",
+          img_caption: c.img_caption || "",
+          img_title: c.img_title || "",
+          img_filename: c.img_filename || "",
+          img_description: c.img_description || "",
           is_current_production: c.is_current_production,
           sort_order: index,
           url: c.url || null,
@@ -478,39 +493,111 @@ export function DashboardCredits() {
               </div>
 
               {/* Image selection and preview */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 border-t border-bone/5 pt-3 items-center">
-                <div className="md:col-span-8 space-y-1">
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
-                    Bild-URL (Visas i manus-förhandsvisningen vid hover)
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={c.img || ""}
-                      onChange={(e) => updateCredit(c.id, "img", e.target.value)}
-                      placeholder="Skriv in bild-URL eller välj från mediabiblioteket"
-                      className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setActivePickerId(c.id + "-img")}
-                      className="px-3 py-1.5 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
-                    >
-                      Media
-                    </button>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 border-t border-bone/5 pt-3 items-start">
+                <div className="md:col-span-8 space-y-3">
+                  <div className="space-y-1">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                      Bild-URL (Visas i manus-förhandsvisningen vid hover)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={c.img || ""}
+                        onChange={(e) => updateCredit(c.id, "img", e.target.value)}
+                        placeholder="Skriv in bild-URL eller välj från mediabiblioteket"
+                        className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setActivePickerId(c.id + "-img")}
+                        className="px-3 py-1.5 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                      >
+                        Media
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Alt-Text (SEO)
+                      </label>
+                      <input
+                        type="text"
+                        value={c.img_alt || ""}
+                        onChange={(e) => updateCredit(c.id, "img_alt", e.target.value)}
+                        placeholder="Alt-text för Google..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Titel (Title Tag)
+                      </label>
+                      <input
+                        type="text"
+                        value={c.img_title || ""}
+                        onChange={(e) => updateCredit(c.id, "img_title", e.target.value)}
+                        placeholder="Titel..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Bildtext (Caption)
+                      </label>
+                      <input
+                        type="text"
+                        value={c.img_caption || ""}
+                        onChange={(e) => updateCredit(c.id, "img_caption", e.target.value)}
+                        placeholder="Bildtext..."
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Sökoptimerat Filnamn
+                      </label>
+                      <input
+                        type="text"
+                        value={c.img_filename || ""}
+                        onChange={(e) => updateCredit(c.id, "img_filename", e.target.value)}
+                        placeholder="ex. therese-merit.webp"
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
+                        Beskrivning (Description - WordPress-stil)
+                      </label>
+                      <textarea
+                        value={c.img_description || ""}
+                        onChange={(e) => updateCredit(c.id, "img_description", e.target.value)}
+                        placeholder="Längre beskrivning för mediabiblioteket/SEO..."
+                        rows={2}
+                        className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="md:col-span-4 flex items-center gap-3 pt-4 md:pt-2">
+
+                <div className="md:col-span-4 flex items-center gap-3 pt-4 md:pt-6">
                   {c.img ? (
                     <>
                       <img
                         src={c.img}
                         alt="Meritförhandsvisning"
-                        className="h-10 w-10 object-cover border border-bone/10 rounded-sm"
+                        className="h-14 w-14 object-cover border border-bone/10 rounded-sm"
                       />
                       <button
                         type="button"
-                        onClick={() => updateCredit(c.id, "img", "")}
+                        onClick={() => {
+                          updateCredit(c.id, "img", "");
+                          updateCredit(c.id, "img_alt", "");
+                          updateCredit(c.id, "img_caption", "");
+                          updateCredit(c.id, "img_title", "");
+                          updateCredit(c.id, "img_filename", "");
+                        }}
                         className="text-[8px] uppercase tracking-widest text-red-400 hover:text-red-300 font-mono transition-colors cursor-pointer"
                       >
                         Ta bort bild
@@ -731,11 +818,18 @@ export function DashboardCredits() {
     <MediaPickerModal
       isOpen={activePickerId !== null}
       onClose={() => setActivePickerId(null)}
-      onSelect={(url) => {
+      onSelect={(url, metadata) => {
         if (activePickerId) {
           if (activePickerId.endsWith("-img")) {
             const actualId = activePickerId.substring(0, activePickerId.length - 4);
             updateCredit(actualId, "img", url);
+            if (metadata) {
+              if (metadata.alt) updateCredit(actualId, "img_alt", metadata.alt);
+              if (metadata.title) updateCredit(actualId, "img_title", metadata.title);
+              if (metadata.caption) updateCredit(actualId, "img_caption", metadata.caption);
+              if (metadata.description) updateCredit(actualId, "img_description", metadata.description);
+              if (metadata.filename) updateCredit(actualId, "img_filename", metadata.filename);
+            }
           } else {
             updateCredit(activePickerId, "commentary_url", url);
           }

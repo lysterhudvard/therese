@@ -388,6 +388,9 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           url: p.url,
           download_url: p.download_url || p.url,
           alt: p.alt || "Therese Järvheden porträtt",
+          title: p.title || "",
+          caption: p.caption || "",
+          filename: p.filename || "",
           allow_download: p.allow_download !== false
         }));
 
@@ -491,22 +494,26 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
   const voiceImageData = useMemo(() => {
     let url = IMG.voice;
     let alt = "Therese — röst";
+    let title = "";
+    let caption = "";
     if (dbData?.biography?.voice_settings) {
       try {
         const vs = typeof dbData.biography.voice_settings === "string"
           ? JSON.parse(dbData.biography.voice_settings)
           : dbData.biography.voice_settings;
         if (vs) {
-          if (vs.hasOwnProperty("image_url")) {
+          if (vs.hasOwnProperty("image_url") && vs.image_url) {
             url = vs.image_url;
           }
           if (vs.image_alt) alt = vs.image_alt;
+          if (vs.image_title) title = vs.image_title;
+          if (vs.image_caption) caption = vs.image_caption;
         }
       } catch (e) {
         console.error("Failed to parse voice settings image:", e);
       }
     }
-    return { url, alt };
+    return { url, alt, title, caption };
   }, [dbData]);
 
   const imageCredits = useMemo(() => {
@@ -694,7 +701,12 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           activeCommentaryUrl={activeCommentary?.url}
           onPlayCommentary={setActiveCommentary}
         />
-        <Voice imageUrl={voiceImageData.url} imageAlt={voiceImageData.alt} />
+        <Voice 
+          imageUrl={voiceImageData.url} 
+          imageAlt={voiceImageData.alt} 
+          imageTitle={voiceImageData.title}
+          imageCaption={voiceImageData.caption}
+        />
         <Contact bioData={dbData?.biography} />
         <Footer bioData={dbData?.biography} />
 

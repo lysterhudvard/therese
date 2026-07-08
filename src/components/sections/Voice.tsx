@@ -8,9 +8,11 @@ import { IMG } from "../../routes/index";
 interface VoiceProps {
   imageUrl?: string;
   imageAlt?: string;
+  imageTitle?: string;
+  imageCaption?: string;
 }
 
-export function Voice({ imageUrl, imageAlt }: VoiceProps) {
+export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption }: VoiceProps) {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -51,8 +53,18 @@ export function Voice({ imageUrl, imageAlt }: VoiceProps) {
           </div>
           {imageUrl && (
             <div className="relative h-[60svh] md:h-[90svh] overflow-hidden md:order-first">
-              <SpotlightImage src={imageUrl} alt={imageAlt || "Therese — röst"} className="h-full w-full" />
+              <SpotlightImage 
+                src={imageUrl} 
+                alt={imageAlt || "Therese — röst"} 
+                title={imageTitle}
+                className="h-full w-full" 
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r pointer-events-none" />
+              {imageCaption && (
+                <div className="absolute bottom-4 left-6 z-10 text-[9px] uppercase tracking-[0.3em] text-bone/40 font-mono">
+                  {imageCaption}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -11,6 +11,11 @@ export function DashboardSeo() {
   const [titleEn, setTitleEn] = useState("");
   const [descEn, setDescEn] = useState("");
   const [ogImage, setOgImage] = useState("");
+  const [ogImageAlt, setOgImageAlt] = useState("");
+  const [ogImageCaption, setOgImageCaption] = useState("");
+  const [ogImageTitle, setOgImageTitle] = useState("");
+  const [ogImageFilename, setOgImageFilename] = useState("");
+  const [ogImageDescription, setOgImageDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
@@ -37,6 +42,11 @@ export function DashboardSeo() {
         setTitleEn(data.title_en || "");
         setDescEn(data.description_en || "");
         setOgImage(data.og_image || "");
+        setOgImageAlt(data.og_image_alt || "");
+        setOgImageCaption(data.og_image_caption || "");
+        setOgImageTitle(data.og_image_title || "");
+        setOgImageFilename(data.og_image_filename || "");
+        setOgImageDescription(data.og_image_description || "");
       }
     };
 
@@ -120,6 +130,11 @@ export function DashboardSeo() {
       title_en: titleEn,
       description_en: descEn,
       og_image: ogImage,
+      og_image_alt: ogImageAlt,
+      og_image_caption: ogImageCaption,
+      og_image_title: ogImageTitle,
+      og_image_filename: ogImageFilename,
+      og_image_description: ogImageDescription,
     });
 
     setIsSaving(false);
@@ -254,7 +269,7 @@ export function DashboardSeo() {
           )}
 
           {/* Social share image setup */}
-          <div className="border border-bone/5 bg-stage/10 p-4 rounded-sm space-y-3">
+          <div className="border border-bone/5 bg-stage/10 p-4 rounded-sm space-y-4">
             <h4 className="text-[10px] uppercase tracking-widest text-ember font-mono">OpenGraph Delningsbild</h4>
             <div>
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Delningsbild (URL)</label>
@@ -264,7 +279,7 @@ export function DashboardSeo() {
                   value={ogImage}
                   onChange={(e) => setOgImage(e.target.value)}
                   placeholder="https://exempel.se/og.jpg"
-                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                 />
                 <button
                   type="button"
@@ -275,6 +290,59 @@ export function DashboardSeo() {
                   <ImageIcon size={14} />
                   <span className="sr-only">Välj</span>
                 </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Alt-Text (SEO)</label>
+                <input
+                  type="text"
+                  value={ogImageAlt}
+                  onChange={(e) => setOgImageAlt(e.target.value)}
+                  placeholder="Alt-text..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Titel (Title Tag)</label>
+                <input
+                  type="text"
+                  value={ogImageTitle}
+                  onChange={(e) => setOgImageTitle(e.target.value)}
+                  placeholder="Titel..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Bildtext (Caption)</label>
+                <input
+                  type="text"
+                  value={ogImageCaption}
+                  onChange={(e) => setOgImageCaption(e.target.value)}
+                  placeholder="Bildtext..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Sökoptimerat Filnamn</label>
+                <input
+                  type="text"
+                  value={ogImageFilename}
+                  onChange={(e) => setOgImageFilename(e.target.value)}
+                  placeholder="T.ex: therese-jarvheden-og.webp"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Beskrivning (Description - WordPress-stil)</label>
+                <textarea
+                  value={ogImageDescription}
+                  onChange={(e) => setOgImageDescription(e.target.value)}
+                  placeholder="Längre beskrivning för mediabiblioteket/SEO..."
+                  rows={2}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                />
               </div>
             </div>
             
@@ -382,7 +450,16 @@ export function DashboardSeo() {
     <MediaPickerModal
       isOpen={isPickerOpen}
       onClose={() => setIsPickerOpen(false)}
-      onSelect={(url) => setOgImage(url)}
+      onSelect={(url, metadata) => {
+        setOgImage(url);
+        if (metadata) {
+          if (metadata.alt) setOgImageAlt(metadata.alt);
+          if (metadata.title) setOgImageTitle(metadata.title);
+          if (metadata.caption) setOgImageCaption(metadata.caption);
+          if (metadata.description) setOgImageDescription(metadata.description);
+          if (metadata.filename) setOgImageFilename(metadata.filename);
+        }
+      }}
       typeFilter="image"
     />
     <ImageUploadOptimizer

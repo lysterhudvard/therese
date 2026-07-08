@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, List } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { MediaPickerModal } from "./MediaPickerModal";
 
 interface FooterCreditItem {
   id: string;
@@ -14,8 +15,14 @@ interface FooterCreditItem {
 
 export function DashboardCurtain() {
   const [footerImage, setFooterImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000028-5883458837/image-crop-200000014-6.jpeg?ph=a6c2528650");
+  const [footerImageAlt, setFooterImageAlt] = useState("");
+  const [footerImageCaption, setFooterImageCaption] = useState("");
+  const [footerImageTitle, setFooterImageTitle] = useState("");
+  const [footerImageFilename, setFooterImageFilename] = useState("");
+  const [footerImageDescription, setFooterImageDescription] = useState("");
   const [footerEndSv, setFooterEndSv] = useState("SLUT");
   const [footerEndEn, setFooterEndEn] = useState("END");
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
   
   const [footerCredits, setFooterCredits] = useState<FooterCreditItem[]>([
     {
@@ -91,7 +98,7 @@ export function DashboardCurtain() {
     const fetchCurtainData = async () => {
       const { data, error } = await supabase
         .from("biography")
-        .select("footer_image, footer_end_sv, footer_end_en, footer_credits")
+        .select("footer_image, footer_image_alt, footer_image_caption, footer_image_title, footer_image_filename, footer_image_description, footer_end_sv, footer_end_en, footer_credits")
         .eq("id", "main")
         .maybeSingle();
 
@@ -102,6 +109,11 @@ export function DashboardCurtain() {
 
       if (data) {
         setFooterImage(data.footer_image !== null && data.footer_image !== undefined ? data.footer_image : "");
+        setFooterImageAlt(data.footer_image_alt !== null && data.footer_image_alt !== undefined ? data.footer_image_alt : "");
+        setFooterImageCaption(data.footer_image_caption !== null && data.footer_image_caption !== undefined ? data.footer_image_caption : "");
+        setFooterImageTitle(data.footer_image_title !== null && data.footer_image_title !== undefined ? data.footer_image_title : "");
+        setFooterImageFilename(data.footer_image_filename !== null && data.footer_image_filename !== undefined ? data.footer_image_filename : "");
+        setFooterImageDescription(data.footer_image_description !== null && data.footer_image_description !== undefined ? data.footer_image_description : "");
         setFooterEndSv(data.footer_end_sv !== null && data.footer_end_sv !== undefined ? data.footer_end_sv : "");
         setFooterEndEn(data.footer_end_en !== null && data.footer_end_en !== undefined ? data.footer_end_en : "");
         if (data.footer_credits && Array.isArray(data.footer_credits)) {
@@ -153,6 +165,11 @@ export function DashboardCurtain() {
 
     const { error } = await supabase.from("biography").update({
       footer_image: footerImage,
+      footer_image_alt: footerImageAlt,
+      footer_image_caption: footerImageCaption,
+      footer_image_title: footerImageTitle,
+      footer_image_filename: footerImageFilename,
+      footer_image_description: footerImageDescription,
       footer_end_sv: footerEndSv,
       footer_end_en: footerEndEn,
       footer_credits: footerCredits,
@@ -183,21 +200,86 @@ export function DashboardCurtain() {
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Liten Sidfotsbild URL</label>
-            <input
-              type="text"
-              value={footerImage}
-              onChange={(e) => setFooterImage(e.target.value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Liten Sidfotsbild URL</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={footerImage}
+                  onChange={(e) => setFooterImage(e.target.value)}
+                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsMediaPickerOpen(true)}
+                  className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                >
+                  Media
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Alt-Text (SEO)</label>
+                <input
+                  type="text"
+                  value={footerImageAlt}
+                  onChange={(e) => setFooterImageAlt(e.target.value)}
+                  placeholder="Alt-text..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Titel (Title Tag)</label>
+                <input
+                  type="text"
+                  value={footerImageTitle}
+                  onChange={(e) => setFooterImageTitle(e.target.value)}
+                  placeholder="Titel..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Bildtext (Caption)</label>
+                <input
+                  type="text"
+                  value={footerImageCaption}
+                  onChange={(e) => setFooterImageCaption(e.target.value)}
+                  placeholder="Bildtext..."
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Sökoptimerat Filnamn</label>
+                <input
+                  type="text"
+                  value={footerImageFilename}
+                  onChange={(e) => setFooterImageFilename(e.target.value)}
+                  placeholder="ex. therese-slutsida.webp"
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Beskrivning (Description)</label>
+                <textarea
+                  value={footerImageDescription}
+                  onChange={(e) => setFooterImageDescription(e.target.value)}
+                  placeholder="Längre beskrivning..."
+                  rows={2}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                />
+              </div>
+            </div>
+
             {footerImage && (
               <img src={footerImage} alt="Sidfot förhandsvisning" className="w-full h-32 object-contain mt-2 rounded border border-bone/5 opacity-80" />
             )}
           </div>
           
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className="space-y-4 font-mono">
+            <div className="space-y-2 font-sans">
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Sluttext (Svenska)</label>
               <input
                 type="text"
@@ -207,7 +289,7 @@ export function DashboardCurtain() {
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 font-sans">
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">End text (English)</label>
               <input
                 type="text"
@@ -332,6 +414,21 @@ export function DashboardCurtain() {
           )}
         </button>
       </div>
+    <MediaPickerModal
+      isOpen={isMediaPickerOpen}
+      onClose={() => setIsMediaPickerOpen(false)}
+      onSelect={(url, metadata) => {
+        setFooterImage(url);
+        if (metadata) {
+          if (metadata.alt) setFooterImageAlt(metadata.alt);
+          if (metadata.title) setFooterImageTitle(metadata.title);
+          if (metadata.caption) setFooterImageCaption(metadata.caption);
+          if (metadata.description) setFooterImageDescription(metadata.description);
+          if (metadata.filename) setFooterImageFilename(metadata.filename);
+        }
+      }}
+      typeFilter="image"
+    />
     </form>
   );
 }

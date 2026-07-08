@@ -7,12 +7,29 @@ interface StorageFile {
   url: string;
   type: "image" | "video" | "audio" | "other";
   folder?: string;
+  filePath: string;
+  metadata?: {
+    alt?: string;
+    title?: string;
+    caption?: string;
+    description?: string;
+    filename?: string;
+  };
 }
 
 interface MediaPickerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (url: string) => void;
+  onSelect: (
+    url: string,
+    metadata?: {
+      alt?: string;
+      title?: string;
+      caption?: string;
+      description?: string;
+      filename?: string;
+    }
+  ) => void;
   typeFilter?: "image" | "video" | "audio" | "all";
 }
 
@@ -31,7 +48,16 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
     if (!isSupabaseConfigured()) return;
     setIsLoading(true);
     try {
-      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "general"];
+      // Fetch metadata from DB
+      const { data: metaRows } = await supabase.from("media_metadata").select("*");
+      const metaMap = new Map();
+      if (metaRows) {
+        metaRows.forEach((row) => {
+          metaMap.set(row.file_path, row);
+        });
+      }
+
+      const folders = ["", "hero", "bio", "portfolio", "showreel", "seo", "credits", "voice", "curtain", "general", "meriter", "röst", "ridåfall", "allmänt"];
       const results = await Promise.all(
         folders.map(async (folder) => {
           const { data, error } = await supabase.storage.from("portfolio").list(folder, {
@@ -49,6 +75,13 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
       const allFiles = results.flat();
 
       if (allFiles) {
+        const folderMapping: Record<string, string> = {
+          credits: "meriter",
+          voice: "röst",
+          curtain: "ridåfall",
+          general: "allmänt"
+        };
+
         const mapped: StorageFile[] = allFiles
           .filter((file) => file.name !== ".emptyFolderPlaceholder" && file.id !== null && file.metadata)
           .map((file) => {
@@ -60,11 +93,22 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
             else if (["mp4", "webm", "ogg", "mov", "m4v"].includes(ext)) type = "video";
             else if (["mp3", "wav", "aac", "m4a", "flac"].includes(ext)) type = "audio";
 
+            const normalizedFolder = folderMapping[file.folder || ""] || file.folder || "allmänt";
+            const fileMeta = metaMap.get(filePath) || {};
+
             return {
               name: file.name,
               url: urlData.publicUrl,
               type,
-              folder: file.folder || "general",
+              folder: normalizedFolder,
+              filePath,
+              metadata: {
+                alt: fileMeta.alt || "",
+                title: fileMeta.title || "",
+                caption: fileMeta.caption || "",
+                description: fileMeta.description || "",
+                filename: fileMeta.filename || ""
+              }
             };
           });
         setFiles(mapped);
@@ -103,7 +147,10 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
             { id: "portfolio", label: "Portfolio" },
             { id: "showreel", label: "Showreel" },
             { id: "seo", label: "SEO" },
-            { id: "general", label: "Allmänt" },
+            { id: "meriter", label: "Meriter" },
+            { id: "röst", label: "Röst" },
+            { id: "ridåfall", label: "Ridåfall" },
+            { id: "allmänt", label: "Allmänt" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -135,7 +182,7 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
                 <button
                   key={file.name}
                   onClick={() => {
-                    onSelect(file.url);
+                    onSelect(file.url, file.metadata);
                     onClose();
                   }}
                   className="group relative flex flex-col text-left border border-bone/5 bg-ink/30 rounded-sm overflow-hidden hover:border-ember transition-all"
@@ -143,7 +190,7 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
                   <div className="aspect-square bg-bone/5 flex items-center justify-center relative overflow-hidden">
                     {file.folder && (
                       <div className="absolute top-1.5 left-1.5 bg-ember text-ink font-mono text-[6px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-sm z-10 shadow-sm">
-                        {file.folder}
+                        {file.folder.toUpperCase()}
                       </div>
                     )}
                     {file.type === "image" ? (

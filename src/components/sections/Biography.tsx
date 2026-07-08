@@ -17,6 +17,10 @@ export interface BioSection {
   quote_sv: string;
   quote_en: string;
   image: string;
+  image_alt?: string;
+  image_caption?: string;
+  image_title?: string;
+  image_filename?: string;
   weight?: number;
 }
 
@@ -208,7 +212,8 @@ export function Biography({
                     >
                       <SpotlightImage
                         src={data.image}
-                        alt={`Therese Järvheden — ${lang === "sv" ? data.title_sv : data.title_en}`}
+                        alt={data.image_alt || `Therese Järvheden — ${lang === "sv" ? data.title_sv : data.title_en}`}
+                        title={data.image_title}
                         className="h-full w-full"
                       />
                     </motion.div>
@@ -216,7 +221,9 @@ export function Biography({
                   <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
                 </div>
                 <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono whitespace-pre-line">
-                  {imageCredits ? (
+                  {data.image_caption ? (
+                    <span>{data.image_caption}</span>
+                  ) : imageCredits ? (
                     lang === "sv" ? imageCredits.sv : imageCredits.en
                   ) : (
                     <>

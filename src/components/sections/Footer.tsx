@@ -34,6 +34,8 @@ export function Footer({ bioData }: { bioData?: any }) {
   }, [isInView]);
 
   const footerImage = bioData?.footer_image || "";
+  const footerImageAlt = bioData?.footer_image_alt || "Post-Credits Scene";
+  const footerImageTitle = bioData?.footer_image_title || "";
   const footerEnd = (lang === "sv" ? bioData?.footer_end_sv : bioData?.footer_end_en) || t.footer.end;
 
   const creditsList = useMemo(() => {
@@ -111,7 +113,8 @@ export function Footer({ bioData }: { bioData?: any }) {
             <>
               Actress<span className="hidden md:inline"> · Voice</span>
             </>
-          )}
+          )
+          }
         </div>
       </div>
 
@@ -127,7 +130,8 @@ export function Footer({ bioData }: { bioData?: any }) {
               >
                 <img
                   src={footerImage}
-                  alt="Post-Credits Scene"
+                  alt={footerImageAlt}
+                  title={footerImageTitle}
                   className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
@@ -151,7 +155,8 @@ export function Footer({ bioData }: { bioData?: any }) {
               >
                 <img
                   src={footerImage}
-                  alt="Post-Credits Scene"
+                  alt={footerImageAlt}
+                  title={footerImageTitle}
                   className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />

@@ -10,6 +10,10 @@ interface GalleryImage {
   id: string;
   url: string;
   alt: string;
+  caption?: string;
+  title?: string;
+  filename?: string;
+  description?: string;
   allow_download: boolean;
   download_url?: string;
   sort_order: number;
@@ -94,13 +98,16 @@ export function DashboardPortfolio() {
       url: newImageUrl,
       download_url: newImageUrl,
       alt: newImageAlt || "Therese Järvheden porträtt",
+      caption: "",
+      title: "",
+      filename: newImageUrl.split("/").pop() || "",
       allow_download: true,
       sort_order: images.length,
     };
     setImages([...images, newImg]);
     setNewImageUrl("");
     setNewImageAlt("");
-    toast.success("Bild lagd till i listan. Klicka på Spara för att ladda upp.");
+    toast.success("Bild lagd till i listan. Klicka på Spara för att bekräfta.");
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -202,8 +209,18 @@ export function DashboardPortfolio() {
 
     try {
       // Save images
-      const imagesToUpsert = images.map(({ id, url, alt, allow_download, download_url, sort_order }) => {
-        const item: any = { url, alt, allow_download, download_url: download_url || url, sort_order };
+      const imagesToUpsert = images.map(({ id, url, alt, caption, title, filename, description, allow_download, download_url, sort_order }) => {
+        const item: any = { 
+          url, 
+          alt: alt || "Therese Järvheden portfolio", 
+          caption: caption || "", 
+          title: title || "", 
+          filename: filename || "", 
+          description: description || "",
+          allow_download, 
+          download_url: download_url || url, 
+          sort_order 
+        };
         if (!id.startsWith("temp-")) {
           item.id = id;
         }
@@ -243,10 +260,10 @@ export function DashboardPortfolio() {
         </div>
 
         {/* Add photo tool - Redesigned for clarity */}
-        <div className="bg-stage/15 border border-bone/10 p-6 rounded-md space-y-4 text-center">
-          <h4 className="text-[11px] uppercase tracking-widest text-bone font-mono">Lägg till ny bild i portfolion</h4>
-          <p className="text-[10px] text-bone/50 max-w-sm mx-auto pb-2">
-            Välj om du vill ladda upp en helt ny fil från din dator, eller hämta en bild du redan laddat upp i Mediebiblioteket.
+        <div className="bg-stage/15 border border-bone/10 p-6 rounded-md space-y-4">
+          <h4 className="text-[11px] uppercase tracking-widest text-bone font-mono text-center">Lägg till ny bild i portfolion</h4>
+          <p className="text-[10px] text-bone/50 max-w-sm mx-auto pb-2 text-center">
+            Välj om du vill ladda upp en helt ny fil från din dator, hämta en bild du redan laddat upp i Mediebiblioteket, eller ange en direktlänk.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -281,17 +298,51 @@ export function DashboardPortfolio() {
               Välj från Mediebibliotek
             </button>
           </div>
+
+          {/* Direct URL Inputs */}
+          <div className="border-t border-bone/5 pt-4 mt-2 max-w-lg mx-auto text-left space-y-3">
+            <h5 className="text-[9px] uppercase tracking-widest text-bone/60 font-mono">Eller ange en direkt länk:</h5>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1 font-mono">Bild-URL</label>
+                <input
+                  type="text"
+                  placeholder="https://exempel.se/bild.jpg"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1 font-mono">Alt-text (SEO)</label>
+                <input
+                  type="text"
+                  placeholder="Therese Järvheden porträtt..."
+                  value={newImageAlt}
+                  onChange={(e) => setNewImageAlt(e.target.value)}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddImageUrl}
+              className="w-full py-1.5 bg-bone/10 hover:bg-bone/20 text-bone text-[9px] font-mono uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
+            >
+              Lägg till URL
+            </button>
+          </div>
         </div>
 
         <div id="klick-portfolio-grid" className="space-y-3">
           {images.map((img, index) => (
             <div
               key={img.id}
-              className="flex flex-col md:flex-row md:items-center justify-between border border-bone/10 bg-stage/10 p-4 rounded-sm gap-4"
+              className="flex flex-col border border-bone/10 bg-stage/10 p-4 rounded-sm gap-4"
             >
-              <div className="flex items-center gap-4 flex-1">
+              <div className="flex flex-col md:flex-row md:items-start gap-4">
                 {/* Small thumbnail preview with edit trigger */}
-                <div className="relative w-12 aspect-[3/4] rounded bg-stage border border-bone/10 overflow-hidden shrink-0 group">
+                <div className="relative w-20 aspect-[3/4] rounded bg-stage border border-bone/10 overflow-hidden shrink-0 group mx-auto md:mx-0">
                   <img src={img.url} alt={img.alt} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
                   <button
                     type="button"
@@ -302,26 +353,88 @@ export function DashboardPortfolio() {
                     className="absolute inset-0 bg-ink/75 opacity-0 group-hover:opacity-100 flex items-center justify-center text-ember transition-opacity duration-300 cursor-pointer"
                     title="Byt bild från mediebibliotek"
                   >
-                    <Upload size={10} />
+                    <Upload size={12} />
                   </button>
                 </div>
-                {/* Alt-tag configuration */}
-                <div className="flex-1">
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                    Alt-Text (För Google Images)
-                  </label>
-                  <input
-                    type="text"
-                    value={img.alt}
-                    onChange={(e) => handleAltChange(img.id, e.target.value)}
-                    placeholder="Beskriv bilden..."
-                    className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-                  />
+                
+                {/* Form fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                      Bild-URL
+                    </label>
+                    <input
+                      type="text"
+                      value={img.url}
+                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, url: e.target.value } : x))}
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                      Alt-Text (SEO - Sökoptimering)
+                    </label>
+                    <input
+                      type="text"
+                      value={img.alt}
+                      onChange={(e) => handleAltChange(img.id, e.target.value)}
+                      placeholder="Beskriv bilden för Google..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                      Titel (Title tag)
+                    </label>
+                    <input
+                      type="text"
+                      value={img.title || ""}
+                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, title: e.target.value } : x))}
+                      placeholder="Titel..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                      Bildtext (Caption)
+                    </label>
+                    <input
+                      type="text"
+                      value={img.caption || ""}
+                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, caption: e.target.value } : x))}
+                      placeholder="Kort bildtext..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                      Beskrivning (Description - Längre bakgrund/anteckningar)
+                    </label>
+                    <textarea
+                      value={img.description || ""}
+                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, description: e.target.value } : x))}
+                      placeholder="Längre beskrivning, anteckningar, licens eller historia om bilden..."
+                      rows={2}
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
+                      Filnamn (SEO filnamn, t.ex. therese-jarvheden-drama.webp)
+                    </label>
+                    <input
+                      type="text"
+                      value={img.filename || ""}
+                      onChange={(e) => setImages(images.map((x) => x.id === img.id ? { ...x, filename: e.target.value } : x))}
+                      placeholder="Sökordsoptimerat filnamn..."
+                      className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                    />
+                  </div>
                 </div>
               </div>
-
-              {/* Sorting buttons and download toggle */}
-              <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 border-bone/5 pt-2 md:pt-0 shrink-0">
+ 
+              {/* Sorting and controls */}
+              <div className="flex items-center justify-between border-t border-bone/5 pt-3">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -330,10 +443,10 @@ export function DashboardPortfolio() {
                     className="rounded border-bone/20 text-ember focus:ring-0 focus:ring-offset-0 bg-transparent w-3.5 h-3.5"
                   />
                   <span className="text-[10px] uppercase tracking-widest text-bone/60 font-mono">
-                    Nedladdning
+                    Nedladdning tillåten
                   </span>
                 </label>
-
+ 
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
@@ -364,7 +477,7 @@ export function DashboardPortfolio() {
           ))}
         </div>
       </div>
-
+ 
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
           type="submit"
@@ -383,16 +496,24 @@ export function DashboardPortfolio() {
         </button>
       </div>
     </form>
-    
+     
     <MediaPickerModal
       isOpen={isMediaPickerOpen}
       onClose={() => {
         setIsMediaPickerOpen(false);
         setActivePickingImageId(null);
       }}
-      onSelect={(url) => {
+      onSelect={(url, metadata) => {
         if (activePickingImageId) {
-          setImages(images.map((img) => (img.id === activePickingImageId ? { ...img, url } : img)));
+          setImages(images.map((img) => (img.id === activePickingImageId ? {
+            ...img,
+            url,
+            alt: metadata?.alt || img.alt || "",
+            title: metadata?.title || img.title || "",
+            caption: metadata?.caption || img.caption || "",
+            description: metadata?.description || img.description || "",
+            filename: metadata?.filename || img.filename || ""
+          } : img)));
           setActivePickingImageId(null);
         } else {
           // Instantly add the picked media library image to the portfolio list
@@ -400,7 +521,11 @@ export function DashboardPortfolio() {
             id: `temp-${Date.now()}`,
             url: url,
             download_url: url,
-            alt: "Porträtt från mediebibliotek",
+            alt: metadata?.alt || "Porträtt från mediebibliotek",
+            title: metadata?.title || "",
+            caption: metadata?.caption || "",
+            description: metadata?.description || "",
+            filename: metadata?.filename || "",
             allow_download: true,
             sort_order: images.length,
           };

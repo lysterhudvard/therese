@@ -56,6 +56,16 @@ CREATE TABLE IF NOT EXISTS biography (
     bio_image_credits_en TEXT,
     bio_sections JSONB DEFAULT '[]'::jsonb,
     
+    -- Hero & Footer Image SEO Columns (Migration 6)
+    hero_image_alt TEXT,
+    hero_image_caption TEXT,
+    hero_image_title TEXT,
+    hero_image_filename TEXT,
+    footer_image_alt TEXT,
+    footer_image_caption TEXT,
+    footer_image_title TEXT,
+    footer_image_filename TEXT,
+    
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -93,6 +103,17 @@ ALTER TABLE biography ADD COLUMN IF NOT EXISTS bio_image_credits_sv TEXT;
 ALTER TABLE biography ADD COLUMN IF NOT EXISTS bio_image_credits_en TEXT;
 ALTER TABLE biography ADD COLUMN IF NOT EXISTS bio_sections JSONB DEFAULT '[]'::jsonb;
 
+-- Migration 6 additions
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS hero_image_alt TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS hero_image_caption TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS hero_image_title TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS hero_image_filename TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS footer_image_alt TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS footer_image_caption TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS footer_image_title TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS footer_image_filename TEXT;
+
+
 -- 2. Create Credits (Merits) Table
 CREATE TABLE IF NOT EXISTS credits (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -106,6 +127,13 @@ CREATE TABLE IF NOT EXISTS credits (
     network TEXT NOT NULL,
     url TEXT,
     img TEXT NOT NULL,
+    
+    -- Migration 6 Image SEO fields
+    img_alt TEXT,
+    img_caption TEXT,
+    img_title TEXT,
+    img_filename TEXT,
+
     commentary_url TEXT,
     commentary_duration TEXT,
     commentary_sv TEXT,
@@ -130,6 +158,13 @@ CREATE TABLE IF NOT EXISTS showreels (
     youtube_id TEXT,
     url TEXT,
     poster TEXT NOT NULL,
+    
+    -- Migration 6 Image SEO fields
+    poster_alt TEXT,
+    poster_caption TEXT,
+    poster_title TEXT,
+    poster_filename TEXT,
+
     genre TEXT NOT NULL,
     specs TEXT NOT NULL,
     glow TEXT NOT NULL,
@@ -145,6 +180,13 @@ CREATE TABLE IF NOT EXISTS seo_settings (
     description_sv TEXT NOT NULL,
     description_en TEXT NOT NULL,
     og_image TEXT NOT NULL,
+    
+    -- Migration 6 Image SEO fields
+    og_image_alt TEXT,
+    og_image_caption TEXT,
+    og_image_title TEXT,
+    og_image_filename TEXT,
+
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -155,12 +197,37 @@ CREATE TABLE IF NOT EXISTS portfolio_images (
     alt TEXT NOT NULL,
     allow_download BOOLEAN NOT NULL DEFAULT true,
     download_url TEXT,
+    
+    -- Migration 6 Image SEO fields
+    caption TEXT,
+    title TEXT,
+    filename TEXT,
+
     sort_order INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Ensure download_url column exists
+-- Ensure all SEO columns exist for existing installations
+ALTER TABLE credits ADD COLUMN IF NOT EXISTS img_alt TEXT;
+ALTER TABLE credits ADD COLUMN IF NOT EXISTS img_caption TEXT;
+ALTER TABLE credits ADD COLUMN IF NOT EXISTS img_title TEXT;
+ALTER TABLE credits ADD COLUMN IF NOT EXISTS img_filename TEXT;
+
+ALTER TABLE showreels ADD COLUMN IF NOT EXISTS poster_alt TEXT;
+ALTER TABLE showreels ADD COLUMN IF NOT EXISTS poster_caption TEXT;
+ALTER TABLE showreels ADD COLUMN IF NOT EXISTS poster_title TEXT;
+ALTER TABLE showreels ADD COLUMN IF NOT EXISTS poster_filename TEXT;
+
+ALTER TABLE seo_settings ADD COLUMN IF NOT EXISTS og_image_alt TEXT;
+ALTER TABLE seo_settings ADD COLUMN IF NOT EXISTS og_image_caption TEXT;
+ALTER TABLE seo_settings ADD COLUMN IF NOT EXISTS og_image_title TEXT;
+ALTER TABLE seo_settings ADD COLUMN IF NOT EXISTS og_image_filename TEXT;
+
 ALTER TABLE portfolio_images ADD COLUMN IF NOT EXISTS download_url TEXT;
+ALTER TABLE portfolio_images ADD COLUMN IF NOT EXISTS caption TEXT;
+ALTER TABLE portfolio_images ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE portfolio_images ADD COLUMN IF NOT EXISTS filename TEXT;
+
 
 -- Enable Row Level Security (RLS) for all tables
 ALTER TABLE biography ENABLE ROW LEVEL SECURITY;
@@ -269,3 +336,62 @@ INSERT INTO biography (
       }
     ]'::jsonb
 ) ON CONFLICT (id) DO NOTHING;
+
+-- 7. Ensure storage bucket and policies are set up for Jarvheden portfolio
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('portfolio', 'portfolio', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for the portfolio bucket to allow public read and full write permissions
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+CREATE POLICY "Public Access" ON storage.objects
+    FOR SELECT
+    USING (bucket_id = 'portfolio');
+
+DROP POLICY IF EXISTS "Admin Upload Access" ON storage.objects;
+CREATE POLICY "Admin Upload Access" ON storage.objects
+    FOR INSERT
+    WITH CHECK (bucket_id = 'portfolio');
+
+DROP POLICY IF EXISTS "Admin Update Access" ON storage.objects;
+CREATE POLICY "Admin Update Access" ON storage.objects
+    FOR UPDATE
+    USING (bucket_id = 'portfolio')
+    WITH CHECK (bucket_id = 'portfolio');
+
+DROP POLICY IF EXISTS "Admin Delete Access" ON storage.objects;
+CREATE POLICY "Admin Delete Access" ON storage.objects
+    FOR DELETE
+    USING (bucket_id = 'portfolio');
+
+-- Migration 7 additions: Media Metadata Table & Description Column Updates
+CREATE TABLE IF NOT EXISTS media_metadata (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    file_path TEXT UNIQUE NOT NULL,
+    alt TEXT,
+    title TEXT,
+    caption TEXT,
+    description TEXT,
+    filename TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE media_metadata ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public select on media_metadata" ON media_metadata;
+CREATE POLICY "Allow public select on media_metadata" ON media_metadata FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow all actions on media_metadata" ON media_metadata;
+CREATE POLICY "Allow all actions on media_metadata" ON media_metadata FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE portfolio_images ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS hero_image_description TEXT;
+ALTER TABLE biography ADD COLUMN IF NOT EXISTS footer_image_description TEXT;
+
+-- Migration 8 additions: Add Image SEO Description Columns to remaining tables
+ALTER TABLE seo_settings ADD COLUMN IF NOT EXISTS og_image_description TEXT;
+ALTER TABLE credits ADD COLUMN IF NOT EXISTS img_description TEXT;
+ALTER TABLE showreels ADD COLUMN IF NOT EXISTS poster_description TEXT;
+
+
