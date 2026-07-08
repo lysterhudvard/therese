@@ -11,6 +11,7 @@ interface GalleryImage {
   url: string;
   alt: string;
   allow_download: boolean;
+  download_url?: string;
   sort_order: number;
 }
 
@@ -91,6 +92,7 @@ export function DashboardPortfolio() {
     const newImg: GalleryImage = {
       id: `temp-${Date.now()}`,
       url: newImageUrl,
+      download_url: newImageUrl,
       alt: newImageAlt || "Therese Järvheden porträtt",
       allow_download: true,
       sort_order: images.length,
@@ -117,15 +119,20 @@ export function DashboardPortfolio() {
   };
 
   const proceedWithUpload = async (fileToUpload: File) => {
+    const originalFile = pendingUploadFile; // Keep reference to original file before we reset it
     setIsOptimizerOpen(false);
     setPendingUploadFile(null);
     setIsUploading(true);
-    toast.loading("Laddar upp bild till hink...", { id: "upload-toast" });
+    toast.loading("Laddar upp bild(er) till hink...", { id: "upload-toast" });
 
     try {
+      let optimizedUrl = "";
+      let originalUrl = "";
+
+      // 1. Upload display image (optimized WebP or original raw file)
       const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const filePath = `portfolio/${fileName}`;
 
       const { error } = await supabase.storage
         .from("portfolio")
@@ -138,13 +145,37 @@ export function DashboardPortfolio() {
         throw error;
       }
 
-      // Get public URL
+      // Get display image public URL
       const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(filePath);
+      optimizedUrl = urlData.publicUrl;
+
+      // 2. If it is an optimized file, also upload the original file for the high-res download
+      const isOptimized = fileToUpload.name.includes("-optimized.");
+      if (isOptimized && originalFile) {
+        const origExt = originalFile.name.split(".").pop();
+        const origFileName = `${Math.random().toString(36).substring(2)}-original.${origExt}`;
+        const origFilePath = `portfolio/${origFileName}`;
+
+        const { error: origErr } = await supabase.storage
+          .from("portfolio")
+          .upload(origFilePath, originalFile, { cacheControl: "31536000", upsert: true });
+
+        if (!origErr) {
+          const { data: origUrlData } = supabase.storage.from("portfolio").getPublicUrl(origFilePath);
+          originalUrl = origUrlData.publicUrl;
+        } else {
+          console.warn("Could not upload original download file, falling back to display URL:", origErr);
+          originalUrl = optimizedUrl;
+        }
+      } else {
+        originalUrl = optimizedUrl;
+      }
       
       const newImg: GalleryImage = {
         id: `temp-${Date.now()}`,
-        url: urlData.publicUrl,
-        alt: fileToUpload.name.split(".")[0],
+        url: optimizedUrl,
+        download_url: originalUrl,
+        alt: fileToUpload.name.split("-optimized")[0].split(".")[0],
         allow_download: true,
         sort_order: images.length,
       };
@@ -171,8 +202,8 @@ export function DashboardPortfolio() {
 
     try {
       // Save images
-      const imagesToUpsert = images.map(({ id, url, alt, allow_download, sort_order }) => {
-        const item: any = { url, alt, allow_download, sort_order };
+      const imagesToUpsert = images.map(({ id, url, alt, allow_download, download_url, sort_order }) => {
+        const item: any = { url, alt, allow_download, download_url: download_url || url, sort_order };
         if (!id.startsWith("temp-")) {
           item.id = id;
         }

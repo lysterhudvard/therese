@@ -70,6 +70,7 @@ export async function getPageData() {
     // Map portfolio images
     const mappedImages = (portRes.data || []).map((p: any) => ({
       url: p.url,
+      download_url: p.download_url || p.url,
       alt: p.alt || "Therese Järvheden porträtt",
       allow_download: p.allow_download !== false
     }));

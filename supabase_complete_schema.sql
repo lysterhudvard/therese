@@ -154,9 +154,13 @@ CREATE TABLE IF NOT EXISTS portfolio_images (
     url TEXT NOT NULL,
     alt TEXT NOT NULL,
     allow_download BOOLEAN NOT NULL DEFAULT true,
+    download_url TEXT,
     sort_order INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Ensure download_url column exists
+ALTER TABLE portfolio_images ADD COLUMN IF NOT EXISTS download_url TEXT;
 
 -- Enable Row Level Security (RLS) for all tables
 ALTER TABLE biography ENABLE ROW LEVEL SECURITY;
