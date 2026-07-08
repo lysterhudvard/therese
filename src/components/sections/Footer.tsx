@@ -13,15 +13,15 @@ export function Footer({ bioData }: { bioData?: any }) {
 
   useEffect(() => {
     if (isInView) {
-      // Step 1: Wait 1.2s showing the big intro screen
+      // Step 1: Wait 0.4s showing the big intro screen
       const morphTimer = setTimeout(() => {
         setAnimatedIn(true);
-      }, 1200);
+      }, 400);
 
       // Step 2: Once it morphs, wait for transition to finish, then start scroll
       const scrollTimer = setTimeout(() => {
         setStartScroll(true);
-      }, 2000);
+      }, 900);
 
       return () => {
         clearTimeout(morphTimer);
