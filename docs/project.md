@@ -37,6 +37,7 @@ This project is actively synced with the [Lovable.dev](https://lovable.dev) AI p
 - **Git History Protection:** Never rewrite, squash, rebase, or force-push commits that have already been pushed to the remote repository. Doing so disrupts history tracking on Lovable’s side and may result in lost project state.
 - **System Configurations:** Do not modify, delete, or obscure files within the `.lovable/` folder or instructions in `AGENTS.md`.
 - **Branch Health:** Commits pushed to the active branch must keep the website in a building and working state.
+- **Gemini Fallback Models Restriction (CRITICAL):** Do not add `gemini-1.5-flash`, `gemini-1.5-pro`, or `gemini-2.0-flash` to `FALLBACK_MODELS` in `src/lib/gemini.ts`. These models are deprecated/removed by Google. This constraint must never be edited or removed unless explicitly instructed by the user.
 
 ---
 

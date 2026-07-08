@@ -34,6 +34,7 @@
 - **Silent Failure Prevention:** Ensure your functions return explicit
   success/error states or logs. Avoid state mutations that run completely in the
   background without user or system feedback.
+- **Gemini Fallback Models Restriction (CRITICAL):** Never add `gemini-1.5-flash`, `gemini-1.5-pro`, or `gemini-2.0-flash` to the list of Gemini fallback models (`FALLBACK_MODELS` in `src/lib/gemini.ts`). These models are deprecated/removed by Google and will fail. This constraint must never be edited or removed unless explicitly instructed by the user.
 
 ## 4. Verification Workflow
 
