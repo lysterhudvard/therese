@@ -84,7 +84,7 @@ if (processedDbData.biography) {
 
 if (processedDbData.portfolioImages) {
   for (let i = 0; i < processedDbData.portfolioImages.length; i++) {
-    processedDbData.portfolioImages[i].url = await optimizeImageUrl(processedDbData.portfolioImages[i].url, 1000);
+    processedDbData.portfolioImages[i].url = await optimizeImageUrl(processedDbData.portfolioImages[i].url, 600);
   }
 }
 
