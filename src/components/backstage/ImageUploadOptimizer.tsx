@@ -213,6 +213,12 @@ export function ImageUploadOptimizer({
   const handleUploadOptimized = () => {
     if (!optimizedBlob) return;
     
+    // If the optimized file is actually larger than the original, upload the original instead
+    if (optimizedBlob.size >= file.size) {
+      onUpload(file, selectedSection);
+      return;
+    }
+    
     // Create new optimized file name
     const originalName = file.name;
     const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf(".")) || originalName;
@@ -385,11 +391,16 @@ export function ImageUploadOptimizer({
                         Storleksminskning:
                       </span>
                       <span className="font-mono text-emerald-400 font-bold flex items-center gap-1">
-                        <ArrowRight size={10} /> {calculateReduction()}% mindre!
+                        <ArrowRight size={10} /> {optimizedDetails.size >= originalDetails.size ? "0" : calculateReduction()}% mindre!
                       </span>
                     </div>
 
-                    {calculateReduction() > 0 && (
+                    {optimizedDetails.size >= originalDetails.size ? (
+                      <div className="flex items-start gap-1.5 text-[9px] text-amber-400 bg-amber-950/25 border border-amber-900/30 p-2 rounded-sm mt-2">
+                        <AlertTriangle size={12} className="flex-shrink-0 mt-0.5 text-amber-400" />
+                        <span>Originalfilen är mindre ({formatKb(originalDetails.size)}) än den optimerade WebP-versionen. Vi kommer automatiskt att ladda upp originalet.</span>
+                      </div>
+                    ) : (
                       <div className="flex items-start gap-1.5 text-[9px] text-emerald-400 bg-emerald-950/20 border border-emerald-900/30 p-2 rounded-sm mt-2">
                         <Check size={12} className="flex-shrink-0 mt-0.5" />
                         <span>Komprimerad till det moderna {selectedSection === "seo" ? "JPEG" : "WebP"} formatet, laddar snabbt på Google!</span>

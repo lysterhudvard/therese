@@ -295,3 +295,17 @@ This document details critical bugs, layout errors, and interaction blocks found
   1. **Static HTML Preload:** Modified `Layout.astro` and `src/pages/index.astro` to add `<link rel="preload" as="image" href="..." fetchpriority="high">` to the HTML `<head>`. This tells the browser to start downloading the hero image immediately in parallel with fetching stylesheet assets.
   2. **Bypassed Hydration Block:** Replaced `<motion.img>` with a standard, fully opaque HTML `<img>` tag styling the zoom-out entry transition using a pure CSS keyframes animation (`.animate-hero-zoom`). The browser executes this immediately upon HTML parsing without waiting for JavaScript.
   3. **Corrected Cache Headers:** Updated all storage uploads in `DashboardMedia.tsx`, `DashboardPortfolio.tsx`, `DashboardShowreels.tsx`, `DashboardCredits.tsx`, and `DashboardSeo.tsx` to pass the correct HTTP string format: `cacheControl: "public, max-age=31536000"`.
+
+## 45. Upload Size Bloating Safeguard (Optimized vs Original)
+- **Symptom:** Uploading a small, pre-optimized image (e.g. 52 KB) resulted in a much larger uploaded file (e.g. 150 KB) when clicking the "Ladda upp Optimerad" button.
+- **Root Cause:** When an already highly compressed image is drawn onto an HTML `<canvas>` for resizing, the browser decodes it back to raw uncompressed pixels. Re-encoding those pixels back to WebP with a standard `82%` quality setting can result in a file size that is significantly larger than the original heavily compressed file.
+- **Resolution:**
+  - Added an automated size comparison check inside `ImageUploadOptimizer.tsx`.
+  - If the canvas-optimized output file is larger than or equal to the original uploaded file, the UI displays a warning notifying the user, and the "Ladda upp Optimerad" handler automatically falls back to uploading the original file instead.
+
+## 46. Live CMS Updates and Client-Side Hydration Refresh
+- **Symptom:** After uploading a new hero image (e.g. 52 KB) and saving it in the CMS, visitors of the website still saw and downloaded the old hero image (150 KB).
+- **Root Cause:** Astro compiles the index page statically (`output: "static"`). The page was initialized with the database state at build-time (`initialDbData`). Because the client-side code in `routes/index.tsx` returned early if `initialDbData` was present (`if (initialDbData) return;`), it never fetched fresh database records from Supabase on the client. Therefore, visitors only saw the version of the site captured during the last static build.
+- **Resolution:**
+  - Removed `if (initialDbData) return;` from the client-side `useEffect` in `routes/index.tsx`.
+  - The page now queries the live Supabase tables asynchronously in the background. If the database records have changed (e.g., a new hero image URL has been set in the CMS), the client-side state is updated, and the new 52 KB image is loaded and displayed instantly without causing any page flashes or requiring a site redeployment.

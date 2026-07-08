@@ -104,8 +104,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
 
   // Load all live Supabase data
   useEffect(() => {
-    if (initialDbData) return;
-    
     if (!isSupabaseConfigured()) {
       setDbLoaded(true);
       return;
