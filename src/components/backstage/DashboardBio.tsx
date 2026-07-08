@@ -521,7 +521,7 @@ export function DashboardBio() {
                   <div className="md:col-span-1 flex flex-col items-center">
                     <span className="text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Förhandsvisning</span>
                     {section.image ? (
-                      <img src={section.image} alt={section.title_sv} className="h-14 w-14 object-cover border border-bone/15 rounded-sm" />
+                      <img src={section.image} alt={section.title_sv} className="w-10 aspect-[3/4] h-auto object-cover border border-bone/15 rounded-sm" />
                     ) : (
                       <div className="h-14 w-14 border border-dashed border-bone/10 flex items-center justify-center text-bone/20 text-[8px] font-mono">Ingen bild</div>
                     )}

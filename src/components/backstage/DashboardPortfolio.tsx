@@ -319,7 +319,7 @@ export function DashboardPortfolio() {
             >
               <div className="flex items-center gap-4 flex-1">
                 {/* Small thumbnail preview with edit trigger */}
-                <div className="relative w-16 h-12 rounded bg-stage border border-bone/10 overflow-hidden shrink-0 group">
+                <div className="relative w-12 aspect-[3/4] rounded bg-stage border border-bone/10 overflow-hidden shrink-0 group">
                   <img src={img.url} alt={img.alt} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" />
                   <button
                     type="button"

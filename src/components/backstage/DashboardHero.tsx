@@ -251,11 +251,11 @@ export function DashboardHero() {
           <div className="md:col-span-1 flex flex-col items-center">
             <span className="text-[9px] uppercase tracking-widest text-bone/40 font-mono mb-2">Förhandsvisning</span>
             {heroImage ? (
-              <div className="aspect-[3/4] w-24 border border-bone/10 bg-stage/10 rounded-sm overflow-hidden relative group">
+              <div className="aspect-video w-32 border border-bone/10 bg-stage/10 rounded-sm overflow-hidden relative group">
                 <img src={heroImage} alt="Förhandsvisning hero" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="aspect-[3/4] w-24 border border-dashed border-bone/10 bg-stage/5 rounded-sm flex flex-col items-center justify-center text-bone/20 font-mono text-[9px]">
+              <div className="aspect-video w-32 border border-dashed border-bone/10 bg-stage/5 rounded-sm flex flex-col items-center justify-center text-bone/20 font-mono text-[9px]">
                 <Image size={18} className="mb-1" />
                 Ingen bild
               </div>

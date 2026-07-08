@@ -114,7 +114,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
             <div
               key={img.url + i}
               className="relative shrink-0 group overflow-hidden border border-bone/5 hover:border-ember/30 transition-colors duration-500"
-              style={{ width: "min(34vw, 460px)", aspectRatio: "3/4" }}
+              style={{ width: "min(34vw, 460px, 54svh)", aspectRatio: "3/4" }}
             >
               <img
                 src={img.url}

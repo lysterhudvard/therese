@@ -8,15 +8,18 @@ Detta dokument är en guide för redaktörer och testare som hanterar bilder och
 
 Följande tabell visar de optimala specifikationerna för varje sektion:
 
-| Sektion / Akt | Funktion | Rekommenderat format (Aspect Ratio) | Rekommenderad upplösning (px) | Max filstorlek |
-| :--- | :--- | :--- | :--- | :--- |
-| **Akt I: Hero (Nu aktuell)** | Stor bakgrundsbild i sajtens topp | Liggande (16:9 / 21:9) | `2000 × 1125` eller `2560 × 1440` | ~300 KB |
-| **Akt II: Biografi (Moods)** | Porträttbilder för Dramatisk/Komisk/Klassisk | Stående (3:4 eller 4:5) | `1000 × 1333` eller `1000 × 1250` | ~150 KB |
-| **Akt III: Portfolio Bilder** | Bilder i det horisontella bildgalleriet | Flexibelt (Kombination av 16:9 / 3:4) | `1200 px` på längsta sidan | ~150 KB |
-| **Akt IV: Showreels (Poster)** | Stillbild som visas innan videon startas | Widescreen (21:9 eller 16:9) | `1920 × 820` (21:9) eller `1920 × 1080` (16:9) | ~200 KB |
-| **Akt V: Meriter (Miniatyr)** | Liten presentationsbild per meritrad | Liggande (16:9) | `600 × 338` | ~50 KB |
-| **Akt VI: Röst (Banner)** | Bakgrunds- eller sidobild för röstsektionen | Kvadratiskt eller stående (1:1 / 4:5) | `1000 × 1000` eller `1000 × 1250` | ~150 KB |
-| **SEO: Delningsbild (OG Image)** | Bilden som visas när sajtlänken delas | Socialt landskap (1.91:1) | `1200 × 630` | ~250 KB |
+| Sektion / Akt | Funktion | Faktiskt format (Aspect Ratio) | Faktisk visningsstorlek på hemsidan (px) | Rekommenderad upplösning (px) | Max filstorlek |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Akt I: Hero (Nu aktuell)** | Stor bakgrundsbild i sajtens topp | Fullskärm (Flexibel / object-cover) | **Fullskärm (100vw × 100svh)**<br>• *Dator (t.ex.):* `1920 × 1080`<br>• *Mobil (t.ex.):* `375 × 812` | `2000 × 1125` eller `2560 × 1440` | ~300 KB |
+| **Akt II: Biografi (Moods)** | Porträttbilder för Dramatisk/Komisk/Klassisk | Stående (3:4) | **Skalas efter grid (`aspect-[3/4]`)**<br>• *Dator:* Max `460 × 614`<br>• *Mobil:* Ca `327 × 436` | `1000 × 1333` | ~150 KB |
+| **Akt III: Portfolio Bilder** | Bilder i det horisontella bildgalleriet | Stående (3:4) | **Breddlåst bildkarusell**<br>• *Dator:* Max `460 × 613` *(visas oftast runt `417 × 557` depending on screen)*<br>• *Mobil:* Fast `240 × 320` | `600 × 800` eller `900 × 1200`<br>*(Astro optimerar bredd till 600px vid build)* | ~150 KB |
+| **Akt IV: Showreels (Poster)** | Stillbild som visas innan videon startas | Liggande (21:9 för startsidan, 16:9 för teaterläge/miniatyrer) | **Widescreen-spelare**<br>• *Inline:* Max `1400 × 600` (21:9)<br>• *Teaterläge:* Max `1400 × 788` (16:9)<br>• *Miniatyrer:* Max `466 × 262` (16:9) | `1920 × 820` (21:9) eller `1920 × 1080` (16:9) | ~200 KB |
+| **Akt V: Meriter (Miniatyr)** | Hover-bild per meritrad i listan | Stående (3:4) | **Svävande popup-kort (enbart dator)**<br>• *Dator:* Fast `256 × 341`<br>• *Mobil:* Visas ej | `600 × 800` eller `450 × 600` | ~50 KB |
+| **Akt VI: Röst (Banner)** | Sidobild för röstsektionen | Flexibel (Kvadratisk/Stående ~1:1 eller 4:5) | **Skalas efter grid/viewport**<br>• *Dator:* Ca `960 × 972` (50vw × 90vh)<br>• *Mobil:* Ca `375 × 487` (100vw × 60vh) | `1000 × 1000` eller `1000 × 1250` | ~150 KB |
+| **Akt XII: Ridåfall (Miniatyr)** | Bild för post-credits scenskiss i sidfot | Liggande (~3:2 / 1.6:1) | **Animerad minispelare**<br>• *Dator (normal):* `320 × 208`<br>• *Dator (scroll-läge):* `112 × 80`<br>• *Mobil (normal):* `256 × 160` | `960 × 600` eller `600 × 400` | ~100 KB |
+| **SEO: Delningsbild (OG Image)** | Bilden som visas när sajtlänken delas | Socialt landskap (1.91:1) | **Rendreras av externa plattformar**<br>• *Facebook/LinkedIn:* `1200 × 630` | `1200 × 630` | ~250 KB |
+
+
 
 ---
 

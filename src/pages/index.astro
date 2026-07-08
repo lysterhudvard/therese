@@ -47,58 +47,7 @@ if (!processedDbData) {
   };
 }
 
-// Perform server-side image optimizations
-if (processedDbData.biography) {
-  if (processedDbData.biography.hero_image) {
-    processedDbData.biography.hero_image = await optimizeImageUrl(processedDbData.biography.hero_image, 1600);
-  }
-  if (processedDbData.biography.mood_images) {
-    try {
-      const mood = typeof processedDbData.biography.mood_images === 'string'
-        ? JSON.parse(processedDbData.biography.mood_images)
-        : processedDbData.biography.mood_images;
-      if (mood) {
-        if (mood.dramatic) mood.dramatic = await optimizeImageUrl(mood.dramatic, 800);
-        if (mood.comedic) mood.comedic = await optimizeImageUrl(mood.comedic, 800);
-        if (mood.classical) mood.classical = await optimizeImageUrl(mood.classical, 800);
-        processedDbData.biography.mood_images = mood;
-      }
-    } catch (e) {
-      console.error("Failed to parse mood images:", e);
-    }
-  }
-  if (processedDbData.biography.voice_settings) {
-    try {
-      const vs = typeof processedDbData.biography.voice_settings === 'string'
-        ? JSON.parse(processedDbData.biography.voice_settings)
-        : processedDbData.biography.voice_settings;
-      if (vs && vs.image_url) {
-        vs.image_url = await optimizeImageUrl(vs.image_url, 1000);
-        processedDbData.biography.voice_settings = vs;
-      }
-    } catch (e) {
-      console.error("Failed to parse voice settings image:", e);
-    }
-  }
-}
-
-if (processedDbData.portfolioImages) {
-  for (let i = 0; i < processedDbData.portfolioImages.length; i++) {
-    processedDbData.portfolioImages[i].url = await optimizeImageUrl(processedDbData.portfolioImages[i].url, 600);
-  }
-}
-
-if (processedDbData.credits) {
-  for (let i = 0; i < processedDbData.credits.length; i++) {
-    processedDbData.credits[i].img = await optimizeImageUrl(processedDbData.credits[i].img, 600);
-  }
-}
-
-if (processedDbData.showreels) {
-  for (let i = 0; i < processedDbData.showreels.length; i++) {
-    processedDbData.showreels[i].poster = await optimizeImageUrl(processedDbData.showreels[i].poster, 800);
-  }
-}
+// Server-side image optimizations are skipped because the CMS already optimizes all uploads to WebP natively.
 
 // Extract SEO data from dbData if available, otherwise use defaults
 const seoTitle = processedDbData?.seo?.title_sv || "Therese Järvheden — Skådespelerska";
