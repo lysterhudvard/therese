@@ -167,4 +167,15 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** Hostinger FTP accounts created for specific domains are automatically mapped to that domain's `public_html/` root by default. Having `server-dir: ./public_html/` in the workflow config pushed the assets into a duplicate subdirectory rather than the actual web root.
 - **Resolution:** Updated `.github/workflows/deploy.yml` to set `server-dir: ./`, directing files to upload directly into the FTP account's root directory, which correctly maps to the website's public web root.
 
+## 28. Portfolio Bilder flaggade som "Oversized" i Google PageSpeed
+- **Symptom:** PageSpeed-analysen klagade på att bilderna i det horisontella rullningsgalleriet var mycket större än nödvändigt för visningsytan (filstorlekar på runt `899x1200` men visades på endast `417x557` i CSS-layouten).
+- **Root Cause:** I `src/pages/index.astro` var Astros inbyggda bildoptimerare inställd på att skala ner alla portföljbilder till en fast bredd på `1000px`. På grund av bildernas stående porträttformat resulterade detta i onödigt stora och tunga bildfiler för mobila enheter.
+- **Resolution:** Ändrade målupplösningsparametern i `index.astro` från `1000` till `600`. Astros byggprocess skalar nu ner visningsversionerna perfekt till galleriboxens storlek, vilket dramatiskt krymper filvikten och eliminerar PageSpeed-varningarna.
+
+## 29. Lågupplösta pressbilder vid nedladdning för castare
+- **Symptom:** Castare och agenter som laddade ner pressbilder via nedladdningsknappen fick de webb-optimerade, lågupplösta WebP-filerna istället för tryckfärdiga originalbilder.
+- **Root Cause:** Samma bild-URL användes till både rendering i sidans layout och till nedladdningslänken. Eftersom vi optimerade bilderna hårt för webbprestanda, blev även de nedladdade bilderna komprimerade och små.
+- **Resolution:** Lagt till en ny kolumn `download_url` i tabellen `portfolio_images` i Supabase. Uppdaterat CMS-panelen så att när du laddar upp en bild laddas **både** en optimerad WebP-kopia (för snabb laddning) och den orörda originalfilen (för nedladdning) upp till lagringshinken. Frontend-knappen pekar nu direkt på originalfilen via `download_url`.
+
+
 

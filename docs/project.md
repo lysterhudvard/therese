@@ -10,23 +10,24 @@ The goal of this project is to build a premium portfolio and casting portal for 
 
 ### Current Tech Stack
 
-- **Framework:** TanStack Start (`@tanstack/react-start`) on React 19 and Vite
-- **Routing:** TanStack Router (`@tanstack/react-router`) with file-based routing
-- **Styling:** Tailwind CSS v4.0 (with new `@theme` configuration and `@utility` rules in `src/styles.css`)
+- **Framework:** Astro (Static HTML and Server-Side Rendering)
+- **Client Interactivity:** React 19 (hydrated dynamically as Astro Islands where necessary)
+- **Routing:** Astro static file routing for `/` and `/backstage/`
+- **Styling:** Tailwind CSS v4.0 (with custom `@theme` configuration in `src/styles.css`)
 - **Animation:** Framer Motion (for cinematic transitions, spotlight cursors, and parallax effects)
 - **Icons:** Lucide React
 - **Backend/Database:** Supabase (PostgreSQL, Storage buckets, Row Level Security)
 
 ### Current Codebase Map
 
-- `src/routes/__root.tsx`: The root shell, HTML scaffolding, metadata/viewport settings, Google Fonts integration (Cormorant Garamond + Inter Tight).
-- `src/routes/index.tsx`: The primary single-page landing component. It fetches from the live database on mount, merges translations dynamically, updates SEO tags, and distributes dynamic data to page sections.
-- `src/routes/backstage.tsx`: The route gate for the backstage CMS admin panel.
+- `src/layouts/Layout.astro`: Scaffolds the main HTML layout, sets up metadata/viewport, handles Google Fonts integration, and embeds styling.
+- `src/pages/index.astro`: The entry point for the landing page. It performs server-side data fetching from Supabase and optimizes remote image assets at build time using Astro's dynamic image optimizer.
+- `src/pages/backstage.astro`: The entry point for the backstage CMS admin panel.
+- `src/routes/index.tsx`: The primary landing component (mounted as a React Island in `index.astro`).
 - `src/components/backstage/`: Subcomponents for admin CRUD pages (`BackstageDashboard.tsx`, `DashboardHero.tsx`, `DashboardBio.tsx`, `DashboardPortfolio.tsx`, `DashboardCredits.tsx`, `DashboardSeo.tsx`, `DashboardMedia.tsx`).
 - `src/lib/supabase.ts`: Database client instantiation and connection helpers.
 - `src/lib/supabase-sync.ts`: Automated data seeder that syncs static local assets up to Supabase if the tables are empty or manually forced.
-- `src/styles.css`: Standard styling variables (oklch colors), custom Tailwind v4 configurations, utility classes (film-grain, cursor defaults, no-scrollbar).
-- `src/lib/lovable-error-reporting.ts` & others: Diagnostics and error boundaries designed to integrate with the Lovable development environment.
+- `src/styles.css`: Standard styling variables, custom Tailwind v4 configurations, and global utility classes.
 
 ---
 
@@ -41,28 +42,22 @@ This project is actively synced with the [Lovable.dev](https://lovable.dev) AI p
 
 ---
 
-## 3. Astro Migration Plan (Speed & SEO)
+## 3. Astro Architecture & Performance (Completed Migration)
 
-To maximize performance, load times, and search/AI-engine indexability, the long-term plan is to migrate this application to **Astro**.
+The application has been successfully migrated to **Astro** to maximize performance, load times, and search/AI-engine indexability.
 
 ### Why Astro?
 
 - **Zero JS by Default:** Astro ships zero client-side JavaScript by default, only hydrating interactive islands (like the custom Spotlight cursor, contact forms, or image carousels) where necessary.
 - **Outstanding Core Web Vitals:** Minimizing initial bundle sizes directly optimizes Largest Contentful Paint (LCP) and Interaction to Next Paint (INP).
-- **First-Class SEO:** Astro offers static HTML generation (SSG) alongside server-side rendering (SSR), allowing search bots and LLMs (ChatGPT, Gemini, Perplexity) to crawl fully populated HTML pages without rendering JavaScript.
+- **First-Class SEO:** Astro offers static HTML generation (SSG) alongside server-side rendering (SSR), allowing search bots and LLMs to crawl fully populated HTML pages without rendering JavaScript.
 
-### Migration Mapping Guide
+### Active Routes
 
-When the migration to Astro occurs, the TanStack Router structure should be mapped as follows:
-
-| Current Route (TanStack Start)        | Astro Output Route          | Static/SSR   | Notes                                                     |
-| :------------------------------------ | :-------------------------- | :----------- | :-------------------------------------------------------- |
-| `src/routes/index.tsx` (Home)         | `src/pages/index.astro`     | Static (SSG) | Hero section, short bio, key showreels, direct links.     |
-| `/cv` (TBD - currently section)       | `src/pages/cv.astro`        | Static (SSG) | Full HTML table for credits, printable styling.           |
-| `/showreels` (TBD)                    | `src/pages/showreels.astro` | Static (SSG) | Embedded video objects using Vimeo and schema.org markup. |
-| `/voice` (TBD)                        | `src/pages/voice.astro`     | Static (SSG) | Voice reels, audio elements, Scania dialect marketing.    |
-| `/kontakt` (TBD)                      | `src/pages/kontakt.astro`   | SSR / Hybrid | Form submission endpoint.                                 |
-| `/en/*` (TBD - currently local state) | `src/pages/en/...`          | Static (SSG) | Localized paths for international casting agencies.       |
+| Route          | File Path                 | Rendering Type | Notes                                                     |
+| :------------- | :------------------------ | :------------- | :-------------------------------------------------------- |
+| `/` (Home)     | `src/pages/index.astro`   | Pre-rendered   | Hero section, short bio, key showreels, direct links.     |
+| `/backstage`   | `src/pages/backstage.astro` | SPA (React)    | Secure portal for backstage admin updates.                 |
 
 ---
 

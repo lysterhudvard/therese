@@ -160,4 +160,11 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Valbara Ikoner för Anpassade Länkar:** Lagt till en ny funktion i CMS:et för att kunna välja bland en uppsättning fördefinierade ikoner för de två anpassade länkarna (t.ex. Glob/Webbplats, Video, Pris, Portfölj, Musik/Röst, E-post, Telefon eller standardlänk).
 - **Säker villkorlig rendering:** Uppdaterat kontaktsidan så att alla sociala medier samt externa/anpassade länkar döljs helt från layouten om fälten lämnas tomma, vilket förhindrar trasiga länkar och tomma ikoner.
 
+### 27. Bild- & Laddningsoptimering för Portfölj
+- **Målupplösning vid kompilering:** Justerat målbredden för Astro-byggda portföljbilder i `src/pages/index.astro` från `1000px` till `600px`. Detta gör att de färdiga bildfilerna i `_astro/` matchar de faktiska visningsdimensionerna i layouten, vilket höjer Google PageSpeed-poängen på mobil och minskar onödig nedladdningsvikt.
+- **Dual-Upload med högkvalitativ originalnedladdning:** Konfigurerat CMS-gränssnittet (`DashboardPortfolio.tsx`) och databasschemat (`portfolio_images`) för att stödja en separat `download_url`. När du laddar upp en bild skapas en lättviktig WebP-version för visning, medan den orörda, högupplösta originalbilden sparas separat och länkas till nedladdningsknappen för castare.
+- **Säker SQL-migrering:** Lagt till ALTER TABLE-skript och uppdaterat det kompletta schemat för att inkludera `download_url TEXT` i Supabase.
+- **SSR- & Klient-mappning:** Uppdaterat datahämtningen på både servernivå (Astro SSR i `supabase-server.ts`) och klientnivå (`index.tsx`) för att skicka vidare nedladdningslänken.
+
+
 
