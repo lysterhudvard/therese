@@ -173,3 +173,16 @@ input:-webkit-autofill:active {
   z-index: 50 !important;
 }
 
+/* Custom CSS zoom for LCP Hero image (no JS hydration block) */
+@keyframes heroZoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.animate-hero-zoom {
+  animation: heroZoom 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+

@@ -5,12 +5,14 @@ interface Props {
 	title?: string;
 	description?: string;
 	image?: string;
+	heroImage?: string;
 }
 
 const { 
   title = "Therese Järvheden — Skådespelerska", 
   description = "Therese Järvheden — Swedish actress. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.",
-  image = "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650"
+  image = "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+  heroImage
 } = Astro.props;
 ---
 
@@ -46,6 +48,9 @@ const {
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter+Tight:wght@300;400;500;600&display=swap" />
     </noscript>
     
+    {heroImage && (
+      <link rel="preload" as="image" href={heroImage} fetchpriority="high" />
+    )}
 	</head>
 	<body>
 		<slot />

@@ -17,13 +17,10 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
   return (
     <section id="top" ref={ref} className="relative h-[100svh] w-full overflow-hidden">
       <motion.div style={{ scale, opacity }} className="absolute inset-0">
-        <motion.img
+        <img
           src={heroImage || ""}
           alt="Therese Järvheden"
-          initial={{ opacity: 0, scale: 1.08 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-          className="h-full w-full object-cover object-[50%_25%]"
+          className="h-full w-full object-cover object-[50%_25%] animate-hero-zoom"
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-stage/40 via-stage/30 to-stage" />

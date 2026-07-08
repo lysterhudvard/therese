@@ -283,3 +283,15 @@ This document details critical bugs, layout errors, and interaction blocks found
   - Added a DOM toggle within the `isEnlarged` layout hook inside `TheaterPlayer.tsx`.
   - When the player is active, the `<main>` root element is styled with `visibility: hidden`. Since the enlarged player mounts via React Portal directly into `document.body` (outside the `<main>` tag), it remains fully visible.
   - When closed, `<main>` visibility is restored to default. Using `visibility: hidden` hides all page contents while preserving scroll offsets, preventing jumpiness when the overlay is dismissed.
+
+## 44. PageSpeed LCP Render Delay & Caching Optimizations
+- **Symptom:** Google PageSpeed Insights reported a low score (e.g., 69) with:
+  1. **LCP Element Render Delay:** A high delay of 5+ seconds before the hero image started loading.
+  2. **Cache Lifetime Warnings:** Requests to assets in Supabase Storage showed a TTL of only `1h`.
+- **Root Causes:**
+  1. **Hydration Block:** The hero image was rendered by Framer Motion as a dynamic `<motion.img>` with `initial={{ opacity: 0 }}`. This meant that the HTML page generated on the server hid the image entirely with zero opacity until the browser downloaded React, loaded the JS bundles (such as `fallbackData.js`), and hydrated. Only then did it fade in.
+  2. **Header Syntax:** The backend upload configuration passed the cache control argument as a raw numeric value (`"31536000"`). CDNs and browsers ignore this as it lacks standard HTTP directive qualifiers (e.g. `public, max-age=`).
+- **Resolution:**
+  1. **Static HTML Preload:** Modified `Layout.astro` and `src/pages/index.astro` to add `<link rel="preload" as="image" href="..." fetchpriority="high">` to the HTML `<head>`. This tells the browser to start downloading the hero image immediately in parallel with fetching stylesheet assets.
+  2. **Bypassed Hydration Block:** Replaced `<motion.img>` with a standard, fully opaque HTML `<img>` tag styling the zoom-out entry transition using a pure CSS keyframes animation (`.animate-hero-zoom`). The browser executes this immediately upon HTML parsing without waiting for JavaScript.
+  3. **Corrected Cache Headers:** Updated all storage uploads in `DashboardMedia.tsx`, `DashboardPortfolio.tsx`, `DashboardShowreels.tsx`, `DashboardCredits.tsx`, and `DashboardSeo.tsx` to pass the correct HTTP string format: `cacheControl: "public, max-age=31536000"`.

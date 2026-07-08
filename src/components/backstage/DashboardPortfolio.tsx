@@ -132,7 +132,7 @@ export function DashboardPortfolio() {
 
       const { error } = await supabase.storage
         .from("portfolio")
-        .upload(filePath, fileToUpload, { cacheControl: "31536000", upsert: true });
+        .upload(filePath, fileToUpload, { cacheControl: "public, max-age=31536000", upsert: true });
 
       if (error) {
         if (error.message.includes("Bucket not found")) {
@@ -154,7 +154,7 @@ export function DashboardPortfolio() {
 
         const { error: origErr } = await supabase.storage
           .from("portfolio")
-          .upload(origFilePath, originalFile, { cacheControl: "31536000", upsert: true });
+          .upload(origFilePath, originalFile, { cacheControl: "public, max-age=31536000", upsert: true });
 
         if (!origErr) {
           const { data: origUrlData } = supabase.storage.from("portfolio").getPublicUrl(origFilePath);

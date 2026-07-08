@@ -140,7 +140,7 @@ export function DashboardMedia() {
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const fileFullPath = `${category}/${fileName}`;
       
-      const { error } = await supabase.storage.from("portfolio").upload(fileFullPath, fileToUpload, { cacheControl: "31536000", upsert: true });
+      const { error } = await supabase.storage.from("portfolio").upload(fileFullPath, fileToUpload, { cacheControl: "public, max-age=31536000", upsert: true });
 
       if (error) throw error;
 

@@ -127,7 +127,7 @@ export function DashboardShowreels() {
 
       const { error } = await supabase.storage
         .from("portfolio")
-        .upload(filePath, fileToUpload, { cacheControl: "31536000", upsert: true });
+        .upload(filePath, fileToUpload, { cacheControl: "public, max-age=31536000", upsert: true });
 
       if (error) throw error;
 
