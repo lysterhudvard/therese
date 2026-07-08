@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Play, Pause, Volume2, VolumeX, Maximize2, ArrowLeft, ArrowRight, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize2, ArrowLeft, ArrowRight, X, Video } from "lucide-react";
 import { useT } from "../../hooks/use-t";
 import { VIDEOS, type VideoItem } from "./ShowreelsData";
 
@@ -260,11 +260,15 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
                   {!isTransitionComplete ? (
                     // Static poster image displayed during layout scale-up, gradually fading to black
                     <div className="w-full h-full relative">
-                      <img
-                        src={activeVideo.poster}
-                        alt="Preparing screen..."
-                        className="w-full h-full object-cover select-none"
-                      />
+                      {activeVideo.poster ? (
+                        <img
+                          src={activeVideo.poster}
+                          alt="Preparing screen..."
+                          className="w-full h-full object-cover select-none"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-black/95" />
+                      )}
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -327,11 +331,15 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
                   className="w-full h-full relative cursor-pointer group"
                   onClick={() => setIsEnlarged(true)}
                 >
-                  <img
-                    src={activeVideo.poster}
-                    alt={activeVideo.title[lang]}
-                    className="w-full h-full object-cover select-none transition duration-[1500ms] group-hover:scale-105"
-                  />
+                  {activeVideo.poster ? (
+                    <img
+                      src={activeVideo.poster}
+                      alt={activeVideo.title[lang]}
+                      className="w-full h-full object-cover select-none transition duration-[1500ms] group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-stage/10 transition duration-[1500ms] group-hover:scale-105" />
+                  )}
                   {/* Glowing play symbol */}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-colors duration-[1500ms]">
                     <span className="flex items-center gap-5 text-xs uppercase tracking-[0.4em] text-bone font-sans select-none">
@@ -480,12 +488,16 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
                       playsInline
                       className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                     />
-                  ) : (
+                  ) : item.poster ? (
                     <img
                       src={item.poster}
                       alt={item.title[lang]}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                     />
+                  ) : (
+                    <div className="absolute inset-0 w-full h-full bg-stage/40 flex items-center justify-center">
+                      <Video className="w-6 h-6 text-bone/20" />
+                    </div>
                   )}
                   {/* Ambient dim overlay */}
                   <div className="absolute inset-0 bg-ink/30" />

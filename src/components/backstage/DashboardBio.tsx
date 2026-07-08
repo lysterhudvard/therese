@@ -245,7 +245,7 @@ export function DashboardBio() {
       title_en: "New Section",
       quote_sv: "Skriv citat här...",
       quote_en: "Write quote here...",
-      image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+      image: "",
       weight: 300
     };
     setBioSections([...bioSections, newSection]);

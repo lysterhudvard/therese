@@ -248,7 +248,7 @@ export function DashboardMedia() {
           sub_en: "Direct link",
           vimeo_id: vimeoId,
           url: isVimeo ? undefined : externalUrl,
-          poster: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
+          poster: "",
           genre: "VIDEO",
           specs: "16:9 // HD",
           glow: "rgba(235, 94, 40, 0.15)",

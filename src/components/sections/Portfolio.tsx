@@ -23,7 +23,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
   const [maxX, setMaxX] = useState(0);
 
   // Normalize image data to objects
-  const normalizedImages = (images.length > 0 ? images : IMG.portfolio).map((img, idx) => {
+  const normalizedImages = images.map((img, idx) => {
     if (typeof img === "string") {
       return {
         url: img,
@@ -74,7 +74,11 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
   };
 
   return (
-    <section id="portfolio" ref={ref} className="relative h-auto md:h-[320vh]">
+    <section 
+      id="portfolio" 
+      ref={ref} 
+      className={`relative ${normalizedImages.length > 0 ? "h-auto md:h-[320vh]" : "h-auto md:h-[100svh]"}`}
+    >
       <motion.div
         style={{ opacity: exitOpacity, scale: exitScale }}
         className="relative md:sticky top-0 h-auto md:h-[100svh] w-full overflow-hidden bg-ink"
@@ -91,7 +95,9 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
         </div>
 
         {/* Dark barrier on the left to fade out images as they approach the text */}
-        <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden md:block" />
+        {normalizedImages.length > 0 && (
+          <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden md:block" />
+        )}
 
         <div className="absolute left-6 top-1/2 z-30 -translate-y-1/2 md:left-12 hidden md:block">
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-1.5">
@@ -102,46 +108,56 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
             <br />
             {t.portfolio.title[1]}
           </div>
-          <div className="mt-4 text-xs text-bone/70 max-w-[180px]">{t.portfolio.hint}</div>
+          {normalizedImages.length > 0 && (
+            <div className="mt-4 text-xs text-bone/70 max-w-[180px]">{t.portfolio.hint}</div>
+          )}
         </div>
 
-        <motion.div
-          ref={trackRef}
-          style={{ x }}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
-        >
-          {normalizedImages.map((img, i) => (
-            <div
-              key={img.url + i}
-              className="relative shrink-0 group overflow-hidden border border-bone/5 hover:border-ember/30 transition-colors duration-500"
-              style={{ width: "min(34vw, 460px, 54svh)", aspectRatio: "3/4" }}
-            >
-              <img
-                src={img.url}
-                alt={img.alt}
-                loading="lazy"
-                className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.02]"
-              />
-              <div className="absolute left-3 top-3 font-mono text-[10px] text-bone/60 bg-ink/40 backdrop-blur-xs px-2 py-0.5 rounded-sm">
-                {String(i + 1).padStart(2, "0")} / {String(normalizedImages.length).padStart(2, "0")}
-              </div>
-              <div className="absolute bottom-3 left-3 font-mono text-[9px] text-bone/70 tracking-wider">
-                THESS · {String(2020 + (i % 4))}
-              </div>
+        {/* Desktop Image Track / Placeholder */}
+        {normalizedImages.length === 0 ? (
+          <div className="hidden md:flex absolute left-[45vw] top-1/2 -translate-y-1/2 items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow">
+            <span>//</span>
+            <span>{lang === "sv" ? "Bilder kommer snart" : "Images coming soon"}</span>
+          </div>
+        ) : (
+          <motion.div
+            ref={trackRef}
+            style={{ x }}
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
+          >
+            {normalizedImages.map((img, i) => (
+              <div
+                key={img.url + i}
+                className="relative shrink-0 group overflow-hidden border border-bone/5 hover:border-ember/30 transition-colors duration-500"
+                style={{ width: "min(34vw, 460px, 54svh)", aspectRatio: "3/4" }}
+              >
+                <img
+                  src={img.url}
+                  alt={img.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.02]"
+                />
+                <div className="absolute left-3 top-3 font-mono text-[10px] text-bone/60 bg-ink/40 backdrop-blur-xs px-2 py-0.5 rounded-sm">
+                  {String(i + 1).padStart(2, "0")} / {String(normalizedImages.length).padStart(2, "0")}
+                </div>
+                <div className="absolute bottom-3 left-3 font-mono text-[9px] text-bone/70 tracking-wider">
+                  THESS · {String(2020 + (i % 4))}
+                </div>
 
-              {img.allow_download && (
-                <button
-                  type="button"
-                  onClick={() => triggerDownload(img.download_url || img.url, `therese-jarvheden-press-${i + 1}.jpg`)}
-                  className="absolute bottom-3 right-3 p-2 bg-ink/75 hover:bg-ember border border-bone/10 hover:border-ember text-bone hover:text-ink rounded-full transition-all duration-300 shadow-md flex items-center justify-center cursor-pointer scale-90 group-hover:scale-100 opacity-0 group-hover:opacity-100"
-                  title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
-                >
-                  <Download size={14} />
-                </button>
-              )}
-            </div>
-          ))}
-        </motion.div>
+                {img.allow_download && (
+                  <button
+                    type="button"
+                    onClick={() => triggerDownload(img.download_url || img.url, `therese-jarvheden-press-${i + 1}.jpg`)}
+                    className="absolute bottom-3 right-3 p-2 bg-ink/75 hover:bg-ember border border-bone/10 hover:border-ember text-bone hover:text-ink rounded-full transition-all duration-300 shadow-md flex items-center justify-center cursor-pointer scale-90 group-hover:scale-100 opacity-0 group-hover:opacity-100"
+                    title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
+                  >
+                    <Download size={14} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </motion.div>
+        )}
 
         {/* Mobile / Tablet layout - natural height, does not lock page scrolling */}
         <div className="md:hidden relative z-10 flex flex-col py-16">
@@ -153,34 +169,42 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
               {t.portfolio.title[0]} {t.portfolio.title[1]}
             </h3>
           </div>
-          <div className="w-full overflow-x-auto no-scrollbar">
-            <div className="flex items-center gap-4 px-6">
-              {normalizedImages.map((img, i) => (
-                <div key={img.url + i} className="relative shrink-0 w-[240px] aspect-[3/4] rounded overflow-hidden border border-bone/10">
-                  <img
-                    src={img.url}
-                    alt={img.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute left-2 top-2 font-mono text-[10px] text-bone/70 bg-black/50 px-1.5 py-0.5 rounded-sm">
-                    {String(i + 1).padStart(2, "0")}
-                  </div>
-
-                  {img.allow_download && (
-                    <button
-                      type="button"
-                      onClick={() => triggerDownload(img.download_url || img.url, `therese-jarvheden-press-${i + 1}.jpg`)}
-                      className="absolute bottom-2 right-2 p-2 bg-black/60 text-bone hover:text-ember rounded-full transition-colors flex items-center justify-center cursor-pointer"
-                      title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
-                    >
-                      <Download size={12} />
-                    </button>
-                  )}
-                </div>
-              ))}
+          
+          {normalizedImages.length === 0 ? (
+            <div className="px-6 py-6 font-mono text-[9px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow flex items-center gap-2">
+              <span>//</span>
+              <span>{lang === "sv" ? "Bilder kommer snart" : "Images coming soon"}</span>
             </div>
-          </div>
+          ) : (
+            <div className="w-full overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-4 px-6">
+                {normalizedImages.map((img, i) => (
+                  <div key={img.url + i} className="relative shrink-0 w-[240px] aspect-[3/4] rounded overflow-hidden border border-bone/10">
+                    <img
+                      src={img.url}
+                      alt={img.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute left-2 top-2 font-mono text-[10px] text-bone/70 bg-black/50 px-1.5 py-0.5 rounded-sm">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+
+                    {img.allow_download && (
+                      <button
+                        type="button"
+                        onClick={() => triggerDownload(img.download_url || img.url, `therese-jarvheden-press-${i + 1}.jpg`)}
+                        className="absolute bottom-2 right-2 p-2 bg-black/60 text-bone hover:text-ember rounded-full transition-colors flex items-center justify-center cursor-pointer"
+                        title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
+                      >
+                        <Download size={12} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </section>

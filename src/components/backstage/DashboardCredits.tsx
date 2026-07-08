@@ -92,7 +92,7 @@ export function DashboardCredits() {
       category_en: "",
       network: "",
       type: "Film",
-      img: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=300",
+      img: "",
       is_current_production: false,
       sort_order: credits.length,
       commentary_url: "",
@@ -211,7 +211,7 @@ export function DashboardCredits() {
           category_en: c.category_en,
           network: c.network,
           type: c.type,
-          img: c.img || "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=300",
+          img: c.img || "",
           is_current_production: c.is_current_production,
           sort_order: index,
           url: c.url || null,
@@ -477,6 +477,53 @@ export function DashboardCredits() {
                 </div>
               </div>
 
+              {/* Image selection and preview */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 border-t border-bone/5 pt-3 items-center">
+                <div className="md:col-span-8 space-y-1">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                    Bild-URL (Visas i manus-förhandsvisningen vid hover)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={c.img || ""}
+                      onChange={(e) => updateCredit(c.id, "img", e.target.value)}
+                      placeholder="Skriv in bild-URL eller välj från mediabiblioteket"
+                      className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setActivePickerId(c.id + "-img")}
+                      className="px-3 py-1.5 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+                    >
+                      Media
+                    </button>
+                  </div>
+                </div>
+                <div className="md:col-span-4 flex items-center gap-3 pt-4 md:pt-2">
+                  {c.img ? (
+                    <>
+                      <img
+                        src={c.img}
+                        alt="Meritförhandsvisning"
+                        className="h-10 w-10 object-cover border border-bone/10 rounded-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateCredit(c.id, "img", "")}
+                        className="text-[8px] uppercase tracking-widest text-red-400 hover:text-red-300 font-mono transition-colors cursor-pointer"
+                      >
+                        Ta bort bild
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-[8px] uppercase tracking-widest text-bone/25 font-mono italic">
+                      Ingen bild vald
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Advanced collapsable: Audio recordings and scripts */}
               <div className="border-t border-bone/5 pt-3">
                 <button
@@ -686,10 +733,16 @@ export function DashboardCredits() {
       onClose={() => setActivePickerId(null)}
       onSelect={(url) => {
         if (activePickerId) {
-          updateCredit(activePickerId, "commentary_url", url);
+          if (activePickerId.endsWith("-img")) {
+            const actualId = activePickerId.substring(0, activePickerId.length - 4);
+            updateCredit(actualId, "img", url);
+          } else {
+            updateCredit(activePickerId, "commentary_url", url);
+          }
         }
+        setActivePickerId(null);
       }}
-      typeFilter="audio"
+      typeFilter={activePickerId?.endsWith("-img") ? "image" : "audio"}
     />
     </>
   );

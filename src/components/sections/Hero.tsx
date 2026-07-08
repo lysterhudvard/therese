@@ -19,7 +19,7 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
     <section id="top" ref={ref} className="relative h-[100svh] w-full overflow-hidden">
       <motion.div style={{ scale, opacity }} className="absolute inset-0">
         <motion.img
-          src={heroImage || IMG.hero}
+          src={heroImage || ""}
           alt="Therese Järvheden"
           initial={{ opacity: 0, scale: 1.08 }}
           animate={{ opacity: 1, scale: 1 }}

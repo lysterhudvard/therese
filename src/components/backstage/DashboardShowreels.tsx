@@ -96,7 +96,7 @@ export function DashboardShowreels() {
       vimeo_id: "",
       youtube_id: "",
       url: "",
-      poster: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
+      poster: "",
       genre: "DRAMA / SCENKLIPP",
       specs: "16:9 // HD",
       glow: "rgba(235, 94, 40, 0.15)",

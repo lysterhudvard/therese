@@ -376,7 +376,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
             url: r.url || undefined,
             vimeoId: r.vimeo_id || undefined,
             youtubeId: r.youtube_id || undefined,
-            poster: r.poster || "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=1000",
+            poster: r.poster || "",
             genre: r.genre || "SHOWREEL",
             specs: r.specs || "16:9 // HD",
             glow: r.glow || "rgba(235, 94, 40, 0.15)"
@@ -396,11 +396,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           credits: mappedCredits,
           showreels: mappedShowreels,
           seo: seoRes.data,
-          portfolioImages: mappedImages.length > 0 ? mappedImages : IMG.portfolio.map((url, i) => ({
-            url,
-            alt: `Therese Järvheden portfolio ${i + 1}`,
-            allow_download: true
-          }))
+          portfolioImages: mappedImages
         });
       } catch (e) {
         console.error("Failed to load live Supabase data:", e);
@@ -501,7 +497,9 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           ? JSON.parse(dbData.biography.voice_settings)
           : dbData.biography.voice_settings;
         if (vs) {
-          if (vs.image_url) url = vs.image_url;
+          if (vs.hasOwnProperty("image_url")) {
+            url = vs.image_url;
+          }
           if (vs.image_alt) alt = vs.image_alt;
         }
       } catch (e) {

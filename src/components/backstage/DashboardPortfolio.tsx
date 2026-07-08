@@ -242,72 +242,44 @@ export function DashboardPortfolio() {
           </h3>
         </div>
 
-        {/* Add photo tool */}
-        <div className="bg-stage/15 border border-bone/5 p-4 rounded-sm space-y-4">
-          <h4 className="text-[10px] uppercase tracking-widest text-bone/70 font-mono">Lägg till ny bild</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild via URL</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  id="klick-portfolio-url-input"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  placeholder="https://exempel.se/bild.jpg"
-                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsMediaPickerOpen(true)}
-                  className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
-                  title="Välj från mediebibliotek"
-                >
-                  <ImageIcon size={12} />
-                </button>
-                <button
-                  type="button"
-                  id="klick-portfolio-url-add"
-                  onClick={handleAddImageUrl}
-                  className="px-3 bg-bone/10 hover:bg-bone/20 text-bone rounded-sm text-xs transition-colors cursor-pointer"
-                  title="Lägg till länk"
-                >
-                  <Plus size={12} />
-                </button>
-              </div>
+        {/* Add photo tool - Redesigned for clarity */}
+        <div className="bg-stage/15 border border-bone/10 p-6 rounded-md space-y-4 text-center">
+          <h4 className="text-[11px] uppercase tracking-widest text-bone font-mono">Lägg till ny bild i portfolion</h4>
+          <p className="text-[10px] text-bone/50 max-w-sm mx-auto pb-2">
+            Välj om du vill ladda upp en helt ny fil från din dator, eller hämta en bild du redan laddat upp i Mediebiblioteket.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Direct Upload Button */}
+            <div className="relative w-full sm:w-auto">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                disabled={isUploading}
+                className="hidden"
+                id="portfolio-file-upload-main"
+              />
+              <label
+                htmlFor="portfolio-file-upload-main"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-ember/10 hover:bg-ember/20 border border-ember/30 text-ember text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full"
+              >
+                <Upload size={14} />
+                {isUploading ? "Laddar upp..." : "Ladda upp från dator"}
+              </label>
             </div>
-            
-            <div className="space-y-1">
-              <label className="text-[8px] uppercase tracking-widest text-bone/45 font-mono">Direkt Filuppladdning</label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  disabled={isUploading}
-                  className="hidden"
-                  id="portfolio-file-upload"
-                />
-                <label
-                  htmlFor="portfolio-file-upload"
-                  id="klick-portfolio-upload"
-                  className="w-full flex items-center justify-center gap-2 border border-dashed border-bone/20 hover:border-ember/40 bg-stage/20 py-1.5 rounded-sm text-xs font-mono text-bone/50 hover:text-bone cursor-pointer transition-colors"
-                >
-                  <Upload size={12} />
-                  Välj bildfil
-                </label>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-[8px] uppercase tracking-widest text-bone/45 font-mono">Alt-tag (Beskrivning för SEO)</label>
-            <input
-              type="text"
-              value={newImageAlt}
-              onChange={(e) => setNewImageAlt(e.target.value)}
-              placeholder="Ex: Therese Järvheden - Svartvitt porträtt 2025"
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
+
+            <span className="text-bone/30 text-xs italic">eller</span>
+
+            {/* Media Library Button */}
+            <button
+              type="button"
+              onClick={() => setIsMediaPickerOpen(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full sm:w-auto"
+            >
+              <ImageIcon size={14} />
+              Välj från Mediebibliotek
+            </button>
           </div>
         </div>
 
@@ -423,7 +395,17 @@ export function DashboardPortfolio() {
           setImages(images.map((img) => (img.id === activePickingImageId ? { ...img, url } : img)));
           setActivePickingImageId(null);
         } else {
-          setNewImageUrl(url);
+          // Instantly add the picked media library image to the portfolio list
+          const newImg: GalleryImage = {
+            id: `temp-${Date.now()}`,
+            url: url,
+            download_url: url,
+            alt: "Porträtt från mediebibliotek",
+            allow_download: true,
+            sort_order: images.length,
+          };
+          setImages([...images, newImg]);
+          toast.success("Bild tillagd från mediebiblioteket. Klicka på Spara för att bekräfta.");
         }
       }}
       typeFilter="image"

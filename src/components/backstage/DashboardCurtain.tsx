@@ -101,10 +101,10 @@ export function DashboardCurtain() {
       }
 
       if (data) {
-        if (data.footer_image) setFooterImage(data.footer_image);
-        if (data.footer_end_sv) setFooterEndSv(data.footer_end_sv);
-        if (data.footer_end_en) setFooterEndEn(data.footer_end_en);
-        if (data.footer_credits && Array.isArray(data.footer_credits) && data.footer_credits.length > 0) {
+        setFooterImage(data.footer_image !== null && data.footer_image !== undefined ? data.footer_image : "");
+        setFooterEndSv(data.footer_end_sv !== null && data.footer_end_sv !== undefined ? data.footer_end_sv : "");
+        setFooterEndEn(data.footer_end_en !== null && data.footer_end_en !== undefined ? data.footer_end_en : "");
+        if (data.footer_credits && Array.isArray(data.footer_credits)) {
           setFooterCredits(data.footer_credits as FooterCreditItem[]);
         }
       }

@@ -27,23 +27,19 @@ let processedDbData = dbData;
 if (!processedDbData) {
   processedDbData = {
     biography: {
-      hero_image: IMG.hero,
+      hero_image: "",
       hero_text_sv: "",
       hero_text_en: "",
       mood_images: {
-        dramatic: MOOD_DATA.Dramatic.image,
-        comedic: MOOD_DATA.Comedic.image,
-        classical: MOOD_DATA.Classical.image
+        dramatic: "",
+        comedic: "",
+        classical: ""
       }
     },
     credits: CREDITS,
     showreels: [],
     seo: null,
-    portfolioImages: IMG.portfolio.map((url, i) => ({
-      url,
-      alt: `Therese Järvheden portfolio ${i + 1}`,
-      allow_download: true
-    }))
+    portfolioImages: []
   };
 }
 

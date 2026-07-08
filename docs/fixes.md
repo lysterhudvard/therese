@@ -177,5 +177,31 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** Samma bild-URL användes till både rendering i sidans layout och till nedladdningslänken. Eftersom vi optimerade bilderna hårt för webbprestanda, blev även de nedladdade bilderna komprimerade och små.
 - **Resolution:** Lagt till en ny kolumn `download_url` i tabellen `portfolio_images` i Supabase. Uppdaterat CMS-panelen så att när du laddar upp en bild laddas **både** en optimerad WebP-kopia (för snabb laddning) och den orörda originalfilen (för nedladdning) upp till lagringshinken. Frontend-knappen pekar nu direkt på originalfilen via `download_url`.
 
+## 30. Portfolio Image Vertically Cropped / Aspect Ratio Distortion Bug
+- **Symptom:** Portrait images uploaded to the portfolio section with a 3:4 aspect ratio (e.g. 460x613 px or 899x1200 px) were severely vertically cropped, cutting off the subject's head and feet. Additionally, thumbnails in the CMS dashboard list appeared distorted.
+- **Root Cause:** 
+  1. **Astro Image Optimizer Distortion:** In `src/pages/index.astro`, Astro's `getImage` function was used to re-optimize portfolio images by passing `width = 600`. Because no target height was provided and the source was a remote URL, Astro scaled the width to 600px but kept the original height of 1200px (resulting in a distorted 1:2 aspect ratio). The CSS `object-cover` property then chopped off the top and bottom of the distorted image to fit the 3:4 container.
+  2. **CMS Thumbnail Aspect Ratio:** In `DashboardPortfolio.tsx` (and `DashboardBio.tsx`), the image previews in the list were hardcoded to landscape aspect ratios (`w-16 h-12` / `h-14 w-14`), forcing the browser to crop the top/bottom of uploaded 3:4 portraits just to display them in the CMS dashboard list.
+- **Resolution:** 
+  * Skipped Astro's redundant server-side re-optimization on database-sourced images (since the client-side `ImageUploadOptimizer.tsx` already formats and compresses them to WebP perfectly upon upload).
+  * Redesigned the CMS list thumbnail styles to use matching vertical ratios (e.g., `w-12 aspect-[3/4]` for portfolio and `w-10 aspect-[3/4] h-auto` for biography), preventing distortion and visual cropping in the admin interface.
+
+## 31. Persistent Placeholder Images Despite Deleting in CMS
+- **Symptom:** After clearing the portfolio and deleting all images via the CMS dashboard, the default mock/placeholder photos would still render in the portfolio section.
+- **Root Cause:** A multi-layered fallback system was checking if the database returned an empty array (`[]`) and, if so, dynamically injected the fallback array `IMG.portfolio`. This fallback existed in three separate places: the client-side data mapper (`src/routes/index.tsx`), the visual container mapping (`src/components/sections/Portfolio.tsx`), and the server-side rendering loader (`src/lib/supabase-server.ts`).
+- **Resolution:** Removed the fallback assignment to `IMG.portfolio` in all three places. Now, if the database returns an empty array, it correctly passes `[]` all the way to the UI template, which gracefully hides the portfolio section when empty.
+
+## 32. Configurable Credit Images and Removed Hardcoded Unsplash Fallbacks in Meriter (Credits)
+- **Symptom:** Newly created credits in "Meriter" defaulted to a hardcoded Unsplash camera/film image fallback, with no input field or media picker in the CMS to edit or replace it.
+- **Root Cause:** In `DashboardCredits.tsx`, the `img` field was initialized to a default Unsplash placeholder during row creation (`addCredit`) and mapped to this fallback on save (`handleSave`). No UI field existed to let the user select a different image.
+- **Resolution:** Added a new `Bild-URL` input field and media picker button directly inside the credit item card in `DashboardCredits.tsx`, using `MediaPickerModal` set to image filter. Removed all hardcoded Unsplash default fallbacks from the CMS initialization and save pipeline.
+
+## 33. Graceful Fallbacks and Layouts for Missing Posters in Showreels and Voice
+- **Symptom:** When a user cleared or deleted the poster image for a showreel video or the background image for the voice section, the frontend would display broken image frames or fall back to the hardcoded `IMG.voice` asset.
+- **Root Cause:** In both client/server loaders, the showreel mapping logic fell back to an Unsplash poster URL if none was set in the database, and the voice settings mapper overrode empty strings with `IMG.voice`.
+- **Resolution:** Removed the hardcoded Unsplash fallback for showreels and modified the voice settings image parser in `index.tsx` to preserve empty image URLs. Updated `Showreels.tsx` to render clean, dark background layouts with generic video icons when no posters exist. Refactored both `Voice.tsx` and `Biography.tsx` to dynamically switch to a beautiful centered single-column layout when their respective section images are deleted or cleared in the CMS, preventing broken links and blank visual gaps while maintaining high-end visual aesthetics. Also set the default image URL for new custom biography sections in `DashboardBio.tsx` to a blank string `""` instead of forcing a default portrait URL.
+
+
+
 
 

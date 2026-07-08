@@ -97,8 +97,8 @@ export function Biography({
   return (
     <section id="bio" ref={ref} className="relative px-6 py-28 md:px-12 md:py-40">
       <motion.div style={{ opacity, scale }} className="w-full h-full">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 md:grid-cols-12">
-          <div className="md:col-span-7">
+        <div className={data.image ? "mx-auto grid max-w-7xl grid-cols-1 gap-14 md:grid-cols-12" : "mx-auto max-w-4xl flex flex-col items-center justify-center text-center"}>
+          <div className={data.image ? "md:col-span-7" : "w-full flex flex-col items-center max-w-3xl"}>
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.bio.act}</div>
             <h2
               className="mt-5 font-display leading-[0.95] text-bone transition-all duration-700"
@@ -141,14 +141,14 @@ export function Biography({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4 }}
-                  className="mt-5 font-display italic text-bone/80 text-xl md:text-2xl max-w-lg"
+                  className={`mt-5 font-display italic text-bone/80 text-xl md:text-2xl max-w-lg ${data.image ? "" : "mx-auto"}`}
                 >
                   "{lang === "sv" ? data.quote_sv : data.quote_en}"
                 </motion.p>
               </AnimatePresence>
             </div>
 
-            <div className="mt-14 space-y-7 text-bone/75 leading-relaxed max-w-xl">
+            <div className={`mt-14 space-y-7 text-bone/75 leading-relaxed ${data.image ? "max-w-xl text-left" : "max-w-2xl text-center mx-auto"}`}>
               <p>
                 {t.bio.p1Pre}
                 {t.bio.p1Link && (
@@ -183,9 +183,9 @@ export function Biography({
               </p>
             </div>
  
-            <dl className="mt-14 grid grid-cols-3 gap-6 border-t border-bone/10 pt-8 max-w-xl">
+            <dl className={`mt-14 grid grid-cols-3 gap-6 border-t border-bone/10 pt-8 w-full ${data.image ? "max-w-xl" : "max-w-2xl mx-auto"}`}>
               {t.bio.facts.map(([k, v]) => (
-                <div key={k}>
+                <div key={k} className={data.image ? "" : "flex flex-col items-center"}>
                   <dt className="text-[9px] uppercase tracking-[0.35em] text-bone/70">{k}</dt>
                   <dd className="mt-2 font-display text-lg text-bone">{v}</dd>
                 </div>
@@ -193,39 +193,41 @@ export function Biography({
             </dl>
           </div>
 
-          <div className="md:col-span-5 md:order-first">
-            <div className="sticky top-28">
-              <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeId}
-                    initial={{ opacity: 0, scale: 1.06 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 h-full w-full"
-                  >
-                    <SpotlightImage
-                      src={data.image}
-                      alt={`Therese Järvheden — ${lang === "sv" ? data.title_sv : data.title_en}`}
-                      className="h-full w-full"
-                    />
-                  </motion.div>
-                </AnimatePresence>
-                <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
-              </div>
-              <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono whitespace-pre-line">
-                {imageCredits ? (
-                  lang === "sv" ? imageCredits.sv : imageCredits.en
-                ) : (
-                  <>
-                    <span>Foto: Robert Eldrim</span>
-                    <span>Smink: Sara Zetterström</span>
-                  </>
-                )}
+          {data.image && (
+            <div className="md:col-span-5 md:order-first">
+              <div className="sticky top-28">
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeId}
+                      initial={{ opacity: 0, scale: 1.06 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 h-full w-full"
+                    >
+                      <SpotlightImage
+                        src={data.image}
+                        alt={`Therese Järvheden — ${lang === "sv" ? data.title_sv : data.title_en}`}
+                        className="h-full w-full"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                  <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
+                </div>
+                <div className="mt-3 flex flex-col gap-1 text-[10px] uppercase tracking-[0.3em] text-bone/50 font-mono whitespace-pre-line">
+                  {imageCredits ? (
+                    lang === "sv" ? imageCredits.sv : imageCredits.en
+                  ) : (
+                    <>
+                      <span>Foto: Robert Eldrim</span>
+                      <span>Smink: Sara Zetterström</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Accordion FAQ Section */}

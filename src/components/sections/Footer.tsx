@@ -33,7 +33,7 @@ export function Footer({ bioData }: { bioData?: any }) {
     }
   }, [isInView]);
 
-  const footerImage = bioData?.footer_image || IMG.portfolio[0];
+  const footerImage = bioData?.footer_image || "";
   const footerEnd = (lang === "sv" ? bioData?.footer_end_sv : bioData?.footer_end_en) || t.footer.end;
 
   const creditsList = useMemo(() => {
@@ -117,53 +117,55 @@ export function Footer({ bioData }: { bioData?: any }) {
 
       <div className="w-full max-w-lg z-10 flex flex-col items-center relative min-h-[380px]">
         {/* Intro/Morphing Screen & Layout Transition */}
-        {!animatedIn ? (
-          <div className="w-full flex justify-center py-8 z-30">
-            <motion.div
-              layoutId="post-credits-reel"
-              transition={{ type: "spring", stiffness: 100, damping: 20 }}
-              className="relative w-64 h-40 md:w-80 md:h-52 bg-stage/95 border border-bone/20 rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
-            >
-              <img
-                src={footerImage}
-                alt="Post-Credits Scene"
-                className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
-              <div
-                className="absolute inset-0 opacity-[0.08] pointer-events-none"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
-                  backgroundSize: "100% 4px",
-                }}
-              />
-            </motion.div>
-          </div>
-        ) : (
-          /* Mini screen mode - positioned directly above the scrolling box on the right */
-          <div className="w-full flex justify-end mb-3 z-30 pr-1">
-            <motion.div
-              layoutId="post-credits-reel"
-              transition={{ type: "spring", stiffness: 100, damping: 20 }}
-              className="relative w-28 h-20 bg-stage/90 border border-bone/15 rounded overflow-hidden shadow-2xl"
-            >
-              <img
-                src={footerImage}
-                alt="Post-Credits Scene"
-                className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
-              <div
-                className="absolute inset-0 opacity-[0.08] pointer-events-none"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
-                  backgroundSize: "100% 4px",
-                }}
-              />
-            </motion.div>
-          </div>
+        {footerImage && (
+          !animatedIn ? (
+            <div className="w-full flex justify-center py-8 z-30">
+              <motion.div
+                layoutId="post-credits-reel"
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                className="relative w-64 h-40 md:w-80 md:h-52 bg-stage/95 border border-bone/20 rounded-lg overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+              >
+                <img
+                  src={footerImage}
+                  alt="Post-Credits Scene"
+                  className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
+                <div
+                  className="absolute inset-0 opacity-[0.08] pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+                    backgroundSize: "100% 4px",
+                  }}
+                />
+              </motion.div>
+            </div>
+          ) : (
+            /* Mini screen mode - positioned directly above the scrolling box on the right */
+            <div className="w-full flex justify-end mb-3 z-30 pr-1">
+              <motion.div
+                layoutId="post-credits-reel"
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                className="relative w-28 h-20 bg-stage/90 border border-bone/15 rounded overflow-hidden shadow-2xl"
+              >
+                <img
+                  src={footerImage}
+                  alt="Post-Credits Scene"
+                  className="w-full h-full object-cover grayscale brightness-75 transition-all duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
+                <div
+                  className="absolute inset-0 opacity-[0.08] pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(rgba(220, 218, 209, 0.08) 50%, transparent 50%)",
+                    backgroundSize: "100% 4px",
+                  }}
+                />
+              </motion.div>
+            </div>
+          )
         )}
 
         {/* Scrolling Credits container */}
