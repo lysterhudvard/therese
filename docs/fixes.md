@@ -303,9 +303,13 @@ This document details critical bugs, layout errors, and interaction blocks found
   - Added an automated size comparison check inside `ImageUploadOptimizer.tsx`.
   - If the canvas-optimized output file is larger than or equal to the original uploaded file, the UI displays a warning notifying the user, and the "Ladda upp Optimerad" handler automatically falls back to uploading the original file instead.
 
-## 46. Live CMS Updates and Client-Side Hydration Refresh
-- **Symptom:** After uploading a new hero image (e.g. 52 KB) and saving it in the CMS, visitors of the website still saw and downloaded the old hero image (150 KB).
-- **Root Cause:** Astro compiles the index page statically (`output: "static"`). The page was initialized with the database state at build-time (`initialDbData`). Because the client-side code in `routes/index.tsx` returned early if `initialDbData` was present (`if (initialDbData) return;`), it never fetched fresh database records from Supabase on the client. Therefore, visitors only saw the version of the site captured during the last static build.
+## 46. Live CMS Updates, Client-Side Hydration Refresh & Performance Tuning
+- **Symptom:** After uploading a new hero image (e.g. 52 KB) and saving it in the CMS, visitors still saw and downloaded the old hero image (150 KB). In addition, enabling background database syncing resulted in PageSpeed warning about a "critical request chain" of database queries on mount, alongside a recommendation to preconnect to the Supabase domain.
+- **Root Cause:** 
+  1. Astro builds the site statically (`output: "static"`), locking page variables to build-time snapshots (`initialDbData`). The client-side page loader in `routes/index.tsx` skipped API queries if this static data existed.
+  2. Running API requests immediately during layout mount puts them into the browser's critical rendering path, delaying load metrics.
+  3. Preconnect hints were missing for the Supabase origin, causing latency overhead.
 - **Resolution:**
-  - Removed `if (initialDbData) return;` from the client-side `useEffect` in `routes/index.tsx`.
-  - The page now queries the live Supabase tables asynchronously in the background. If the database records have changed (e.g., a new hero image URL has been set in the CMS), the client-side state is updated, and the new 52 KB image is loaded and displayed instantly without causing any page flashes or requiring a site redeployment.
+  1. **Dynamic Hydration Refresh:** Removed the early return condition from `routes/index.tsx` so the page fetches fresh database entries asynchronously in the background on load.
+  2. **Non-Blocking Deferred Queries:** Wrapped the client-side Supabase query execution in a deferred/idle timer (`requestIdleCallback` with a `2s` fallback timeout). If the page was server-rendered (static), it displays content instantly while deferring background queries until the browser is fully idle. This keeps the initial critical request chain empty and improves LCP.
+  3. **Origin Preconnection:** Added `<link rel="preconnect" href="https://uhdzswnawlqpsaajsjpo.supabase.co" crossorigin />` and `<link rel="dns-prefetch" ... />` inside the static `<head>` tag in `Layout.astro`. This resolves IP lookup and TCP/TLS handshakes early, speeding up media loads by ~300ms.

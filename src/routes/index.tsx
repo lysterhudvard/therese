@@ -196,8 +196,29 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
       }
     };
 
-    loadAllData();
-  }, []);
+    if (initialDbData) {
+      let timerId: any;
+      const scheduleFetch = () => {
+        timerId = setTimeout(loadAllData, 2000);
+      };
+
+      if (typeof window !== "undefined") {
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(() => scheduleFetch(), { timeout: 3000 });
+        } else {
+          scheduleFetch();
+        }
+      } else {
+        loadAllData();
+      }
+
+      return () => {
+        if (timerId) clearTimeout(timerId);
+      };
+    } else {
+      loadAllData();
+    }
+  }, [initialDbData]);
 
   // Dynamically update head tags for SEO optimization based on DB settings
   useEffect(() => {
