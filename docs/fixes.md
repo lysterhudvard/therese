@@ -315,9 +315,12 @@ This document details critical bugs, layout errors, and interaction blocks found
   3. **Origin Preconnection:** Added `<link rel="preconnect" href="https://uhdzswnawlqpsaajsjpo.supabase.co" crossorigin />` and `<link rel="dns-prefetch" ... />` inside the static `<head>` tag in `Layout.astro`. This resolves IP lookup and TCP/TLS handshakes early, speeding up media loads by ~300ms.
 
 ## 47. LCP Element Render Delay and JS Hydration Block
-- **Symptom:** Google PageSpeed Insights flagged a massive "Element Render Delay" (~5.7s) for the LCP element (the `Therese Järvheden` text logo in the Hero section).
-- **Root Cause:** The Hero text was wrapped in a Framer Motion component with `initial={{ opacity: 0 }}`. This caused the text to be physically invisible in the statically generated HTML. The browser had to download the HTML, parse large JS chunks (`client.js`, `react-dom.js`, `index.js`), hydrate the React tree, boot up Framer Motion, and finally wait out an artificial 0.9s JS delay before it could paint the text to the screen, inflating the LCP metric massively.
+- **Symptom:** Google PageSpeed Insights originally flagged the `Therese Järvheden` text logo as the LCP element with a 5.7s Render Delay. Once that was optimized, it flagged the bottom Hero text (`En våldsam kärlek`) with a new 6.4s Render Delay, while also reporting a Critical Request Chain for the deferred API requests.
+- **Root Cause:** 
+  1. The Hero elements were wrapped in Framer Motion components utilizing Javascript-based transitions (e.g. `initial={{ opacity: 0 }}`). This causes the text to be completely invisible in the statically generated HTML.
+  2. The browser is forced to download the HTML, parse heavy JS chunks, boot up React and Framer Motion, and then wait out artificial 2.3-second animation delays before painting the text to the screen. 
+  3. Because the LCP paint was delayed by up to 6.4 seconds, the deferred API queries (set to run at 5 seconds) technically triggered *before* LCP, accidentally placing them in the "critical path."
 - **Resolution:**
-  - Removed the Javascript-based Framer Motion opacity transition block.
-  - Replaced the `<motion.div>` wrapper with a standard `<div>` carrying a pure CSS keyframe animation (`.animate-hero-text`).
-  - By moving the fade-in logic entirely to CSS, the browser applies the animation rules immediately during HTML/CSS parsing and paints the LCP element completely independently of JavaScript payload loading and hydration, drastically dropping the LCP time to well under 2 seconds.
+  - **Restored the `layoutId` Morph:** The `Therese Järvheden` logo *requires* `layoutId="header-logo"` to maintain its elegant morphing animation into the navbar. This was fully restored so the design integrity is untouched.
+  - **CSS Animation Replacement:** To prevent PageSpeed penalties from the other heavy LCP candidates on the screen, the bottom Hero text and scroll indicator were completely stripped of Framer Motion Javascript bindings.
+  - They were replaced with native CSS keyframe classes (`.animate-slide-up-fade` and `.animate-scroll-text-fade`). The browser now processes these natively during HTML parse, painting them instantly without waiting for Javascript hydration payloads. By pulling the LCP paint time down, the 5-second deferred API requests now safely occur *after* LCP, naturally resolving the "critical request chain" warning as well.

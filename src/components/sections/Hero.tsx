@@ -42,21 +42,20 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
 
       {!heroDone && (
         <div className="absolute inset-0 z-40 flex items-center justify-center px-6 animate-hero-text">
-          <h1
+          <motion.h1
+            layoutId="header-logo"
             className="font-display text-bone text-center tracking-[0.32em] uppercase flex items-center justify-center gap-3 whitespace-nowrap"
             style={{ fontSize: "clamp(1.1rem, 4vw, 3.2rem)" }}
+            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
           >
             <span className="italic font-light">Therese</span>
             <span>Järvheden</span>
-          </h1>
+          </motion.h1>
         </div>
       )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.3, duration: 0.9 }}
-        className="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 md:px-12 md:pb-14"
+      <div
+        className="absolute inset-x-0 bottom-0 z-20 px-6 pb-10 md:px-12 md:pb-14 animate-slide-up-fade"
       >
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="max-w-md">
@@ -71,16 +70,13 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
             <span>{t.hero.base}</span>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.6, duration: 0.8 }}
-        className="absolute left-1/2 bottom-3 z-20 -translate-x-1/2 text-[9px] uppercase tracking-[0.5em] text-bone/70"
+      <div
+        className="absolute left-1/2 bottom-3 z-20 -translate-x-1/2 text-[9px] uppercase tracking-[0.5em] text-bone/70 animate-scroll-text-fade"
       >
         {t.hero.scroll}
-      </motion.div>
+      </div>
     </section>
   );
 }

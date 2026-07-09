@@ -194,3 +194,15 @@ input:-webkit-autofill:active {
   animation: heroTextFade 0.6s ease-out 0.9s both;
 }
 
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up-fade {
+  animation: slideUpFade 0.9s ease-out 2.3s both;
+}
+
+.animate-scroll-text-fade {
+  animation: heroTextFade 0.8s ease-out 2.6s both;
+}
+
