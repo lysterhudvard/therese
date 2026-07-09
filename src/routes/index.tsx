@@ -13,8 +13,9 @@ import { Credits } from "../components/sections/Credits";
 import { Voice } from "../components/sections/Voice";
 import { Contact } from "../components/sections/Contact";
 import { Footer } from "../components/sections/Footer";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { type VideoItem } from "../components/sections/ShowreelsData";
+
+
 import {
   IMG,
   CREDITS,
@@ -60,14 +61,13 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     text: string;
   } | null>(null);
 
-  const [dbData, setDbData] = useState<{
+  const dbData = initialDbData as {
     biography: any;
     credits: Credit[];
     showreels: VideoItem[];
     seo: any;
     portfolioImages: any[];
-  } | null>(initialDbData || null);
-  const [dbLoaded, setDbLoaded] = useState(!!initialDbData);
+  } | null;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -102,123 +102,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     if (typeof document !== "undefined") document.documentElement.lang = lang;
   }, [lang]);
 
-  // Load all live Supabase data
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setDbLoaded(true);
-      return;
-    }
-
-    const loadAllData = async () => {
-      try {
-        const [bioRes, credsRes, reelsRes, seoRes, portRes] = await Promise.all([
-          supabase.from("biography").select("*").eq("id", "main").maybeSingle(),
-          supabase.from("credits").select("*").order("sort_order", { ascending: true }),
-          supabase.from("showreels").select("*").order("sort_order", { ascending: true }),
-          supabase.from("seo_settings").select("*").eq("id", "main").maybeSingle(),
-          supabase.from("portfolio_images").select("*").order("sort_order", { ascending: true })
-        ]);
-
-        // Map credits
-        const mappedCredits = (credsRes.data || []).map((c: any): Credit => {
-          const credit: Credit = {
-            year: c.year || "—",
-            title: c.title || "",
-            role: { sv: c.role_sv || "", en: c.role_en || "" },
-            type: c.type as "TV" | "Film" | "Voice" | "Theater",
-            category: { sv: c.category_sv || "", en: c.category_en || "" },
-            network: c.network || "",
-            url: c.url || undefined,
-            img: c.img || "",
-            is_current_production: c.is_current_production
-          };
-          if (c.commentary_url) {
-            credit.commentary = {
-              url: c.commentary_url,
-              duration: c.commentary_duration || "0:10",
-              svText: c.commentary_sv || "",
-              enText: c.commentary_en || ""
-            };
-          }
-          if (c.script_scene) {
-            credit.script = {
-              scene: c.script_scene,
-              dialogue: {
-                char: c.script_char || "CHARACTER",
-                line: {
-                  sv: c.script_line_sv || "",
-                  en: c.script_line_en || ""
-                }
-              }
-            };
-          }
-          return credit;
-        });
-
-        // Map showreels
-        const mappedShowreels = (reelsRes.data || []).map((r: any): VideoItem => {
-          return {
-            id: r.id || String(r.sort_order),
-            title: { sv: r.title_sv || "", en: r.title_en || "" },
-            sub: { sv: r.sub_sv || "", en: r.sub_en || "" },
-            url: r.url || undefined,
-            vimeoId: r.vimeo_id || undefined,
-            youtubeId: r.youtube_id || undefined,
-            poster: r.poster || "",
-            genre: r.genre || "SHOWREEL",
-            specs: r.specs || "16:9 // HD",
-            glow: r.glow || "rgba(235, 94, 40, 0.15)"
-          };
-        });
-
-        // Map portfolio images
-        const mappedImages = (portRes.data || []).map((p: any) => ({
-          url: p.url,
-          download_url: p.download_url || p.url,
-          alt: p.alt || "Therese Järvheden porträtt",
-          title: p.title || "",
-          caption: p.caption || "",
-          filename: p.filename || "",
-          allow_download: p.allow_download !== false
-        }));
-
-        setDbData({
-          biography: bioRes.data,
-          credits: mappedCredits,
-          showreels: mappedShowreels,
-          seo: seoRes.data,
-          portfolioImages: mappedImages
-        });
-      } catch (e) {
-        console.error("Failed to load live Supabase data:", e);
-      } finally {
-        setDbLoaded(true);
-      }
-    };
-
-    if (initialDbData) {
-      let timerId: any;
-      const scheduleFetch = () => {
-        timerId = setTimeout(loadAllData, 2000);
-      };
-
-      if (typeof window !== "undefined") {
-        if ("requestIdleCallback" in window) {
-          window.requestIdleCallback(() => scheduleFetch(), { timeout: 3000 });
-        } else {
-          scheduleFetch();
-        }
-      } else {
-        loadAllData();
-      }
-
-      return () => {
-        if (timerId) clearTimeout(timerId);
-      };
-    } else {
-      loadAllData();
-    }
-  }, [initialDbData]);
 
   // Dynamically update head tags for SEO optimization based on DB settings
   useEffect(() => {
@@ -487,12 +370,10 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           faqs={dbData?.biography?.faqs} 
         />
         <Portfolio images={dbData?.portfolioImages} />
-        {dbLoaded && (
-          !isSupabaseConfigured() ? (
-            <Showreels />
-          ) : dbData?.showreels && dbData.showreels.length > 0 ? (
-            <Showreels videos={dbData.showreels} />
-          ) : null
+        {dbData?.showreels && dbData.showreels.length > 0 ? (
+          <Showreels videos={dbData.showreels} />
+        ) : (
+          <Showreels />
         )}
         <Credits
           credits={dbData?.credits}
