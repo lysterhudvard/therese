@@ -57,5 +57,5 @@ const heroImage = processedDbData?.biography?.hero_image || "https://a6c2528650.
     We mount the entire Page component as a React Island. 
     By passing processedDbData, the page renders instantly without client-side loading spinners. 
   -->
-  <Page initialDbData={processedDbData} client:load />
+  <Page initialDbData={processedDbData} client:idle />
 </Layout>
