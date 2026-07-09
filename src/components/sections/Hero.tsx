@@ -42,15 +42,13 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
 
       {!heroDone && (
         <div className="absolute inset-0 z-40 flex items-center justify-center px-6 animate-hero-text">
-          <motion.h1
-            layoutId="header-logo"
+          <h1
             className="font-display text-bone text-center tracking-[0.32em] uppercase flex items-center justify-center gap-3 whitespace-nowrap"
             style={{ fontSize: "clamp(1.1rem, 4vw, 3.2rem)" }}
-            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
           >
             <span className="italic font-light">Therese</span>
             <span>Järvheden</span>
-          </motion.h1>
+          </h1>
         </div>
       )}
 

@@ -68,10 +68,11 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
       >
         {heroDone ? (
           <motion.button
-            layoutId="header-logo"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
             onClick={() => go("top")}
             className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5"
-            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
           >
             <span className="italic font-light">Therese</span>
             <span>Järvheden</span>
