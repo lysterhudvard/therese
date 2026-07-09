@@ -41,12 +41,7 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
       />
 
       {!heroDone && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.6 }}
-          className="absolute inset-0 z-40 flex items-center justify-center px-6"
-        >
+        <div className="absolute inset-0 z-40 flex items-center justify-center px-6 animate-hero-text">
           <motion.h1
             layoutId="header-logo"
             className="font-display text-bone text-center tracking-[0.32em] uppercase flex items-center justify-center gap-3 whitespace-nowrap"
@@ -56,7 +51,7 @@ export function Hero({ onDone, heroDone, heroImage }: { onDone: () => void; hero
             <span className="italic font-light">Therese</span>
             <span>Järvheden</span>
           </motion.h1>
-        </motion.div>
+        </div>
       )}
 
       <motion.div

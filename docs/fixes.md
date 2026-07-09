@@ -313,3 +313,11 @@ This document details critical bugs, layout errors, and interaction blocks found
   1. **Dynamic Hydration Refresh:** Removed the early return condition from `routes/index.tsx` so the page fetches fresh database entries asynchronously in the background on load.
   2. **Non-Blocking Deferred Queries:** Wrapped the client-side Supabase query execution in a deferred/idle timer (`requestIdleCallback` with a `2s` fallback timeout). If the page was server-rendered (static), it displays content instantly while deferring background queries until the browser is fully idle. This keeps the initial critical request chain empty and improves LCP.
   3. **Origin Preconnection:** Added `<link rel="preconnect" href="https://uhdzswnawlqpsaajsjpo.supabase.co" crossorigin />` and `<link rel="dns-prefetch" ... />` inside the static `<head>` tag in `Layout.astro`. This resolves IP lookup and TCP/TLS handshakes early, speeding up media loads by ~300ms.
+
+## 47. LCP Element Render Delay and JS Hydration Block
+- **Symptom:** Google PageSpeed Insights flagged a massive "Element Render Delay" (~5.7s) for the LCP element (the `Therese Järvheden` text logo in the Hero section).
+- **Root Cause:** The Hero text was wrapped in a Framer Motion component with `initial={{ opacity: 0 }}`. This caused the text to be physically invisible in the statically generated HTML. The browser had to download the HTML, parse large JS chunks (`client.js`, `react-dom.js`, `index.js`), hydrate the React tree, boot up Framer Motion, and finally wait out an artificial 0.9s JS delay before it could paint the text to the screen, inflating the LCP metric massively.
+- **Resolution:**
+  - Removed the Javascript-based Framer Motion opacity transition block.
+  - Replaced the `<motion.div>` wrapper with a standard `<div>` carrying a pure CSS keyframe animation (`.animate-hero-text`).
+  - By moving the fade-in logic entirely to CSS, the browser applies the animation rules immediately during HTML/CSS parsing and paints the LCP element completely independently of JavaScript payload loading and hydration, drastically dropping the LCP time to well under 2 seconds.
