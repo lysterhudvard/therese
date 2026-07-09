@@ -206,3 +206,19 @@ input:-webkit-autofill:active {
   animation: heroTextFade 0.8s ease-out 0.8s both;
 }
 
+@keyframes navLogoFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.animate-nav-logo-fade-in {
+  animation: navLogoFadeIn 0.5s ease-out 1.7s both;
+}
+
+@keyframes navLinksFadeIn {
+  0% { opacity: 0; pointer-events: none; }
+  100% { opacity: 1; pointer-events: auto; }
+}
+.animate-nav-links-fade-in {
+  animation: navLinksFadeIn 0.5s ease-out 1.7s both;
+}
+

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Page from '../routes/index';
+import Hero from '../components/Hero.astro';
 import { getPageData } from '../lib/supabase-server';
 import { getImage } from 'astro:assets';
 
@@ -30,7 +31,7 @@ if (!processedDbData) {
       hero_image: "",
       hero_text_sv: "",
       hero_text_en: "",
-      mood_images: {
+      mood_images: { 
         dramatic: "",
         comedic: "",
         classical: ""
@@ -50,12 +51,53 @@ const seoTitle = processedDbData?.seo?.title_sv || "Therese Järvheden — Skåd
 const seoDesc = processedDbData?.seo?.description_sv || "Swedish actress Therese Järvheden. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.";
 const seoImage = processedDbData?.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
 const heroImage = processedDbData?.biography?.hero_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+
+// Extract Hero Text Business Logic for Build Time rendering
+const bio = processedDbData?.biography;
+const credits = processedDbData?.credits || [];
+
+let heroLineSv = bio?.hero_text_sv || '"En våldsam kärlek" — SVT dramadokumentär.';
+let heroLineEn = bio?.hero_text_en || '"En våldsam kärlek" — SVT documentary drama.';
+
+if (bio?.is_automated && credits.length > 0) {
+  const currentProd = credits.find((c: any) => c.is_current_production);
+  if (currentProd) {
+    const title = currentProd.title;
+    
+    // SV
+    const roleSv = currentProd.role?.sv || '';
+    const detailsSv = currentProd.network || currentProd.category?.sv || '';
+    heroLineSv = `"${title}" — ${roleSv} (${detailsSv}).`;
+
+    // EN
+    const roleEn = currentProd.role?.en || '';
+    const detailsEn = currentProd.network || currentProd.category?.en || '';
+    heroLineEn = `"${title}" — ${roleEn} (${detailsEn}).`;
+  }
+}
+
+const heroRoleSv = bio?.hero_role_sv || "Skådespelerska";
+const heroRoleEn = bio?.hero_role_en || "Actress";
+const heroBaseSv = bio?.hero_base_sv || "Malmö · Stockholm";
+const heroBaseEn = bio?.hero_base_en || "Malmö · Stockholm";
 ---
 
 <Layout title={seoTitle} description={seoDesc} image={seoImage} heroImage={heroImage}>
   <!-- 
-    We mount the entire Page component as a React Island. 
-    By passing processedDbData, the page renders instantly without client-side loading spinners. 
+    Pure static HTML Hero section, completely decoupled from React to maximize LCP.
+  -->
+  <Hero 
+    heroImage={heroImage}
+    heroLineSv={heroLineSv}
+    heroLineEn={heroLineEn}
+    heroRoleSv={heroRoleSv}
+    heroRoleEn={heroRoleEn}
+    heroBaseSv={heroBaseSv}
+    heroBaseEn={heroBaseEn}
+  />
+  <!-- 
+    We mount the rest of the Page component as a React Island.
+    Using client:idle ensures hydration happens off the critical path, keeping page interactions non-blocking.
   -->
   <Page initialDbData={processedDbData} client:idle />
 </Layout>

@@ -5,7 +5,6 @@ import { useT, type Lang, LangContext, I18N } from "../hooks/use-t";
 import { Nav } from "../components/Nav";
 import { Spotlight } from "../components/ui/Spotlight";
 import { CommentaryPlayer } from "../components/ui/CommentaryPlayer";
-import { Hero } from "../components/sections/Hero";
 import { Biography } from "../components/sections/Biography";
 import { Portfolio } from "../components/sections/Portfolio";
 import { Showreels } from "../components/sections/Showreels";
@@ -44,7 +43,6 @@ export const Route = createFileRoute("/")({
 
 /* ---------- Page ---------- */
 export default function Page({ initialDbData }: { initialDbData?: any }) {
-  const [heroDone, setHeroDone] = useState(false);
   const [lang, setLangState] = useState<Lang>("sv");
   const [isInPortfolio, setIsInPortfolio] = useState(false);
   const [activeCommentary, setActiveCommentary] = useState<{
@@ -333,7 +331,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     <LangContext.Provider value={ctx}>
       <main className="relative bg-stage text-bone selection:bg-ember selection:text-ink">
         <Spotlight />
-        <Nav heroDone={heroDone} />
+        <Nav />
 
         {/* Cinematic Anamorphic Scope Bars */}
         <div
@@ -348,8 +346,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
             transform: isInPortfolio ? "translateY(0)" : "translateY(100%)",
           }}
         />
-
-        <Hero onDone={() => setHeroDone(true)} heroDone={heroDone} heroImage={dbData?.biography?.hero_image} />
         <Biography 
           sections={parsedSections} 
           imageCredits={imageCredits} 
