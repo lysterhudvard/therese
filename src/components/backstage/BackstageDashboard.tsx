@@ -12,7 +12,6 @@ import { DashboardCurtain } from "./DashboardCurtain";
 import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2, Mail, Film } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "../../lib/supabase";
-import { checkDatabaseSeeded, seedDatabaseWithCurrentContent } from "../../lib/supabase-sync";
 import { KlickGuideWidget } from "./KlickGuideWidget";
 
 interface BackstageDashboardProps {
@@ -24,40 +23,9 @@ type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
   const [isConfigured, setIsConfigured] = useState(false);
-  const [isSeeded, setIsSeeded] = useState(true);
-  const [checkingDb, setCheckingDb] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
-
   useEffect(() => {
-    const configured = isSupabaseConfigured();
-    setIsConfigured(configured);
-
-    if (configured) {
-      setCheckingDb(true);
-      checkDatabaseSeeded()
-        .then(({ seeded }) => {
-          setIsSeeded(seeded);
-        })
-        .finally(() => {
-          setCheckingDb(false);
-        });
-    }
+    setIsConfigured(isSupabaseConfigured());
   }, []);
-
-  const handleSeedDatabase = async () => {
-    setIsSeeding(true);
-    toast.loading("Överför webbplatsens innehåll till Supabase...", { id: "seeding-toast" });
-    
-    const result = await seedDatabaseWithCurrentContent();
-    setIsSeeding(false);
-
-    if (result.success) {
-      setIsSeeded(true);
-      toast.success(result.message, { id: "seeding-toast" });
-    } else {
-      toast.error(result.message, { id: "seeding-toast" });
-    }
-  };
 
   const navigationItems = [
     { id: "hero", label: "Akt I: Nu aktuell", icon: Star },
@@ -153,17 +121,6 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
 
         {/* Sidebar Footer Operations */}
         <div className="mt-8 space-y-2 border-t border-bone/5 pt-6">
-          {isConfigured && (
-            <button
-              type="button"
-              onClick={handleSeedDatabase}
-              disabled={isSeeding}
-              className="w-full flex items-center gap-3 px-4 py-2 text-[9px] uppercase tracking-widest font-mono text-ember/60 hover:text-ember transition-colors cursor-pointer text-left"
-            >
-              <RefreshCw size={11} className={isSeeding ? "animate-spin" : ""} />
-              Tvinga Synk till DB
-            </button>
-          )}
           <a
             href="/"
             className="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest font-mono text-bone/50 hover:text-bone transition-colors cursor-pointer"
@@ -184,33 +141,6 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
       {/* Main Content Area */}
       <main className="flex-1 p-6 md:p-12 overflow-y-auto max-h-screen relative z-10">
         <div className="max-w-6xl mx-auto space-y-6">
-          {/* Seeding Prompt Banner */}
-          {isConfigured && !isSeeded && !checkingDb && (
-            <div className="border border-ember/20 bg-ember/5 p-6 rounded-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-bone flex items-center gap-2 font-mono uppercase tracking-wider">
-                  <Database size={16} className="text-ember animate-pulse" />
-                  Importera befintligt innehåll till databasen
-                </h3>
-                <p className="text-xs text-bone/70 max-w-2xl leading-relaxed">
-                  Dina Supabase-inställningar i <code className="text-ember">.env</code> är aktiva, men databasen saknar innehåll. Klicka på knappen nedan för att automatiskt kopiera alla befintliga texter, bilder, showreels och meriter till Supabase så du kan redigera dem härifrån.
-                </p>
-              </div>
-              <button
-                onClick={handleSeedDatabase}
-                disabled={isSeeding}
-                className="flex items-center gap-2 px-4 py-2.5 bg-ember text-ink font-mono text-[10px] uppercase tracking-widest font-bold rounded-sm hover:bg-ember/90 transition-all cursor-pointer whitespace-nowrap"
-              >
-                {isSeeding ? (
-                  <RefreshCw size={12} className="animate-spin" />
-                ) : (
-                  <RefreshCw size={12} />
-                )}
-                Kopiera till Supabase
-              </button>
-            </div>
-          )}
-
           {/* Missing .env credentials Warning */}
           {!isConfigured && (
             <div className="border border-red-500/20 bg-red-500/5 p-6 rounded-sm">

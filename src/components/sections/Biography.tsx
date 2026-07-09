@@ -2,7 +2,6 @@ import { useRef, useState, useMemo, useEffect } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
-import { MOOD_DATA, type Mood } from "../../routes/fallbackData";
 
 interface FAQItem {
   id: string;

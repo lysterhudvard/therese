@@ -2,13 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useT } from "../../hooks/use-t";
-import {
-  CREDITS,
-  REVIEW_QUOTES_EN,
-  REVIEW_QUOTES_SV,
-  type Credit,
-  type FilterKey,
-} from "../../routes/fallbackData";
+import { type Credit, type FilterKey } from "../../types";
 
 export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -114,7 +108,7 @@ export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
 }
 
 export function Credits({
-  credits = CREDITS,
+  credits = [],
   reviewQuotes,
   activeCommentaryUrl,
   onPlayCommentary,
@@ -139,7 +133,19 @@ export function Credits({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const defaultQuotes = useMemo(() => lang === "sv" ? REVIEW_QUOTES_SV : REVIEW_QUOTES_EN, [lang]);
+  const defaultQuotes = useMemo(() => lang === "sv" ? [
+      "en närvaro som river ner väggar",
+      "en av fyra kvinnor vi får följa",
+      "skånsk röst — varm, rå, omedelbar",
+      "drama som hon känner extra starkt för",
+      "närvarande, sårbar, exakt",
+  ] : [
+      "a presence that tears down walls",
+      "one of four women we follow",
+      "Scanian voice — warm, raw, immediate",
+      "drama she feels especially strongly about",
+      "present, vulnerable, precise",
+  ], [lang]);
   const activeQuotes = reviewQuotes || defaultQuotes;
 
   const rows = useMemo(

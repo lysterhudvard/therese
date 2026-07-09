@@ -16,14 +16,7 @@ import { Footer } from "../components/sections/Footer";
 import { type VideoItem } from "../components/sections/ShowreelsData";
 
 
-import {
-  IMG,
-  CREDITS,
-  REVIEW_QUOTES_SV,
-  REVIEW_QUOTES_EN,
-  MOOD_DATA,
-  type Credit
-} from "./fallbackData";
+import { type Credit } from "../types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -145,27 +138,20 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
         console.error(e);
       }
     }
-    return lang === "sv" ? REVIEW_QUOTES_SV : REVIEW_QUOTES_EN;
+    return lang === "sv" ? [
+      "en närvaro som river ner väggar",
+      "en av fyra kvinnor vi får följa",
+      "skånsk röst — varm, rå, omedelbar",
+      "drama som hon känner extra starkt för",
+      "närvarande, sårbar, exakt",
+    ] : [
+      "a presence that tears down walls",
+      "one of four women we follow",
+      "Scanian voice — warm, raw, immediate",
+      "drama she feels especially strongly about",
+      "present, vulnerable, precise",
+    ];
   }, [dbData, lang]);
-
-  const mergedMoodData = useMemo(() => {
-    const base = { ...MOOD_DATA };
-    if (dbData?.biography?.mood_images) {
-      try {
-        const parsed = typeof dbData.biography.mood_images === "string"
-          ? JSON.parse(dbData.biography.mood_images)
-          : dbData.biography.mood_images;
-        if (parsed) {
-          if (parsed.dramatic) base.Dramatic = { ...base.Dramatic, image: parsed.dramatic };
-          if (parsed.comedic) base.Comedic = { ...base.Comedic, image: parsed.comedic };
-          if (parsed.classical) base.Classical = { ...base.Classical, image: parsed.classical };
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return base;
-  }, [dbData]);
 
   const parsedSections = useMemo(() => {
     if (dbData?.biography?.bio_sections) {
@@ -184,7 +170,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
   }, [dbData]);
 
   const voiceImageData = useMemo(() => {
-    let url = IMG.voice;
+    let url = "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650";
     let alt = "Therese — röst";
     let title = "";
     let caption = "";
@@ -402,7 +388,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
                   "name": "Therese Järvheden",
                   "jobTitle": lang === "sv" ? "Skådespelerska" : "Actress",
                   "description": lang === "sv" ? dbData.seo?.description_sv : dbData.seo?.description_en,
-                  "image": dbData.portfolioImages?.[0] || IMG.hero,
+                  "image": dbData.portfolioImages?.[0]?.url || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
                   "url": "https://theresejarvheden.se",
                   "knowsLanguage": ["sv", "en"],
                   "address": {

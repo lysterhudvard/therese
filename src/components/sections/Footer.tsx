@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useT } from "../../hooks/use-t";
-import { IMG } from "../../routes/fallbackData";
 
 export function Footer({ bioData }: { bioData?: any }) {
   const { lang, t } = useT();
