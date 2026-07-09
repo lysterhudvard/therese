@@ -191,7 +191,7 @@ input:-webkit-autofill:active {
   100% { opacity: 1; }
 }
 .animate-hero-text {
-  animation: heroTextFade 0.8s ease-out 0.1s both;
+  animation: heroTextFade 0.6s ease-out 0.9s both;
 }
 
 @keyframes slideUpFade {
@@ -199,26 +199,10 @@ input:-webkit-autofill:active {
   100% { opacity: 1; transform: translateY(0); }
 }
 .animate-slide-up-fade {
-  animation: slideUpFade 0.9s ease-out 0.5s both;
+  animation: slideUpFade 0.9s ease-out 2.3s both;
 }
 
 .animate-scroll-text-fade {
-  animation: heroTextFade 0.8s ease-out 0.8s both;
-}
-
-@keyframes navLogoFadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-.animate-nav-logo-fade-in {
-  animation: navLogoFadeIn 0.5s ease-out 1.7s both;
-}
-
-@keyframes navLinksFadeIn {
-  0% { opacity: 0; pointer-events: none; }
-  100% { opacity: 1; pointer-events: auto; }
-}
-.animate-nav-links-fade-in {
-  animation: navLinksFadeIn 0.5s ease-out 1.7s both;
+  animation: heroTextFade 0.8s ease-out 2.6s both;
 }
 

@@ -29,7 +29,7 @@ export function LangSwitch({ className = "" }: { className?: string }) {
 }
 
 /* ---------- Navigation ---------- */
-export function Nav() {
+export function Nav({ heroDone }: { heroDone: boolean }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -66,15 +66,24 @@ export function Nav() {
       <div
         className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-5 lg:py-3.5" : "py-7 lg:py-5"}`}
       >
-        <button
-          onClick={() => go("top")}
-          className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5 animate-nav-logo-fade-in"
-        >
-          <span className="italic font-light">Therese</span>
-          <span>Järvheden</span>
-        </button>
-        <div
-          className="flex items-center animate-nav-links-fade-in"
+        {heroDone ? (
+          <motion.button
+            layoutId="header-logo"
+            onClick={() => go("top")}
+            className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5"
+            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
+          >
+            <span className="italic font-light">Therese</span>
+            <span>Järvheden</span>
+          </motion.button>
+        ) : (
+          <div className="w-[150px]" />
+        )}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: heroDone ? 1 : 0 }}
+          transition={{ duration: 0.5 }}
+          className={`flex items-center ${!heroDone ? "pointer-events-none" : ""}`}
         >
           <nav className="hidden lg:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
             {links.map((l) => (
@@ -130,7 +139,7 @@ export function Nav() {
               />
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
       <AnimatePresence>
         {open && (
