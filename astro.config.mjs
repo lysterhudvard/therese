@@ -1,9 +1,9 @@
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
+import preact from '@astrojs/preact';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [react()],
+  integrations: [preact({ compat: true })],
   build: {
     inlineStylesheets: 'always'
   },
@@ -20,8 +20,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        '@': '/src'
+        '@': '/src',
+        'react': 'preact/compat',
+        'react-dom/test-utils': 'preact/test-utils',
+        'react-dom': 'preact/compat',
+        'react/jsx-runtime': 'preact/jsx-runtime'
       }
+    },
+    ssr: {
+      noExternal: ['framer-motion', 'lucide-react', '@radix-ui/*', 'react-day-picker', 'react-hook-form', 'react-resizable-panels', 'recharts']
     }
   }
 });
