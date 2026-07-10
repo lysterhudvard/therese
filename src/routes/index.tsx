@@ -5,7 +5,6 @@ import { useT, type Lang, LangContext, I18N } from "../hooks/use-t";
 import { Nav } from "../components/Nav";
 import { Spotlight } from "../components/ui/Spotlight";
 import { CommentaryPlayer } from "../components/ui/CommentaryPlayer";
-import { Hero } from "../components/sections/Hero";
 import { Biography } from "../components/sections/Biography";
 import { Portfolio } from "../components/sections/Portfolio";
 import { Showreels } from "../components/sections/Showreels";
@@ -52,8 +51,15 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
   });
 
   useEffect(() => {
-    if (typeof window !== "undefined" && heroDone) {
-      sessionStorage.setItem("introPlayed", "1");
+    if (typeof window !== "undefined") {
+      if (heroDone) {
+        sessionStorage.setItem("introPlayed", "1");
+      } else {
+        const tm = setTimeout(() => {
+          setHeroDone(true);
+        }, 2400); // Wait for Astro CSS animation to finish
+        return () => clearTimeout(tm);
+      }
     }
   }, [heroDone]);
   const [lang, setLangState] = useState<Lang>("sv");
@@ -136,41 +142,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     }
   }, [dbData, lang]);
 
-  const heroData = useMemo(() => {
-    const bio = dbData?.biography;
-    const credits = dbData?.credits || [];
-
-    let heroLineSv = bio?.hero_text_sv || '"En våldsam kärlek" — SVT dramadokumentär.';
-    let heroLineEn = bio?.hero_text_en || '"En våldsam kärlek" — SVT documentary drama.';
-
-    if (bio?.is_automated && credits.length > 0) {
-      const currentProd = credits.find((c: any) => c.is_current_production);
-      if (currentProd) {
-        const title = currentProd.title;
-        
-        // SV
-        const roleSv = currentProd.role?.sv || '';
-        const detailsSv = currentProd.network || currentProd.category?.sv || '';
-        heroLineSv = `"${title}" — ${roleSv} (${detailsSv}).`;
-
-        // EN
-        const roleEn = currentProd.role?.en || '';
-        const detailsEn = currentProd.network || currentProd.category?.en || '';
-        heroLineEn = `"${title}" — ${roleEn} (${detailsEn}).`;
-      }
-    }
-
-    const heroRoleSv = bio?.hero_role_sv || "Skådespelerska";
-    const heroRoleEn = bio?.hero_role_en || "Actress";
-    const heroBaseSv = bio?.hero_base_sv || "Malmö · Stockholm";
-    const heroBaseEn = bio?.hero_base_en || "Malmö · Stockholm";
-
-    return {
-      heroLine: lang === "sv" ? heroLineSv : heroLineEn,
-      heroRole: lang === "sv" ? heroRoleSv : heroRoleEn,
-      heroBase: lang === "sv" ? heroBaseSv : heroBaseEn,
-    };
-  }, [dbData, lang]);
 
   const reviewQuotes = useMemo(() => {
     if (dbData?.biography?.review_quotes) {
@@ -396,14 +367,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           }}
         />
 
-        <Hero
-          onDone={() => setHeroDone(true)}
-          heroDone={heroDone}
-          heroImage={dbData?.biography?.hero_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650"}
-          heroLine={heroData.heroLine}
-          heroRole={heroData.heroRole}
-          heroBase={heroData.heroBase}
-        />
+
         <Biography 
           sections={parsedSections} 
           imageCredits={imageCredits} 
