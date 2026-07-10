@@ -212,3 +212,25 @@ This document tracks completed features, animation systems, layout updates, and 
 
 
 
+### 41. Phase 5 — Astro SSG Migration & Island Architecture
+- **Framework Porting:** Fully transitioned the frontend architecture from Tanstack Start to Astro Static Site Generation (SSG). This eliminates the monolithic React SPA, drastically reducing initial JS payloads and meeting static hosting constraints.
+- **Deconstructed React Island Monolith:** Broke down the massive `<Page />` wrapper component into fine-grained, independent Astro Islands (`<Nav client:idle />`, `<Biography client:visible />`, etc.), ensuring below-the-fold content defers hydration until needed.
+- **Global State via Vanilla Stores:** Refactored translation (`lang`) and commentary audio states to use custom vanilla event buses/stores, allowing isolated React islands to communicate cleanly without a shared React parent tree.
+
+### 42. Phase 6 — Core Web Vitals & PageSpeed Optimization
+- **Zero-Height Hydration Trap Fixed:** Wrapped `client:visible` Astro islands in explicit natively-sized `<div>` containers (`min-height: 80vh`), preventing them from collapsing to 0px and triggering eager JS downloads on initial paint.
+- **Removed Framer Motion Bottlenecks on Mobile:** 
+  - Rewrote the `<Nav />` component to use pure CSS transitions and React state instead of Framer Motion. 
+  - Changed `<Spotlight />` cursor tracking to use `client:media="(min-width: 1024px)"`, entirely stripping its heavy JS execution out of mobile and tablet loads.
+- **Lucide Icon De-bloat:** Swapped all imported `lucide-react` icons in the `<CommentaryPlayer />` for raw inline SVGs to completely strip the icon framework out of the client bundle.
+- **Framework Swap (React to Preact):** 
+  - Substituted the entire React rendering engine for Preact to eliminate ~50 KiB of unused JS framework overhead flagged by Lighthouse.
+  - Used NPM alias injections (`react@npm:@preact/compat`) and Vite `ssr.noExternal` declarations to force heavy ecosystem libraries (`framer-motion`, `lucide-react`) to compile seamlessly using Preact's compatibility layer during Astro SSR, dropping the JS footprint by 80% with zero visual regressions.
+
+### 43. GDPR-Compliant Cookie Consent (Swedish Market)
+- **Swedish and English Bilingual Support**: Built a fully responsive Cookie Consent banner conforming with Swedish Post- och telestyrelsen (PTS) and GDPR requirements.
+- **Granular Consent Controls**: Users can toggle non-essential cookie categories (Analys & statistik, Marknadsföring) individually, which are turned off by default (no pre-ticked checkboxes).
+- **Equal & Balanced Prominence**: Features equally prominent "Acceptera alla" and "Neka alla" buttons to avoid misleading design nudges.
+- **Integrated Privacy Policy Modal**: Displays the privacy policy directly inside the cookie banner to prevent redirecting users away from the main landing page, maintaining a cinematic experience.
+- **Persistent Consent & Easy Withdrawal**: Preferences are saved locally in the browser's `localStorage` and can be easily revised or withdrawn at any time by clicking the "Cookie-inställningar" button integrated into the footer metadata row.
+- **Performance Optimized**: Implemented with inline SVGs instead of third-party icon libraries to prevent client-side JS bundle bloat, aligned with Astro's performance principles.

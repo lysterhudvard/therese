@@ -11,6 +11,7 @@ import { Credits } from '../components/sections/Credits';
 import { Voice } from '../components/sections/Voice';
 import { Contact } from '../components/sections/Contact';
 import { Footer } from '../components/sections/Footer';
+import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
 import { getPageData } from '../lib/supabase-server';
 import { getImage } from 'astro:assets';
@@ -221,6 +222,7 @@ if (processedDbData?.biography?.review_quotes) {
     <Footer client:visible bioData={processedDbData?.biography} />
   </div>
   <CommentaryPlayer client:visible />
+  <CookieConsent client:load />
 
   <!-- Anamorphic Scope Bars intersection observer trigger script -->
   <script>

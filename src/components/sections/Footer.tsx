@@ -231,6 +231,14 @@ export function Footer({ bioData }: { bioData?: any }) {
       {/* Bottom metadata row */}
       <div className="relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10">
         <div>© {new Date().getFullYear()} Therese Järvheden</div>
+        <div>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open-cookie-settings'))}
+            className="hover:text-ember transition-colors cursor-pointer"
+          >
+            {lang === "sv" ? "Cookie-inställningar" : "Cookie Settings"}
+          </button>
+        </div>
         <div>ALL CREDITS DIRECTED BY THERESE JÄRVHEDEN</div>
       </div>
     </footer>
