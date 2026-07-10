@@ -93,11 +93,11 @@ export function Biography({
   }, [faqs, lang]);
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
+  const exitOpacity = useTransform(scrollYProgress, [0.3, 0.95], [1, 0]);
 
-  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
+  const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
   return (
-    <section id="bio" ref={ref} className="relative px-6 py-16 md:px-12 md:py-36">
+    <section id="bio" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
       <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className={data.image ? "mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-12" : "mx-auto max-w-4xl flex flex-col items-center justify-center text-center"}>
 
@@ -112,17 +112,54 @@ export function Biography({
               {t.bio.heading[2]}
             </h2>
 
+            {/* Mobile Image, right below the title */}
+            {data.image && (
+              <div className="block lg:hidden mt-8 w-full">
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeId}
+                      initial={{ opacity: 0, scale: 1.06 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 h-full w-full"
+                    >
+                      <SpotlightImage
+                        src={data.image}
+                        alt={data.image_alt || `Therese Järvheden — ${lang === "sv" ? data.title_sv : data.title_en}`}
+                        title={data.image_title}
+                        className="h-full w-full"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                  <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
+                </div>
+                <div className="mt-2 text-[9px] uppercase tracking-[0.3em] text-bone/50 font-mono whitespace-pre-line">
+                  {data.image_caption ? (
+                    <span>{data.image_caption}</span>
+                  ) : imageCredits ? (
+                    lang === "sv" ? imageCredits.sv : imageCredits.en
+                  ) : (
+                    <>
+                      <span>Foto: Robert Eldrim · Smink: Sara Zetterström</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="mt-10">
               <div className="text-[10px] uppercase tracking-[0.4em] text-bone/50 mb-3 font-mono">
                 {t.bio.director}
               </div>
-              <div className="inline-flex hairline border-t-0 border border-bone/15 overflow-x-auto no-scrollbar whitespace-nowrap max-w-full">
+              <div className="flex w-full hairline border-t-0 border border-bone/15 overflow-hidden">
                 {activeSections.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => setActiveId(s.id)}
                     data-hover
-                    className={`relative flex-shrink-0 px-5 py-3 text-[11px] uppercase tracking-[0.32em] transition-colors ${
+                    className={`relative flex-1 min-w-0 px-2 min-[375px]:px-3 sm:px-5 py-3 text-[9px] min-[375px]:text-[10px] sm:text-[11px] uppercase tracking-[0.15em] min-[375px]:tracking-[0.25em] sm:tracking-[0.32em] transition-colors truncate ${
                       activeId === s.id ? "text-ink" : "text-bone/70 hover:text-bone"
                     }`}
                   >
@@ -197,7 +234,7 @@ export function Biography({
           </div>
 
           {data.image && (
-            <div className="lg:col-span-5 lg:order-first">
+            <div className="hidden lg:block lg:col-span-5 lg:order-first">
               <div className="sticky top-28">
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
                   <AnimatePresence mode="wait">

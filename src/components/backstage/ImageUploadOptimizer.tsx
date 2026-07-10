@@ -89,8 +89,19 @@ const SECTION_PROFILES: Record<string, ImageProfile> = {
     maxHeight: 1600,
     targetKb: 150,
     description: "Standardprofil för övriga bilder.",
-    seoGuideline: "Håller bildstorlekar under kontroll för att bibehålla en stabil och responsiv sajtupplevelse.",
   },
+};
+
+const FOLDER_LABELS: Record<string, string> = {
+  hero: "Hero",
+  bio: "Bio",
+  portfolio: "Portfolio",
+  showreel: "Showreel",
+  seo: "SEO",
+  credits: "Meriter",
+  voice: "Röst",
+  curtain: "Ridåfall",
+  general: "Allmänt",
 };
 
 export function ImageUploadOptimizer({
@@ -295,7 +306,7 @@ export function ImageUploadOptimizer({
                   }`}
                 >
                   <span className="block text-[10px] font-bold font-mono tracking-wider truncate">
-                    {key.toUpperCase()}
+                    {(FOLDER_LABELS[key] || key).toUpperCase()}
                   </span>
                   <span className="block text-[8px] text-bone/40 truncate mt-0.5">
                     Max {profile.maxWidth}px

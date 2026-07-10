@@ -100,8 +100,10 @@ export function DashboardHero() {
     setIsSaving(false);
     if (error) {
       toast.error(`Kunde inte spara i databasen: ${error.message}`);
+      alert(`Misslyckades med att spara Akt I (Nu aktuell): ${error.message}`);
     } else {
       toast.success("Akt I (Nu aktuell) har sparats framgångsrikt i Supabase!");
+      alert("Akt I (Nu aktuell) har sparats framgångsrikt!");
     }
   };
 

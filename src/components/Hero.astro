@@ -31,6 +31,8 @@ const {
     />
     <div class="absolute inset-0 bg-gradient-to-b from-stage/40 via-stage/30 to-stage"></div>
     <div class="absolute inset-0 bg-gradient-to-r from-stage/60 via-transparent to-stage/60"></div>
+    <!-- Solid mask to cover sub-pixel line leaks at the bottom on mobile/tablet -->
+    <div class="absolute inset-x-0 bottom-0 h-[3px] bg-stage z-20 pointer-events-none"></div>
   </div>
 
   <!-- Curtain Reveal Panels (Pure CSS) -->
@@ -78,11 +80,6 @@ const {
     </div>
   </div>
 
-  <!-- Scroll Indicator -->
-  <div class="absolute left-1/2 bottom-3 z-20 -translate-x-1/2 text-[9px] uppercase tracking-[0.5em] text-bone/70 animate-scroll-text-fade">
-    <span class="lang-sv">scrolla</span>
-    <span class="lang-en">scroll</span>
-  </div>
 </section>
 
 <script is:inline>

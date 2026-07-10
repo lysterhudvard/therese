@@ -178,8 +178,10 @@ export function DashboardCurtain() {
     setIsSaving(false);
     if (error) {
       toast.error(`Kunde inte spara eftertexter: ${error.message}`);
+      alert(`Misslyckades med att spara Akt VIII (Ridåfall): ${error.message}`);
     } else {
       toast.success("Akt VIII (Ridåfall) har sparats framgångsrikt!");
+      alert("Akt VIII (Ridåfall) har sparats framgångsrikt!");
     }
   };
 

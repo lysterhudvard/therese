@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, ArrowRight, Video } from "lucide-react";
+import { ArrowLeft as ArrowLeftOrig, ArrowRight as ArrowRightOrig, Video as VideoOrig } from "lucide-react";
+
+const ArrowLeft = ArrowLeftOrig as any;
+const ArrowRight = ArrowRightOrig as any;
+const Video = VideoOrig as any;
 import { useT } from "../../hooks/use-t";
 import { VIDEOS, type VideoItem } from "./ShowreelsData";
 import { TheaterPlayer } from "./showreels/TheaterPlayer";
@@ -29,14 +33,14 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
     target: sectionRef,
     offset: ["start start", "end start"],
   });
-  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
-  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
+  const exitOpacity = useTransform(scrollYProgress, [0.3, 0.95], [1, 0]);
+  const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
 
   return (
     <section
       id="showreels"
       ref={sectionRef}
-      className={`relative px-6 py-16 md:px-12 md:py-36 bg-ink overflow-hidden ${
+      className={`relative px-6 py-20 md:px-12 md:py-48 bg-ink overflow-hidden ${
         isEnlarged ? "z-[9999]" : ""
       }`}
     >

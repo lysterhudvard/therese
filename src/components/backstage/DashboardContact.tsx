@@ -103,11 +103,14 @@ export function DashboardContact() {
     if (error) {
       if (error.message.includes("column \"contact_links\" of relation \"biography\" does not exist")) {
         toast.error("Vänligen kör 'supabase_migration_4.sql' i din Supabase SQL Editor först.");
+        alert("Kunde inte spara: Kolumnen 'contact_links' saknas i din biography-tabell. Vänligen kör 'supabase_migration_4.sql' i din Supabase SQL Editor.");
       } else {
         toast.error(`Kunde inte spara kontaktinfo: ${error.message}`);
+        alert(`Misslyckades med att spara Akt VII (Kontaktinfo): ${error.message}`);
       }
     } else {
       toast.success("Akt VII (Kontaktinfo) har sparats framgångsrikt!");
+      alert("Akt VII (Kontaktinfo) har sparats framgångsrikt!");
     }
   };
 

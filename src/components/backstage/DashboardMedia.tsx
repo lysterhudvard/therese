@@ -15,6 +15,11 @@ export function DashboardMedia() {
   const [externalType, setExternalType] = useState<"image" | "video">("image");
   const [externalAlt, setExternalAlt] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [displayCount, setDisplayCount] = useState(20);
+
+  useEffect(() => {
+    setDisplayCount(20);
+  }, [selectedFilter]);
 
   // Optimizer Modal States
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
@@ -226,11 +231,13 @@ export function DashboardMedia() {
 
       if (error) throw error;
       toast.success("Metadata sparad för filen!");
+      alert("Filinformationen har sparats framgångsrikt!");
       setEditingMetaPath(null);
       fetchFiles();
     } catch (err: any) {
       console.error(err);
       toast.error(`Kunde inte spara metadata: ${err.message}`);
+      alert(`Misslyckades med att spara filinformation: ${err.message}`);
     }
   };
 
@@ -440,26 +447,41 @@ export function DashboardMedia() {
               <span className="text-xs font-mono text-bone/40 uppercase tracking-widest">Inga filer i denna kategori</span>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {files
-                .filter(f => selectedFilter === "all" || f.folder === selectedFilter)
-                .map((file, index) => (
-                  <MediaCardItem
-                    key={file.id}
-                    file={file}
-                    index={index}
-                    formatSize={formatSize}
-                    handleCopyUrl={handleCopyUrl}
-                    handleAddToPortfolio={handleAddToPortfolio}
-                    editingMetaPath={editingMetaPath}
-                    setEditingMetaPath={setEditingMetaPath}
-                    editMetaValues={editMetaValues}
-                    setEditMetaValues={setEditMetaValues}
-                    handleSaveMetadata={handleSaveMetadata}
-                    handleMoveFile={handleMoveFile}
-                    handleDeleteFile={handleDeleteFile}
-                  />
-                ))}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {files
+                  .filter(f => selectedFilter === "all" || f.folder === selectedFilter)
+                  .slice(0, displayCount)
+                  .map((file, index) => (
+                    <MediaCardItem
+                      key={file.id}
+                      file={file}
+                      index={index}
+                      formatSize={formatSize}
+                      handleCopyUrl={handleCopyUrl}
+                      handleAddToPortfolio={handleAddToPortfolio}
+                      editingMetaPath={editingMetaPath}
+                      setEditingMetaPath={setEditingMetaPath}
+                      editMetaValues={editMetaValues}
+                      setEditMetaValues={setEditMetaValues}
+                      handleSaveMetadata={handleSaveMetadata}
+                      handleMoveFile={handleMoveFile}
+                      handleDeleteFile={handleDeleteFile}
+                    />
+                  ))}
+              </div>
+
+              {files.filter(f => selectedFilter === "all" || f.folder === selectedFilter).length > displayCount && (
+                <div className="flex justify-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDisplayCount(prev => prev + 20)}
+                    className="px-4 py-2 border border-bone/10 hover:border-ember text-bone hover:text-ember transition-colors rounded font-mono text-[10px] uppercase tracking-widest cursor-pointer"
+                  >
+                    Visa fler (+20)
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

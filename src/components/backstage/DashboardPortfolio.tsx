@@ -220,9 +220,11 @@ export function DashboardPortfolio() {
       if (imgErr) throw imgErr;
 
       toast.success("Akt III (Portfolio Bilder) har sparats i Supabase!");
+      alert("Akt III (Portfolio Bilder) har sparats framgångsrikt!");
     } catch (err: any) {
       console.error(err);
       toast.error(`Fel vid sparning: ${err.message}`);
+      alert(`Misslyckades med att spara Akt III (Portfolio Bilder): ${err.message}`);
     } finally {
       setIsSaving(false);
     }

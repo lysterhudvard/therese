@@ -286,5 +286,40 @@ section#voice,
 section#contact {
   content-visibility: auto;
   contain-intrinsic-size: 800px;
-  min-height: 80vh;
+}
+
+/* Unified, perfectly consistent vertical spacing/padding for every section and footer */
+section#bio,
+section#showreels,
+section#credits,
+section#voice,
+section#contact,
+footer {
+  padding-top: 5rem !important;    /* 80px on mobile */
+  padding-bottom: 5rem !important; /* 80px on mobile */
+}
+
+@media (min-width: 768px) {
+  section#bio,
+  section#showreels,
+  section#credits,
+  section#voice,
+  section#contact,
+  footer {
+    padding-top: 12rem !important;    /* 192px on tablet & desktop (30% increase) */
+    padding-bottom: 12rem !important; /* 192px on tablet & desktop (30% increase) */
+  }
+}
+
+/* Ensure Portfolio section on mobile/tablet uses identical padding */
+section#portfolio .lg\:hidden {
+  padding-top: 5rem !important;
+  padding-bottom: 5rem !important;
+}
+
+@media (min-width: 768px) {
+  section#portfolio .lg\:hidden {
+    padding-top: 12rem !important;
+    padding-bottom: 12rem !important;
+  }
 }

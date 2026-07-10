@@ -172,11 +172,11 @@ export function Credits({
   const filters: FilterKey[] = ["Alla", "Film", "TV", "Theater", "Voice"];
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
+  const exitOpacity = useTransform(scrollYProgress, [0.3, 0.95], [1, 0]);
 
-  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
+  const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
   return (
-    <section id="credits" ref={ref} className="relative px-6 py-16 md:px-12 md:py-36">
+    <section id="credits" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
       <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <ParallaxQuotes quotes={activeQuotes} />
 
@@ -227,7 +227,7 @@ export function Credits({
                     onMouseEnter={() => setHoveredCredit(c)}
                     onMouseLeave={() => setHoveredCredit(null)}
                     onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
-                    className="grid grid-cols-12 items-baseline gap-4 py-7 transition-colors hover:bg-bone/[0.06] duration-300"
+                    className="grid grid-cols-12 items-center gap-4 py-7 px-4 sm:px-6 md:px-8 transition-colors hover:bg-bone/[0.06] duration-300"
                   >
                     <div className="col-span-2 lg:col-span-1 font-mono text-xs text-ember/80 group-hover:text-ember transition-colors duration-300">
                       {c.year}
@@ -301,27 +301,22 @@ export function Credits({
                     <div className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.category[lang]}
                     </div>
-                    <div className="hidden lg:block lg:col-span-3 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
+                    <div className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.network}
                     </div>
-                    <div className="col-span-3 lg:col-span-1 flex justify-end">
+                    <div className="col-span-3 lg:col-span-2 flex justify-end">
                       {c.url ? (
                         <a
                           href={c.url}
                           target="_blank"
                           rel="noreferrer"
                           data-hover
-                          aria-label={lang === "sv" ? `Visa ${c.title}` : `View ${c.title}`}
-                          className="text-bone/50 hover:text-ember transition-all hover:rotate-45"
+                          aria-label={lang === "sv" ? `Titta på ${c.title}` : `Watch ${c.title}`}
+                          className="inline-flex items-center gap-1.5 border border-ember/40 bg-ember/5 px-4 py-1.5 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-ember hover:bg-ember hover:text-ink transition-colors rounded-sm shadow-md shadow-ember/5 hover:shadow-ember/15 transition-all duration-300"
                         >
-                          <ArrowUpRight size={18} />
+                          {lang === "sv" ? "Titta" : "Watch"}
                         </a>
-                      ) : (
-                        <ArrowUpRight
-                          size={18}
-                          className="text-bone/20"
-                        />
-                      )}
+                      ) : null}
                     </div>
                     <div className="col-span-12 text-xs text-bone/55 lg:hidden group-hover:text-bone/80 transition-colors duration-300">
                       {c.network} · {c.category[lang]}

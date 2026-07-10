@@ -50,6 +50,11 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [displayCount, setDisplayCount] = useState(20);
+
+  useEffect(() => {
+    setDisplayCount(20);
+  }, [selectedFilter, typeFilter]);
 
   useEffect(() => {
     if (isOpen) {
@@ -134,6 +139,8 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
       (selectedFilter === "all" || f.folder === selectedFilter)
   );
 
+  const displayedFiles = filteredFiles.slice(0, displayCount);
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/80 backdrop-blur-sm">
       <div className="bg-stage border border-bone/10 w-full max-w-4xl max-h-[85vh] flex flex-col rounded-md shadow-2xl relative">
@@ -183,46 +190,60 @@ export function MediaPickerModal({ isOpen, onClose, onSelect, typeFilter = "all"
               Inga {typeFilter !== "all" ? typeFilter : "media"}filer hittades i den här kategorin.
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {filteredFiles.map((file) => (
-                <button
-                  key={file.name}
-                  onClick={() => {
-                    onSelect(file.url, file.metadata);
-                    onClose();
-                  }}
-                  className="group relative flex flex-col text-left border border-bone/5 bg-ink/30 rounded-sm overflow-hidden hover:border-ember transition-all"
-                >
-                  <div className="aspect-square bg-bone/5 flex items-center justify-center relative overflow-hidden">
-                    {file.folder && (
-                      <div className="absolute top-1.5 left-1.5 bg-ember text-ink font-mono text-[6px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-sm z-10 shadow-sm">
-                        {(folderLabels[file.folder] || file.folder).toUpperCase()}
-                      </div>
-                    )}
-                    {file.type === "image" ? (
-                      <img src={file.url} alt={file.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : file.type === "video" ? (
-                      <div className="w-full h-full bg-ink/50 flex flex-col items-center justify-center text-bone/40 group-hover:text-ember transition-colors">
-                        <Video size={24} className="mb-2" />
-                        <span className="text-[9px] uppercase tracking-wider">Video</span>
-                      </div>
-                    ) : file.type === "audio" ? (
-                      <div className="w-full h-full bg-ink/50 flex flex-col items-center justify-center text-bone/40 group-hover:text-ember transition-colors">
-                        <Music size={24} className="mb-2" />
-                        <span className="text-[9px] uppercase tracking-wider">Ljud</span>
-                      </div>
-                    ) : (
-                      <FileText size={24} className="text-bone/40" />
-                    )}
-                  </div>
-                  <div className="p-2 border-t border-bone/5">
-                    <p className="text-[9px] font-mono text-bone/60 truncate" title={file.name}>
-                      {file.name}
-                    </p>
-                  </div>
-                  <div className="absolute inset-0 bg-ember/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                </button>
-              ))}
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {displayedFiles.map((file) => (
+                  <button
+                    key={file.name}
+                    onClick={() => {
+                      onSelect(file.url, file.metadata);
+                      onClose();
+                    }}
+                    className="group relative flex flex-col text-left border border-bone/5 bg-ink/30 rounded-sm overflow-hidden hover:border-ember transition-all"
+                  >
+                    <div className="aspect-square bg-bone/5 flex items-center justify-center relative overflow-hidden">
+                      {file.folder && (
+                        <div className="absolute top-1.5 left-1.5 bg-ember text-ink font-mono text-[6px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-sm z-10 shadow-sm">
+                          {(folderLabels[file.folder] || file.folder).toUpperCase()}
+                        </div>
+                      )}
+                      {file.type === "image" ? (
+                        <img src={file.url} alt={file.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : file.type === "video" ? (
+                        <div className="w-full h-full bg-ink/50 flex flex-col items-center justify-center text-bone/40 group-hover:text-ember transition-colors">
+                          <Video size={24} className="mb-2" />
+                          <span className="text-[9px] uppercase tracking-wider">Video</span>
+                        </div>
+                      ) : file.type === "audio" ? (
+                        <div className="w-full h-full bg-ink/50 flex flex-col items-center justify-center text-bone/40 group-hover:text-ember transition-colors">
+                          <Music size={24} className="mb-2" />
+                          <span className="text-[9px] uppercase tracking-wider">Ljud</span>
+                        </div>
+                      ) : (
+                        <FileText size={24} className="text-bone/40" />
+                      )}
+                    </div>
+                    <div className="p-2 border-t border-bone/5">
+                      <p className="text-[9px] font-mono text-bone/60 truncate" title={file.name}>
+                        {file.name}
+                      </p>
+                    </div>
+                    <div className="absolute inset-0 bg-ember/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  </button>
+                ))}
+              </div>
+
+              {filteredFiles.length > displayCount && (
+                <div className="flex justify-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDisplayCount(prev => prev + 20)}
+                    className="px-4 py-2 border border-bone/10 hover:border-ember text-bone hover:text-ember transition-colors rounded font-mono text-[10px] uppercase tracking-widest cursor-pointer"
+                  >
+                    Visa fler (+20)
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

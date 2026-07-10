@@ -1,6 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { Mail, Check, Send, Film, Globe, Link as LinkIcon, Video, Award, Briefcase, Music, Phone } from "lucide-react";
+import { 
+  Mail as MailOrig, 
+  Check as CheckOrig, 
+  Send as SendOrig, 
+  Film as FilmOrig, 
+  Globe as GlobeOrig, 
+  Link as LinkIconOrig, 
+  Video as VideoOrig, 
+  Award as AwardOrig, 
+  Briefcase as BriefcaseOrig, 
+  Music as MusicOrig, 
+  Phone as PhoneOrig 
+} from "lucide-react";
+
+const Mail = MailOrig as any;
+const Check = CheckOrig as any;
+const Send = SendOrig as any;
+const Film = FilmOrig as any;
+const Globe = GlobeOrig as any;
+const LinkIcon = LinkIconOrig as any;
+const Video = VideoOrig as any;
+const Award = AwardOrig as any;
+const Briefcase = BriefcaseOrig as any;
+const Music = MusicOrig as any;
+const Phone = PhoneOrig as any;
 import { useT } from "../../hooks/use-t";
 import { Field } from "../ui/Field";
 import { Instagram, Facebook, Youtube, XLogo } from "./contact/SocialIcons";
@@ -74,8 +98,8 @@ export function Contact({ bioData }: { bioData?: any }) {
 
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
-  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
+  const exitOpacity = useTransform(scrollYProgress, [0.3, 0.95], [1, 0]);
+  const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
 
   const [isSpotlightActive, setIsSpotlightActive] = useState(false);
   const formCardRef = useRef<HTMLDivElement>(null);
@@ -101,7 +125,7 @@ export function Contact({ bioData }: { bioData?: any }) {
   }, []);
 
   return (
-    <section id="contact" ref={ref} className="relative px-6 py-16 md:px-12 md:py-36">
+    <section id="contact" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
       <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-14">
 

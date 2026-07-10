@@ -84,7 +84,7 @@ export function Footer({ bioData }: { bioData?: any }) {
   return (
     <footer
       ref={footerRef}
-      className="relative border-t border-bone/10 bg-black/40 px-6 py-20 md:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[580px]"
+      className="relative border-t border-bone/10 bg-black/40 px-6 py-20 md:px-12 md:py-32 overflow-hidden flex flex-col items-center justify-center min-h-[580px]"
     >
       {/* Film noise / scanlines effect */}
       <div
@@ -229,16 +229,8 @@ export function Footer({ bioData }: { bioData?: any }) {
       </div>
 
       {/* Bottom metadata row */}
-      <div className="relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10">
+      <div className="relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10 text-left">
         <div>© {new Date().getFullYear()} Therese Järvheden</div>
-        <div>
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('open-cookie-settings'))}
-            className="hover:text-ember transition-colors cursor-pointer"
-          >
-            {lang === "sv" ? "Cookie-inställningar" : "Cookie Settings"}
-          </button>
-        </div>
         <div>ALL CREDITS DIRECTED BY THERESE JÄRVHEDEN</div>
       </div>
     </footer>

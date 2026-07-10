@@ -69,8 +69,8 @@ export function CookieConsent() {
   const [view, setView] = useState<"banner" | "settings" | "policy">("banner");
   const [preferences, setPreferences] = useState<CookiePreferences>({
     necessary: true,
-    analytics: false,
-    marketing: false,
+    analytics: true,
+    marketing: true,
   });
 
   const t = TEXTS[lang === "sv" ? "sv" : "en"];
@@ -139,24 +139,40 @@ export function CookieConsent() {
 
   return (
     <>
-      {/* Floating Consent Trigger Button (glowing cookie) */}
+      {/* Floating Consent Trigger Button (half-hidden at left edge with arrow) */}
       {!isVisible && hasConsented && (
         <button
           onClick={() => {
             setView("settings");
             setIsVisible(true);
           }}
-          className="fixed bottom-6 left-6 z-[95] p-3 rounded-full bg-ink/90 border border-bone/15 text-bone hover:text-ember hover:border-ember/40 shadow-lg backdrop-blur transition-all duration-300 group cursor-pointer animate-in fade-in zoom-in-50 duration-300"
+          className="fixed left-0 bottom-2 z-[95] w-14 h-14 rounded-full flex items-center justify-end pr-2 bg-transparent border border-bone/15 text-bone hover:text-ember hover:border-ember/40 shadow-[4px_0_15px_rgba(0,0,0,0.6)] -translate-x-1/2 hover:translate-x-0 transition-all duration-500 ease-out cursor-pointer group animate-in fade-in duration-300"
+          style={{ cursor: "pointer" }}
           title={lang === "sv" ? "Cookie-inställningar" : "Cookie Settings"}
           aria-label="Cookie Settings"
         >
-          {/* A beautiful cookie icon in SVG */}
-          <svg className="w-5 h-5 transition-transform duration-500 group-hover:rotate-45" viewBox="0 0 24 24" fill="currentColor">
+          {/* Cookie Icon (slid out/visible when hovered) */}
+          <svg 
+            className="w-4 h-4 mr-2 text-bone/70 group-hover:text-ember transition-colors duration-300" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+          >
             <path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm3,14a1.5,1.5,0,1,1,1.5-1.5A1.5,1.5,0,0,1,15,16Zm1.5-6.5A1.25,1.25,0,1,1,17.75,8.25,1.25,1.25,0,0,1,16.5,9.5Zm-9,3.5A1.5,1.5,0,1,1,9,11.5,1.5,1.5,0,0,1,7.5,13Zm3.5,3.5a1,1,0,1,1,1-1A1,1,0,0,1,11,16.5Zm0-8a1.5,1.5,0,1,1,1.5-1.5A1.5,1.5,0,0,1,11,8.5Z" />
           </svg>
+
+          {/* Right arrow / chevron */}
+          <svg 
+            className="w-4 h-4 text-ember transition-transform duration-300 group-hover:translate-x-0.5" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            strokeWidth="3"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
           
-          {/* Tooltip */}
-          <span className="absolute left-14 top-1/2 -translate-y-1/2 bg-ink border border-bone/10 text-bone text-[9px] uppercase tracking-widest px-2.5 py-1 rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-md">
+          {/* Tooltip to the right of the button */}
+          <span className="absolute left-16 top-1/2 -translate-y-1/2 bg-ink border border-bone/10 text-bone text-[9px] uppercase tracking-widest px-2.5 py-1 rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-md">
             {lang === "sv" ? "Inställningar" : "Cookie Settings"}
           </span>
         </button>
@@ -164,7 +180,10 @@ export function CookieConsent() {
 
       {/* Main Banner / Settings Dialog */}
       {isVisible && (
-        <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md z-[100] animate-in fade-in slide-in-from-bottom-8 duration-500">
+        <div 
+          className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md z-[100] animate-in fade-in slide-in-from-bottom-8 duration-500 cursor-default"
+          style={{ cursor: "default" }}
+        >
           <div className="relative overflow-hidden bg-ink/95 border border-bone/15 backdrop-blur-xl rounded-lg p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] film-grain">
             {/* Subtle decorative glowing border on top */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-ember/40 to-transparent" />

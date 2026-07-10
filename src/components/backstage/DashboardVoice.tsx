@@ -98,9 +98,11 @@ export function DashboardVoice() {
 
       if (error) throw error;
       toast.success("Akt VI (Röstinställningar) har sparats i Supabase!");
+      alert("Akt VI (Röstinställningar) har sparats framgångsrikt!");
     } catch (err: any) {
       console.error(err);
       toast.error(`Kunde inte spara röstinställningar: ${err.message}`);
+      alert(`Misslyckades med att spara Akt VI (Röstinställningar): ${err.message}`);
     } finally {
       setIsSaving(false);
     }

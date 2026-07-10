@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
-import { Download } from "lucide-react";
+import { Download as DownloadOrig } from "lucide-react";
+
+const Download = DownloadOrig as any;
 
 export interface PortfolioImage {
   url: string;
@@ -168,7 +170,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
           </motion.div>
         )}
         {/* Mobile / Tablet layout - natural height, does not lock page scrolling */}
-        <div className="lg:hidden relative z-10 flex flex-col py-16">
+        <div className="lg:hidden relative z-10 flex flex-col py-20 md:py-24">
           <div className="px-6 pb-6">
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">
 

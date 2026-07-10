@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Play } from "lucide-react";
+import { Play as PlayOrig } from "lucide-react";
+
+const Play = PlayOrig as any;
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
 
@@ -15,15 +17,15 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption }: VoicePro
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const exitOpacity = useTransform(scrollYProgress, [0.75, 0.98], [1, 0]);
+  const exitOpacity = useTransform(scrollYProgress, [0.3, 0.95], [1, 0]);
 
-  const exitScale = useTransform(scrollYProgress, [0.75, 0.98], [1, 1.02]);
+  const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
 
   return (
     <section id="voice" ref={ref} className="relative overflow-hidden bg-ink">
       <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
-        <div className={imageUrl ? "grid grid-cols-1 lg:grid-cols-2" : "max-w-4xl mx-auto flex flex-col items-center justify-center text-center px-6 py-16 lg:py-36"}>
-          <div className={`flex flex-col justify-center ${imageUrl ? "px-6 py-16 lg:px-16 lg:py-36" : "items-center max-w-2xl"}`}>
+        <div className={imageUrl ? "grid grid-cols-1 lg:grid-cols-2" : "max-w-4xl mx-auto flex flex-col items-center justify-center text-center px-6 py-20 md:py-48"}>
+          <div className={`flex flex-col justify-center ${imageUrl ? "px-6 py-20 md:py-48 lg:px-16" : "items-center max-w-2xl"}`}>
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.voice.act}</div>
 
 

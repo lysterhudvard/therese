@@ -373,12 +373,15 @@ export function DashboardBio() {
       setIsSaving(false);
       if (coreError) {
         toast.error(`Kunde inte spara i databasen: ${coreError.message}`);
+        alert(`Misslyckades med att spara Akt II (Biografi & FAQ): ${coreError.message}`);
       } else {
         toast.warning("Sparade endast grundläggande fält (citat, dialekter, språk). För full funktionalitet, kör 'supabase_migration_5.sql' i din Supabase SQL Editor.");
+        alert("Sparade grundläggande fält framgångsrikt (vissa tabellkolumner saknas i din Supabase-databas)!");
       }
     } else {
       setIsSaving(false);
       toast.success("Akt II (Biografi & FAQ) har sparats framgångsrikt i Supabase!");
+      alert("Akt II (Biografi & FAQ) har sparats framgångsrikt!");
     }
   };
 

@@ -230,9 +230,11 @@ export function DashboardCredits() {
       }
 
       toast.success("Akt V (Meriter & Ljudfiler) har sparats framgångsrikt i Supabase!");
+      alert("Akt V (Meriter & Ljudfiler) har sparats framgångsrikt!");
     } catch (err: any) {
       console.error(err);
       toast.error(`Kunde inte spara meriter: ${err.message}`);
+      alert(`Misslyckades med att spara Akt V (Meriter & Ljudfiler): ${err.message}`);
     } finally {
       setIsSaving(false);
     }

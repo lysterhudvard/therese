@@ -140,8 +140,10 @@ export function DashboardSeo() {
     setIsSaving(false);
     if (error) {
       toast.error(`Kunde inte spara SEO-inställningar: ${error.message}`);
+      alert(`Misslyckades med att spara SEO-inställningar: ${error.message}`);
     } else {
       toast.success("SEO-inställningar och meta-taggar har sparats i Supabase!");
+      alert("SEO-inställningar och meta-taggar har sparats framgångsrikt!");
     }
   };
 

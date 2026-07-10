@@ -4,25 +4,34 @@ import { useT, type Lang } from "../hooks/use-t";
 /* ---------- Language switch ---------- */
 export function LangSwitch({ className = "" }: { className?: string }) {
   const { lang, setLang, t } = useT();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div
       role="group"
-      aria-label={t.lang.label}
+      aria-label={mounted ? t.lang.label : "Språk"}
       className={`inline-flex items-center border border-bone/20 text-[10px] uppercase tracking-[0.3em] ${className}`}
     >
-      {(["sv", "en"] as Lang[]).map((l) => (
-        <button
-          key={l}
-          onClick={() => setLang(l)}
-          data-hover
-          aria-pressed={lang === l}
-          className={`px-2.5 py-1.5 transition-colors ${
-            lang === l ? "bg-bone text-ink" : "text-bone/70 hover:text-bone"
-          }`}
-        >
-          {l}
-        </button>
-      ))}
+      {(["sv", "en"] as Lang[]).map((l) => {
+        const isActive = mounted ? lang === l : l === "sv";
+        return (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            data-hover
+            aria-pressed={isActive}
+            className={`px-2.5 py-1.5 transition-colors cursor-pointer ${
+              isActive ? "bg-bone text-ink" : "text-bone/70 hover:text-bone"
+            }`}
+          >
+            {l}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -35,11 +44,8 @@ export function Nav() {
   const [logoSwapped, setLogoSwapped] = useState(false);
   const { t } = useT();
 
-  const isBypassed =
-    typeof window !== "undefined" &&
-    document.documentElement.classList.contains("skip-intro");
-
   useEffect(() => {
+    const isBypassed = document.documentElement.classList.contains("skip-intro");
     if (isBypassed) {
       setHeroDone(true);
       return;
@@ -48,7 +54,7 @@ export function Nav() {
       setHeroDone(true);
     }, 3800);
     return () => clearTimeout(timer);
-  }, [isBypassed]);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,11 +66,12 @@ export function Nav() {
   }, []);
 
   useEffect(() => {
+    const isBypassed = document.documentElement.classList.contains("skip-intro");
     if (scrolled || isBypassed) {
       setLogoSwapped(true);
       document.documentElement.classList.add("logo-swapped");
     }
-  }, [scrolled, isBypassed]);
+  }, [scrolled]);
 
   const links = [
     { id: "bio", label: t.nav.bio },
@@ -83,7 +90,7 @@ export function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-[70] transition-all duration-700 ease-in-out ${
-        scrolled ? "bg-ink border-b border-bone/10" : "bg-transparent"
+        scrolled || open ? "bg-ink border-b border-bone/10" : "bg-transparent"
       }`}
     >
       <div
@@ -91,6 +98,7 @@ export function Nav() {
       >
         <button
           onClick={() => go("top")}
+          style={open ? { opacity: 1, pointerEvents: "auto" } : undefined}
           className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5 nav-header-logo"
         >
           <span className="italic font-light">Therese</span>
@@ -126,7 +134,7 @@ export function Nav() {
           <div className="flex items-center lg:hidden">
             <button
               onClick={() => setOpen((v) => !v)}
-              className="flex flex-col gap-1.5 text-bone"
+              className="flex flex-col gap-1.5 text-bone p-3 -mr-3 cursor-pointer pointer-events-auto"
               aria-label="Menu"
             >
               <span

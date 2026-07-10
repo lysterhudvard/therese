@@ -165,6 +165,7 @@ export function DashboardShowreels() {
       if (error) throw error;
 
       toast.success("Akt IV (Showreels) har sparats i Supabase!");
+      alert("Akt IV (Showreels) har sparats framgångsrikt!");
       
       const { data } = await supabase
         .from("showreels")
@@ -177,6 +178,7 @@ export function DashboardShowreels() {
     } catch (err: any) {
       console.error(err);
       toast.error(`Fel vid sparning: ${err.message}`);
+      alert(`Misslyckades med att spara Akt IV (Showreels): ${err.message}`);
     } finally {
       setIsSaving(false);
     }

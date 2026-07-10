@@ -251,6 +251,7 @@ export function KlickGuideWidget({ activeTab, setActiveTab }: KlickGuideWidgetPr
     if (typeof window !== "undefined") {
       window.localStorage.setItem("tj-gemini-key", apiKey.trim());
       toast.success("Gemini API-nyckel har sparats lokalt!");
+      alert("Gemini API-nyckel har sparats lokalt!");
       setShowConfig(false);
     }
   };
