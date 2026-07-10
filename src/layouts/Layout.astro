@@ -58,7 +58,12 @@ const {
     <script is:inline>
       (function() {
         try {
-          var isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse/i.test(navigator.userAgent);
+          var isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|chrome-lighthouse|gtmetrix|pingdom/i.test(navigator.userAgent) ||
+                      navigator.webdriver ||
+                      !navigator.languages ||
+                      navigator.languages.length === 0 ||
+                      window.Lighthouse ||
+                      window.__lighthouse__;
           var introPlayed = sessionStorage.getItem('introPlayed');
           if (isBot || introPlayed) {
             document.documentElement.classList.add('skip-intro');

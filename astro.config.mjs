@@ -4,6 +4,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   integrations: [react()],
+  build: {
+    inlineStylesheets: 'always'
+  },
   image: {
     domains: [
       'a6c2528650.clvaw-cdnwnd.com',
