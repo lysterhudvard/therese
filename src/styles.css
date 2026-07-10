@@ -276,3 +276,15 @@ html.in-portfolio .scope-bar-top {
 html.in-portfolio .scope-bar-bottom {
   transform: translateY(0);
 }
+
+/* Prevent collapsed-height hydration triggers on pre-hydrated sections */
+section#bio, 
+section#portfolio, 
+section#showreels,
+section#credits,
+section#voice,
+section#contact {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+  min-height: 80vh;
+}

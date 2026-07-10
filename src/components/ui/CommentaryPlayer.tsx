@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { X, Pause, Play, VolumeX, Volume2 } from "lucide-react";
+
 
 import { useCommentaryStore } from "../../hooks/use-t";
 
@@ -113,7 +113,20 @@ export function CommentaryPlayer() {
           </span>
         </div>
         <button onClick={onClose} className="text-bone/45 hover:text-bone transition-colors p-1">
-          <X size={15} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
         </button>
       </div>
 
@@ -132,9 +145,35 @@ export function CommentaryPlayer() {
           className="h-8 w-8 rounded-full bg-ember hover:bg-bone text-ink hover:text-ink transition-colors flex items-center justify-center shrink-0 shadow-lg"
         >
           {playing ? (
-            <Pause size={13} fill="currentColor" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+            </svg>
           ) : (
-            <Play size={13} fill="currentColor" className="translate-x-[0.5px]" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="translate-x-[0.5px]"
+            >
+              <polygon points="6 3 20 12 6 21 6 3" />
+            </svg>
           )}
         </button>
 
@@ -164,7 +203,39 @@ export function CommentaryPlayer() {
           onClick={toggleMute}
           className="text-bone/55 hover:text-ember transition-colors p-1"
         >
-          {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+          {muted ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4.7 6 9H2v6h4l5 4.3V4.7z" />
+              <line x1="22" x2="16" y1="9" y2="15" />
+              <line x1="16" x2="22" y1="9" y2="15" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4.7 6 9H2v6h4l5 4.3V4.7z" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            </svg>
+          )}
         </button>
       </div>
     </motion.div>
