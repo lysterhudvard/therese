@@ -229,3 +229,30 @@ html.skip-intro .animate-hero-zoom {
   animation: none !important;
   transform: scale(1) !important;
 }
+
+/* React Nav Logo visibility handler */
+.nav-header-logo {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s linear;
+}
+html.logo-swapped .nav-header-logo {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Repeat visitor slide-down reveal for React logo */
+@keyframes logoReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+html.skip-intro .nav-header-logo {
+  animation: logoReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  pointer-events: auto !important;
+}

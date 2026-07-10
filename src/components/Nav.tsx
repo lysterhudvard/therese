@@ -33,6 +33,9 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoSwapped, setLogoSwapped] = useState(false);
+
+  const isBypassed = typeof window !== "undefined" && document.documentElement.classList.contains("skip-intro");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -42,6 +45,13 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (scrolled || isBypassed) {
+      setLogoSwapped(true);
+      document.documentElement.classList.add("logo-swapped");
+    }
+  }, [scrolled, isBypassed]);
 
   const links = [
     { id: "bio", label: t.nav.bio },
@@ -66,19 +76,13 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
       <div
         className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-5 lg:py-3.5" : "py-7 lg:py-5"}`}
       >
-        {heroDone ? (
-          <motion.button
-            layoutId="header-logo"
-            onClick={() => go("top")}
-            className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5"
-            transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 1.6 }}
-          >
-            <span className="italic font-light">Therese</span>
-            <span>Järvheden</span>
-          </motion.button>
-        ) : (
-          <div className="w-[150px]" />
-        )}
+        <motion.button
+          onClick={() => go("top")}
+          className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5 nav-header-logo"
+        >
+          <span className="italic font-light">Therese</span>
+          <span>Järvheden</span>
+        </motion.button>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: heroDone ? 1 : 0 }}

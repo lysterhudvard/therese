@@ -54,11 +54,11 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     if (typeof window !== "undefined") {
       if (heroDone) {
         sessionStorage.setItem("introPlayed", "1");
+        document.documentElement.classList.add("intro-finished");
       } else {
-        const tm = setTimeout(() => {
-          setHeroDone(true);
-        }, 2400); // Wait for Astro CSS animation to finish
-        return () => clearTimeout(tm);
+        const onHeroDone = () => setHeroDone(true);
+        window.addEventListener("hero-done", onHeroDone);
+        return () => window.removeEventListener("hero-done", onHeroDone);
       }
     }
   }, [heroDone]);
