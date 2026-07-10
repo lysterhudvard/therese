@@ -44,7 +44,18 @@ export const Route = createFileRoute("/")({
 
 /* ---------- Page ---------- */
 export default function Page({ initialDbData }: { initialDbData?: any }) {
-  const [heroDone, setHeroDone] = useState(false);
+  const [heroDone, setHeroDone] = useState(() => {
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains("skip-intro");
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && heroDone) {
+      sessionStorage.setItem("introPlayed", "1");
+    }
+  }, [heroDone]);
   const [lang, setLangState] = useState<Lang>("sv");
   const [isInPortfolio, setIsInPortfolio] = useState(false);
   const [activeCommentary, setActiveCommentary] = useState<{

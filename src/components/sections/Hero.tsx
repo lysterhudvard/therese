@@ -24,9 +24,10 @@ export function Hero({
   const opacity = useTransform(scrollYProgress, [0, 0.9], [1, 0]);
 
   useEffect(() => {
+    if (heroDone) return;
     const tm = setTimeout(onDone, 1700);
     return () => clearTimeout(tm);
-  }, [onDone]);
+  }, [onDone, heroDone]);
 
   return (
     <section id="top" ref={ref} className="relative h-[100svh] w-full overflow-hidden">
@@ -42,16 +43,16 @@ export function Hero({
       </motion.div>
 
       <motion.div
-        initial={{ y: 0 }}
+        initial={heroDone ? { y: "-100%" } : { y: 0 }}
         animate={{ y: "-100%" }}
         transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
-        className="absolute inset-x-0 top-0 z-30 h-1/2 bg-ink"
+        className="absolute inset-x-0 top-0 z-30 h-1/2 bg-ink hero-curtain-top"
       />
       <motion.div
-        initial={{ y: 0 }}
+        initial={heroDone ? { y: "100%" } : { y: 0 }}
         animate={{ y: "100%" }}
         transition={{ duration: 1.4, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
-        className="absolute inset-x-0 bottom-0 z-30 h-1/2 bg-ink"
+        className="absolute inset-x-0 bottom-0 z-30 h-1/2 bg-ink hero-curtain-bottom"
       />
 
       {!heroDone && (

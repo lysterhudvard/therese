@@ -53,6 +53,19 @@ const {
     {heroImage && (
       <link rel="preload" as="image" href={heroImage} fetchpriority="high" />
     )}
+
+    <!-- Bot & Repeat Visitor Intro Bypass -->
+    <script is:inline>
+      (function() {
+        try {
+          var isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse/i.test(navigator.userAgent);
+          var introPlayed = sessionStorage.getItem('introPlayed');
+          if (isBot || introPlayed) {
+            document.documentElement.classList.add('skip-intro');
+          }
+        } catch (e) {}
+      })();
+    </script>
 	</head>
 	<body>
 		<slot />

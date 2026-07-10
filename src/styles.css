@@ -206,3 +206,26 @@ input:-webkit-autofill:active {
   animation: heroTextFade 0.8s ease-out 2.6s both;
 }
 
+/* Bypass Intro Animation for Bots and Repeat Visitors */
+html.skip-intro .hero-curtain-top {
+  transform: translateY(-100%) !important;
+}
+html.skip-intro .hero-curtain-bottom {
+  transform: translateY(100%) !important;
+}
+html.skip-intro .animate-slide-up-fade {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+html.skip-intro .animate-hero-text {
+  display: none !important;
+}
+html.skip-intro .animate-scroll-text-fade {
+  animation: none !important;
+  opacity: 1 !important;
+}
+html.skip-intro .animate-hero-zoom {
+  animation: none !important;
+  transform: scale(1) !important;
+}
