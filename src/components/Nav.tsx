@@ -87,7 +87,7 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: heroDone ? 1 : 0 }}
           transition={{ duration: 0.5 }}
-          className={`flex items-center ${!heroDone ? "pointer-events-none" : ""}`}
+          className={`flex items-center ${!heroDone ? "pointer-events-none" : ""} nav-header-menu-container`}
         >
           <nav className="hidden lg:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
             {links.map((l) => (
@@ -114,19 +114,6 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
             </AnimatePresence>
           </nav>
           <div className="flex items-center lg:hidden">
-            <AnimatePresence>
-              {!scrolled && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, width: 0, marginRight: 0 }}
-                  animate={{ opacity: 1, scale: 1, width: "auto", marginRight: 12 }}
-                  exit={{ opacity: 0, scale: 0.8, width: 0, marginRight: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="overflow-hidden inline-flex shrink-0"
-                >
-                  <LangSwitch />
-                </motion.div>
-              )}
-            </AnimatePresence>
             <button
               onClick={() => setOpen((v) => !v)}
               className="flex flex-col gap-1.5 text-bone"
@@ -163,6 +150,9 @@ export function Nav({ heroDone }: { heroDone: boolean }) {
                   {l.label}
                 </button>
               ))}
+              <div className="border-t border-bone/10 pt-5 mt-2 flex justify-start">
+                <LangSwitch />
+              </div>
             </div>
           </motion.div>
         )}

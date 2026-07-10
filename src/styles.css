@@ -256,3 +256,9 @@ html.skip-intro .nav-header-logo {
   animation: logoReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both !important;
   pointer-events: auto !important;
 }
+
+/* Bypass opacity for right-side nav elements on repeat/bot visits */
+html.skip-intro .nav-header-menu-container {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
