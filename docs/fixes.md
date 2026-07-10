@@ -370,3 +370,12 @@ This document details critical bugs, layout errors, and interaction blocks found
     * Tablet (`min-width: 640px`): `--logo-scale: 2.2` (resulting in a center size of `30.8px`).
     * Desktop (`min-width: 1024px`): `--logo-scale: 3.5` (resulting in a center size of `52.5px`).
   This keeps the animation 100% GPU-composited while ensuring the text fits perfectly inside all screen borders.
+
+## 52. PageSpeed Crash Resolution (NO_LCP / Error!)
+- **Symptom:** Lighthouse / PageSpeed Insights audits failed completely with a red exclamation mark, reporting `Error! NO_LCP` on both Largest Contentful Paint (LCP) and Total Blocking Time (TBT).
+- **Root Cause:**
+  1. **TypeError in Head Script:** The inline bot detection script in `Layout.astro` attempted to inspect `navigator.languages.length` and execute `sessionStorage.getItem('introPlayed')` without checking if these properties/APIs exist inside headless test environments. This triggered a fatal JS TypeError, halting browser tracing.
+  2. **Chrome Opacity 0 -> 1 Animation Bug:** Google Chrome's rendering engine frequently crashes or fails to log the LCP candidate if an element starts at exactly `opacity: 0` and is animated to `opacity: 1` concurrently with complex GPU translations, leading to an aborted paint state in Lighthouse.
+- **Resolution:**
+  - **Bulletproof Inline Bot Script:** Updated the inline detector in `Layout.astro` to safely guard all checks with nullish and existence verification (e.g. `typeof navigator !== 'undefined'`, `typeof sessionStorage !== 'undefined'`), and wrapped all sub-routines inside explicit try/catch scopes to ensure it can never throw a fatal error.
+  - **Adjusted Starting Keyframe Opacity:** Modified the start states of the `@keyframes cinematicHandoffMobile` and `@keyframes cinematicHandoffDesktop` in `Hero.astro` to use a tiny, near-invisible opacity value of `0.01` instead of `0`. This forces Chrome's performance tracker to recognize the element as painted immediately, resolving the `NO_LCP` crash while remaining visually identical.

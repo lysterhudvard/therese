@@ -58,17 +58,29 @@ const {
     <script is:inline>
       (function() {
         try {
-          var isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|chrome-lighthouse|gtmetrix|pingdom/i.test(navigator.userAgent) ||
-                      navigator.webdriver ||
-                      !navigator.languages ||
-                      navigator.languages.length === 0 ||
-                      window.Lighthouse ||
-                      window.__lighthouse__;
-          var introPlayed = sessionStorage.getItem('introPlayed');
+          var isBot = false;
+          if (typeof navigator !== 'undefined') {
+            var ua = navigator.userAgent || '';
+            isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|chrome-lighthouse|gtmetrix|pingdom/i.test(ua) ||
+                    !!navigator.webdriver ||
+                    !navigator.languages ||
+                    (navigator.languages && navigator.languages.length === 0);
+          }
+          if (typeof window !== 'undefined') {
+            isBot = isBot || !!window.Lighthouse || !!window.__lighthouse__;
+          }
+          var introPlayed = false;
+          try {
+            if (typeof sessionStorage !== 'undefined' && sessionStorage) {
+              introPlayed = sessionStorage.getItem('introPlayed');
+            }
+          } catch (_) {}
           if (isBot || introPlayed) {
             document.documentElement.classList.add('skip-intro');
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       })();
     </script>
 	</head>
