@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useT, type Lang } from "../hooks/use-t";
 
 /* ---------- Language switch ---------- */
@@ -29,42 +28,34 @@ export function LangSwitch({ className = "" }: { className?: string }) {
 }
 
 /* ---------- Navigation ---------- */
-export function Nav({ heroDone: propHeroDone }: { heroDone?: boolean }) {
-  const { t } = useT();
-  const [open, setOpen] = useState(false);
+export function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [heroDone, setHeroDone] = useState(false);
   const [logoSwapped, setLogoSwapped] = useState(false);
+  const { t } = useT();
 
-  const [heroDone, setHeroDone] = useState(() => {
-    if (propHeroDone !== undefined) return propHeroDone;
-    if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("skip-intro") ||
-             document.documentElement.classList.contains("intro-finished");
-    }
-    return false;
-  });
+  const isBypassed =
+    typeof window !== "undefined" &&
+    document.documentElement.classList.contains("skip-intro");
 
   useEffect(() => {
-    if (propHeroDone !== undefined) {
-      setHeroDone(propHeroDone);
+    if (isBypassed) {
+      setHeroDone(true);
       return;
     }
-    if (typeof window === "undefined" || heroDone) return;
-    const handleDone = () => {
+    const timer = setTimeout(() => {
       setHeroDone(true);
-    };
-    window.addEventListener("hero-done", handleDone);
-    return () => window.removeEventListener("hero-done", handleDone);
-  }, [propHeroDone, heroDone]);
-
-  const isBypassed = typeof window !== "undefined" && document.documentElement.classList.contains("skip-intro");
+    }, 3800);
+    return () => clearTimeout(timer);
+  }, [isBypassed]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const handleScroll = () => {
       setScrolled(window.scrollY > 100);
     };
     window.addEventListener("scroll", handleScroll);
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -98,17 +89,15 @@ export function Nav({ heroDone: propHeroDone }: { heroDone?: boolean }) {
       <div
         className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-5 lg:py-3.5" : "py-7 lg:py-5"}`}
       >
-        <motion.button
+        <button
           onClick={() => go("top")}
           className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5 nav-header-logo"
         >
           <span className="italic font-light">Therese</span>
           <span>Järvheden</span>
-        </motion.button>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: heroDone ? 1 : 0 }}
-          transition={{ duration: 0.5 }}
+        </button>
+        <div
+          style={{ opacity: heroDone ? 1 : 0, transition: 'opacity 0.5s' }}
           className={`flex items-center ${!heroDone ? "pointer-events-none" : ""} nav-header-menu-container`}
         >
           <nav className="hidden lg:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
@@ -121,19 +110,18 @@ export function Nav({ heroDone: propHeroDone }: { heroDone?: boolean }) {
                 {l.label}
               </button>
             ))}
-            <AnimatePresence>
-              {!scrolled && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, width: 0, marginLeft: 0 }}
-                  animate={{ opacity: 1, scale: 1, width: "auto", marginLeft: 16 }}
-                  exit={{ opacity: 0, scale: 0.8, width: 0, marginLeft: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="overflow-hidden inline-flex shrink-0"
-                >
-                  <LangSwitch />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div
+              style={{
+                opacity: !scrolled ? 1 : 0,
+                transform: !scrolled ? "scale(1)" : "scale(0.8)",
+                width: !scrolled ? "auto" : 0,
+                marginLeft: !scrolled ? 16 : 0,
+                transition: "all 0.3s ease-in-out",
+              }}
+              className="overflow-hidden inline-flex shrink-0"
+            >
+              <LangSwitch />
+            </div>
           </nav>
           <div className="flex items-center lg:hidden">
             <button
@@ -152,33 +140,33 @@ export function Nav({ heroDone: propHeroDone }: { heroDone?: boolean }) {
               />
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="lg:hidden border-t border-bone/15 bg-stage/95 backdrop-blur-md"
-          >
-            <div className="flex flex-col px-6 py-6 gap-4">
-              {links.map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => go(l.id)}
-                  className="text-left font-display text-2xl text-bone"
-                >
-                  {l.label}
-                </button>
-              ))}
-              <div className="border-t border-bone/10 pt-5 mt-2 flex justify-start">
-                <LangSwitch />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      
+      <div
+        style={{
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          transform: open ? "translateY(0)" : "translateY(-10px)",
+          transition: "all 0.3s ease-in-out",
+        }}
+        className="lg:hidden absolute left-0 right-0 top-full border-t border-bone/15 bg-stage/95 backdrop-blur-md"
+      >
+        <div className="flex flex-col px-6 py-6 gap-4">
+          {links.map((l) => (
+            <button
+              key={l.id}
+              onClick={() => go(l.id)}
+              className="text-left font-display text-2xl text-bone"
+            >
+              {l.label}
+            </button>
+          ))}
+          <div className="border-t border-bone/10 pt-5 mt-2 flex justify-start">
+            <LangSwitch />
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

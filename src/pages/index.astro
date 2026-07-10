@@ -168,44 +168,58 @@ if (processedDbData?.biography?.review_quotes) {
   </script>
 
   <!-- Mount independent React islands -->
-  <Spotlight client:idle />
+  <Spotlight client:media="(min-width: 1024px)" />
   <Nav client:idle />
 
   <!-- Cinematic Anamorphic Scope Bars (driven purely by intersection observer class) -->
   <div class="scope-bar-top pointer-events-none fixed inset-x-0 top-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"></div>
   <div class="scope-bar-bottom pointer-events-none fixed inset-x-0 bottom-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"></div>
 
-  <Biography 
-    client:visible 
-    sections={parsedSections} 
-    imageCredits={imageCredits} 
-    faqs={processedDbData?.biography?.faqs} 
-  />
+  <div style="min-height: 100vh;">
+    <Biography 
+      client:visible 
+      sections={parsedSections} 
+      imageCredits={imageCredits} 
+      faqs={processedDbData?.biography?.faqs} 
+    />
+  </div>
   
-  <Portfolio client:visible images={processedDbData?.portfolioImages} />
+  <div style="min-height: 100vh;">
+    <Portfolio client:visible images={processedDbData?.portfolioImages} />
+  </div>
   
-  {processedDbData?.showreels && processedDbData.showreels.length > 0 ? (
-    <Showreels client:visible videos={processedDbData.showreels} />
-  ) : (
-    <Showreels client:visible />
-  )}
+  <div style="min-height: 80vh;">
+    {processedDbData?.showreels && processedDbData.showreels.length > 0 ? (
+      <Showreels client:visible videos={processedDbData.showreels} />
+    ) : (
+      <Showreels client:visible />
+    )}
+  </div>
   
-  <Credits
-    client:visible
-    credits={processedDbData?.credits}
-    reviewQuotes={parsedReviewQuotes}
-  />
+  <div style="min-height: 80vh;">
+    <Credits
+      client:visible
+      credits={processedDbData?.credits}
+      reviewQuotes={parsedReviewQuotes}
+    />
+  </div>
   
-  <Voice 
-    client:visible
-    imageUrl={voiceImageData.url} 
-    imageAlt={voiceImageData.alt} 
-    imageTitle={voiceImageData.title}
-    imageCaption={voiceImageData.caption}
-  />
+  <div style="min-height: 80vh;">
+    <Voice 
+      client:visible
+      imageUrl={voiceImageData.url} 
+      imageAlt={voiceImageData.alt} 
+      imageTitle={voiceImageData.title}
+      imageCaption={voiceImageData.caption}
+    />
+  </div>
   
-  <Contact client:visible bioData={processedDbData?.biography} />
-  <Footer client:visible bioData={processedDbData?.biography} />
+  <div style="min-height: 80vh;">
+    <Contact client:visible bioData={processedDbData?.biography} />
+  </div>
+  <div style="min-height: 30vh;">
+    <Footer client:visible bioData={processedDbData?.biography} />
+  </div>
   <CommentaryPlayer client:visible />
 
   <!-- Anamorphic Scope Bars intersection observer trigger script -->
