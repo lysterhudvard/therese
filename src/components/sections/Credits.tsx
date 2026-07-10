@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { useT } from "../../hooks/use-t";
+import { useT, useCommentaryStore, playCommentary, stopCommentary } from "../../hooks/use-t";
 import { type Credit, type FilterKey } from "../../types";
 
 export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
@@ -110,15 +110,17 @@ export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
 export function Credits({
   credits = [],
   reviewQuotes,
-  activeCommentaryUrl,
+  activeCommentaryUrl: propActiveCommentaryUrl,
   onPlayCommentary,
 }: {
   credits?: Credit[];
-  reviewQuotes?: string[];
+  reviewQuotes?: any[];
   activeCommentaryUrl?: string;
   onPlayCommentary?: (c: { title: string; role: string; url: string; text: string } | null) => void;
 }) {
   const { lang, t } = useT();
+  const { active } = useCommentaryStore();
+  const activeCommentaryUrl = active?.url || propActiveCommentaryUrl;
   const [filter, setFilter] = useState<FilterKey>("Alla");
   const [hoveredCredit, setHoveredCredit] = useState<Credit | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -146,7 +148,16 @@ export function Credits({
       "drama she feels especially strongly about",
       "present, vulnerable, precise",
   ], [lang]);
-  const activeQuotes = reviewQuotes || defaultQuotes;
+  const parsedReviewQuotes = useMemo(() => {
+    if (reviewQuotes && Array.isArray(reviewQuotes)) {
+      return reviewQuotes.map((q: any) => {
+        if (typeof q === "string") return q;
+        return lang === "sv" ? q.sv : q.en;
+      });
+    }
+    return undefined;
+  }, [reviewQuotes, lang]);
+  const activeQuotes = parsedReviewQuotes || defaultQuotes;
 
   const rows = useMemo(
     () => (filter === "Alla" ? credits : credits.filter((c) => c.type === filter)),
@@ -243,17 +254,15 @@ export function Credits({
                               e.stopPropagation();
                               const comm = c.commentary;
                               if (!comm) return;
-                              if (onPlayCommentary) {
-                                if (activeCommentaryUrl === comm.url) {
-                                  onPlayCommentary(null);
-                                } else {
-                                  onPlayCommentary({
-                                    title: c.title,
-                                    role: c.role[lang],
-                                    url: comm.url,
-                                    text: lang === "sv" ? comm.svText : comm.enText,
-                                  });
-                                }
+                              if (activeCommentaryUrl === comm.url) {
+                                stopCommentary();
+                              } else {
+                                playCommentary({
+                                  title: c.title,
+                                  role: c.role[lang],
+                                  url: comm.url,
+                                  text: lang === "sv" ? comm.svText : comm.enText,
+                                });
                               }
                             }}
                             data-hover

@@ -1,7 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Page from '../routes/index';
 import Hero from '../components/Hero.astro';
+import { Nav } from '../components/Nav';
+import { Spotlight } from '../components/ui/Spotlight';
+import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
+import { Biography } from '../components/sections/Biography';
+import { Portfolio } from '../components/sections/Portfolio';
+import { Showreels } from '../components/sections/Showreels';
+import { Credits } from '../components/sections/Credits';
+import { Voice } from '../components/sections/Voice';
+import { Contact } from '../components/sections/Contact';
+import { Footer } from '../components/sections/Footer';
+import { setGlobalDbData } from '../hooks/use-t';
 import { getPageData } from '../lib/supabase-server';
 import { getImage } from 'astro:assets';
 
@@ -77,6 +87,67 @@ const heroRoleSv = bio?.hero_role_sv || "Skådespelerska";
 const heroRoleEn = bio?.hero_role_en || "Actress";
 const heroBaseSv = bio?.hero_base_sv || "Malmö · Stockholm";
 const heroBaseEn = bio?.hero_base_en || "Malmö · Stockholm";
+
+// Seed the global DB translation state for SSR page generation
+setGlobalDbData(processedDbData);
+
+// Extract Biography Sections
+let parsedSections = undefined;
+if (processedDbData?.biography?.bio_sections) {
+  try {
+    parsedSections = typeof processedDbData.biography.bio_sections === "string"
+      ? JSON.parse(processedDbData.biography.bio_sections)
+      : processedDbData.biography.bio_sections;
+  } catch (e) {
+    console.error("Failed to parse bio sections:", e);
+  }
+}
+
+// Extract Image Credits
+let imageCredits = undefined;
+if (processedDbData?.biography?.bio_image_credits_sv || processedDbData?.biography?.bio_image_credits_en) {
+  imageCredits = {
+    sv: processedDbData.biography.bio_image_credits_sv || "",
+    en: processedDbData.biography.bio_image_credits_en || ""
+  };
+}
+
+// Extract Voice Image Data
+let voiceImageData = {
+  url: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650",
+  alt: "Therese — röst",
+  title: "",
+  caption: ""
+};
+if (processedDbData?.biography?.voice_settings) {
+  try {
+    const vs = typeof processedDbData.biography.voice_settings === "string"
+      ? JSON.parse(processedDbData.biography.voice_settings)
+      : processedDbData.biography.voice_settings;
+    if (vs) {
+      if (vs.hasOwnProperty("image_url") && vs.image_url) {
+        voiceImageData.url = vs.image_url;
+      }
+      if (vs.image_alt) voiceImageData.alt = vs.image_alt;
+      if (vs.image_title) voiceImageData.title = vs.image_title;
+      if (vs.image_caption) voiceImageData.caption = vs.image_caption;
+    }
+  } catch (e) {
+    console.error("Failed to parse voice settings image:", e);
+  }
+}
+
+// Extract Review Quotes
+let parsedReviewQuotes = undefined;
+if (processedDbData?.biography?.review_quotes) {
+  try {
+    parsedReviewQuotes = typeof processedDbData.biography.review_quotes === "string"
+      ? JSON.parse(processedDbData.biography.review_quotes)
+      : processedDbData.biography.review_quotes;
+  } catch (e) {
+    console.error("Failed to parse review quotes:", e);
+  }
+}
 ---
 
 <Layout title={seoTitle} description={seoDesc} image={seoImage} heroImage={heroImage}>
@@ -91,6 +162,113 @@ const heroBaseEn = bio?.hero_base_en || "Malmö · Stockholm";
     heroBaseEn={heroBaseEn}
   />
   
-  <!-- We mount the rest of the Page component as a React Island. Using client:idle ensures hydration happens off the critical path. -->
-  <Page initialDbData={processedDbData} client:idle />
+  <!-- Expose DB Data on window object for client-side hydration -->
+  <script is:inline define:vars={{ processedDbData }}>
+    window.__INITIAL_DB_DATA__ = processedDbData;
+  </script>
+
+  <!-- Mount independent React islands -->
+  <Spotlight client:idle />
+  <Nav client:idle />
+
+  <!-- Cinematic Anamorphic Scope Bars (driven purely by intersection observer class) -->
+  <div class="scope-bar-top pointer-events-none fixed inset-x-0 top-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"></div>
+  <div class="scope-bar-bottom pointer-events-none fixed inset-x-0 bottom-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"></div>
+
+  <Biography 
+    client:visible 
+    sections={parsedSections} 
+    imageCredits={imageCredits} 
+    faqs={processedDbData?.biography?.faqs} 
+  />
+  
+  <Portfolio client:visible images={processedDbData?.portfolioImages} />
+  
+  {processedDbData?.showreels && processedDbData.showreels.length > 0 ? (
+    <Showreels client:visible videos={processedDbData.showreels} />
+  ) : (
+    <Showreels client:visible />
+  )}
+  
+  <Credits
+    client:visible
+    credits={processedDbData?.credits}
+    reviewQuotes={parsedReviewQuotes}
+  />
+  
+  <Voice 
+    client:visible
+    imageUrl={voiceImageData.url} 
+    imageAlt={voiceImageData.alt} 
+    imageTitle={voiceImageData.title}
+    imageCaption={voiceImageData.caption}
+  />
+  
+  <Contact client:visible bioData={processedDbData?.biography} />
+  <Footer client:visible bioData={processedDbData?.biography} />
+  <CommentaryPlayer client:idle />
+
+  <!-- Anamorphic Scope Bars intersection observer trigger script -->
+  <script>
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          document.documentElement.classList.add('in-portfolio');
+        } else {
+          document.documentElement.classList.remove('in-portfolio');
+        }
+      },
+      {
+        rootMargin: "-10% 0px -10% 0px",
+        threshold: 0.05,
+      }
+    );
+    const portfolioEl = document.getElementById('portfolio');
+    if (portfolioEl) observer.observe(portfolioEl);
+  </script>
+
+  <!-- Dynamic JSON-LD structured data for SEO/AEO search optimization -->
+  {processedDbData && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify([
+        {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": "Therese Järvheden",
+          "jobTitle": "Skådespelerska",
+          "description": processedDbData.seo?.description_sv,
+          "image": processedDbData.portfolioImages?.[0]?.url || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+          "url": "https://theresejarvheden.se",
+          "knowsLanguage": ["sv", "en"],
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Malmö",
+            "addressCountry": "SE"
+          },
+          "sponsor": {
+            "@type": "Organization",
+            "name": "Schultzberg Agency",
+            "url": "https://schultzbergagency.com"
+          }
+        },
+        ...(processedDbData.biography?.faqs && Array.isArray(processedDbData.biography.faqs) && processedDbData.biography.faqs.length > 0
+          ? [
+              {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": processedDbData.biography.faqs.map((faq: any) => ({
+                  "@type": "Question",
+                  "name": faq.q_sv,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faq.a_sv
+                  }
+                }))
+              }
+            ]
+          : [])
+      ])}
+    />
+  )}
 </Layout>

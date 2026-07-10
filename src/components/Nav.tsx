@@ -29,11 +29,33 @@ export function LangSwitch({ className = "" }: { className?: string }) {
 }
 
 /* ---------- Navigation ---------- */
-export function Nav({ heroDone }: { heroDone: boolean }) {
+export function Nav({ heroDone: propHeroDone }: { heroDone?: boolean }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [logoSwapped, setLogoSwapped] = useState(false);
+
+  const [heroDone, setHeroDone] = useState(() => {
+    if (propHeroDone !== undefined) return propHeroDone;
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains("skip-intro") ||
+             document.documentElement.classList.contains("intro-finished");
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (propHeroDone !== undefined) {
+      setHeroDone(propHeroDone);
+      return;
+    }
+    if (typeof window === "undefined" || heroDone) return;
+    const handleDone = () => {
+      setHeroDone(true);
+    };
+    window.addEventListener("hero-done", handleDone);
+    return () => window.removeEventListener("hero-done", handleDone);
+  }, [propHeroDone, heroDone]);
 
   const isBypassed = typeof window !== "undefined" && document.documentElement.classList.contains("skip-intro");
 

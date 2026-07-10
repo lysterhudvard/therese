@@ -2,19 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { X, Pause, Play, VolumeX, Volume2 } from "lucide-react";
 
-export function CommentaryPlayer({
-  title,
-  role,
-  url,
-  text,
-  onClose,
-}: {
-  title: string;
-  role: string;
-  url: string;
-  text: string;
-  onClose: () => void;
-}) {
+import { useCommentaryStore } from "../../hooks/use-t";
+
+export function CommentaryPlayer() {
+  const { active, stopCommentary } = useCommentaryStore();
+
+  if (!active) return null;
+
+  const { title, role, url, text } = active;
+  const onClose = stopCommentary;
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

@@ -262,3 +262,17 @@ html.skip-intro .nav-header-menu-container {
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+
+/* Cinematic Anamorphic Scope Bars */
+.scope-bar-top {
+  transform: translateY(-100%);
+}
+.scope-bar-bottom {
+  transform: translateY(100%);
+}
+html.in-portfolio .scope-bar-top {
+  transform: translateY(0);
+}
+html.in-portfolio .scope-bar-bottom {
+  transform: translateY(0);
+}

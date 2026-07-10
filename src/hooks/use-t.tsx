@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 
 export type Lang = "sv" | "en";
 
@@ -210,10 +210,245 @@ export const I18N = {
 
 export type Dict = typeof I18N.sv;
 
+declare global {
+  interface Window {
+    __INITIAL_DB_DATA__?: any;
+    Lighthouse?: any;
+    __lighthouse__?: any;
+  }
+}
+
+// Global reactive states for Astro independent islands
+let currentLang: Lang = "sv";
+let globalDbData: any = null;
+const langListeners = new Set<(l: Lang) => void>();
+const dbDataListeners = new Set<(d: any) => void>();
+
+if (typeof window !== "undefined") {
+  const saved = window.localStorage.getItem("tj-lang") as Lang | null;
+  if (saved === "sv" || saved === "en") {
+    currentLang = saved;
+    document.documentElement.lang = saved;
+  }
+  if (window.__INITIAL_DB_DATA__) {
+    globalDbData = window.__INITIAL_DB_DATA__;
+  }
+}
+
+export const setGlobalDbData = (data: any) => {
+  globalDbData = data;
+  dbDataListeners.forEach((lis) => lis(data));
+};
+
+export const useT = (componentDbData?: any) => {
+  const [lang, setLangState] = useState<Lang>(currentLang);
+  
+  const getInitialDbData = () => {
+    if (globalDbData) return globalDbData;
+    if (componentDbData) return componentDbData;
+    if (typeof window !== "undefined" && window.__INITIAL_DB_DATA__) return window.__INITIAL_DB_DATA__;
+    return null;
+  };
+
+  const [dbData, setDbData] = useState<any>(getInitialDbData);
+
+  if (componentDbData && !globalDbData) {
+    globalDbData = componentDbData;
+  }
+
+  useEffect(() => {
+    const handleLangUpdate = (l: Lang) => setLangState(l);
+    langListeners.add(handleLangUpdate);
+    return () => {
+      langListeners.delete(handleLangUpdate);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleDataUpdate = (d: any) => setDbData(d);
+    dbDataListeners.add(handleDataUpdate);
+    return () => {
+      dbDataListeners.delete(handleDataUpdate);
+    };
+  }, []);
+
+  const setLang = (l: Lang) => {
+    if (currentLang === l) return;
+    currentLang = l;
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("tj-lang", l);
+      document.documentElement.lang = l;
+    }
+    langListeners.forEach((lis) => lis(l));
+  };
+
+  // Merge the translations exactly as before
+  const mergedT = useMemo(() => {
+    const deepClone = (obj: any): any => {
+      if (obj === null || typeof obj !== "object") return obj;
+      if (typeof obj === "function") return obj;
+      if (Array.isArray(obj)) return obj.map(deepClone);
+      const cloned: any = {};
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          cloned[key] = deepClone(obj[key]);
+        }
+      }
+      return cloned;
+    };
+
+    const base = deepClone(I18N[lang]);
+    
+    if (dbData?.biography) {
+      const bio = dbData.biography;
+      
+      let heroLine = lang === "sv" ? bio.hero_text_sv : bio.hero_text_en;
+      
+      if (bio.is_automated && dbData.credits && dbData.credits.length > 0) {
+        const currentProd = dbData.credits.find((c: any) => c.is_current_production);
+        if (currentProd) {
+          const title = currentProd.title;
+          const role = lang === "sv" ? currentProd.role.sv : currentProd.role.en;
+          const details = currentProd.network || (lang === "sv" ? currentProd.category.sv : currentProd.category.en);
+          heroLine = `"${title}" — ${role} (${details}).`;
+        }
+      }
+      
+      if (heroLine) {
+        base.hero.line = heroLine;
+      }
+
+      const heroRole = lang === "sv" ? bio.hero_role_sv : bio.hero_role_en;
+      if (heroRole) {
+        base.hero.role = heroRole;
+      }
+      
+      const heroBase = lang === "sv" ? bio.hero_base_sv : bio.hero_base_en;
+      if (heroBase) {
+        base.hero.base = heroBase;
+      }
+      
+      const heading = lang === "sv" ? bio.heading_sv : bio.heading_en;
+      if (heading) {
+        base.bio.heading = [heading, "", ""];
+      }
+      
+      const p1 = lang === "sv" ? bio.paragraph1_sv : bio.paragraph1_en;
+      if (p1) {
+        base.bio.p1Post = p1;
+        base.bio.p1Pre = "";
+        base.bio.p1Link = "";
+      }
+      const p2 = lang === "sv" ? bio.paragraph2_sv : bio.paragraph2_en;
+      if (p2) {
+        base.bio.p2 = [p2, "", "", "", "", "", "", "", ""];
+      }
+      const p3 = lang === "sv" ? bio.paragraph3_sv : bio.paragraph3_en;
+      if (p3) {
+        base.bio.p3 = [p3, "", "", "", ""];
+      }
+      
+      if (bio.dialects_sv || bio.languages_sv) {
+        const dialects = lang === "sv" ? bio.dialects_sv : bio.dialects_en;
+        const languages = lang === "sv" ? bio.languages_sv : bio.languages_en;
+        
+        base.bio.facts = [
+          [lang === "sv" ? "Bas" : "Base", "Malmö / Stockholm"],
+          [lang === "sv" ? "Dialekt" : "Dialect", dialects || ""],
+          [lang === "sv" ? "Språk" : "Language", languages || ""],
+        ];
+      } else if (bio.facts) {
+        try {
+          const parsedFacts = typeof bio.facts === "string" ? JSON.parse(bio.facts) : bio.facts;
+          if (Array.isArray(parsedFacts)) {
+            base.bio.facts = parsedFacts.map((f: any) => {
+              const key = lang === "sv" ? f.key_sv : f.key_en;
+              const val = lang === "sv" ? f.val_sv : f.val_en;
+              return [key, val];
+            });
+          }
+        } catch (e) {
+          console.error("Failed to parse bio facts:", e);
+        }
+      }
+
+      const dramaticQuote = lang === "sv" ? (bio.quote_sv || bio.quote_dramatic_sv) : (bio.quote_en || bio.quote_dramatic_en);
+      if (dramaticQuote) base.bio.lines.Dramatic = dramaticQuote;
+      
+      const comedicQuote = lang === "sv" ? bio.quote_comedic_sv : bio.quote_comedic_en;
+      if (comedicQuote) base.bio.lines.Comedic = comedicQuote;
+      
+      const classicalQuote = lang === "sv" ? bio.quote_classical_sv : bio.quote_classical_en;
+      if (classicalQuote) base.bio.lines.Classical = classicalQuote;
+
+      if (bio.voice_settings) {
+        try {
+          const vs = typeof bio.voice_settings === "string" ? JSON.parse(bio.voice_settings) : bio.voice_settings;
+          if (vs) {
+            if (lang === "sv") {
+              if (vs.heading_sv) base.voice.heading = [vs.heading_sv, "", ""];
+              if (vs.body_sv) base.voice.body = [vs.body_sv, "", ""];
+              if (vs.cta_sv) base.voice.cta = vs.cta_sv;
+              if (vs.demo_sv) base.voice.demo = vs.demo_sv;
+            } else {
+              if (vs.heading_en) base.voice.heading = [vs.heading_en, "", ""];
+              if (vs.body_en) base.voice.body = [vs.body_en, "", ""];
+              if (vs.cta_en) base.voice.cta = vs.cta_en;
+              if (vs.demo_en) base.voice.demo = vs.demo_en;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse voice settings:", e);
+        }
+      }
+    }
+    
+    return base as Dict;
+  }, [dbData, lang]);
+
+  return { lang, setLang, t: mergedT };
+};
+
+// Global reactive store for CommentaryPlayer
+export interface CommentaryData {
+  title: string;
+  role: string;
+  url: string;
+  text: string;
+}
+
+let activeCommentary: CommentaryData | null = null;
+const commentaryListeners = new Set<(c: CommentaryData | null) => void>();
+
+export function getActiveCommentary() {
+  return activeCommentary;
+}
+
+export function playCommentary(data: CommentaryData) {
+  activeCommentary = data;
+  commentaryListeners.forEach((lis) => lis(data));
+}
+
+export function stopCommentary() {
+  activeCommentary = null;
+  commentaryListeners.forEach((lis) => lis(null));
+}
+
+export function useCommentaryStore() {
+  const [active, setActive] = useState<CommentaryData | null>(activeCommentary);
+  useEffect(() => {
+    const handleCommentaryUpdate = (c: CommentaryData | null) => setActive(c);
+    commentaryListeners.add(handleCommentaryUpdate);
+    return () => {
+      commentaryListeners.delete(handleCommentaryUpdate);
+    };
+  }, []);
+  return { active, playCommentary, stopCommentary };
+}
+
+// Keep LangContext for backward compatibility
 export const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: Dict }>({
   lang: "sv",
   setLang: () => {},
   t: I18N.sv as Dict,
 });
-
-export const useT = () => useContext(LangContext);
