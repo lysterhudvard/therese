@@ -412,3 +412,19 @@ This document details critical bugs, layout errors, and interaction blocks found
   - **Framework Replacement:** Uninstalled `@astrojs/react`, `react`, and `react-dom`. Replaced them entirely with `@astrojs/preact` and `preact` (a drop-in replacement that is only 3kb).
   - **NPM Ecosystem Alias:** Because the project relies on heavily integrated React ecosystem packages (such as `lucide-react`, `framer-motion`, and `@radix-ui`), swapping React directly breaks their CJS `require('react')` calls. To resolve this cleanly across the entire `node_modules` structure, React was installed as an npm alias pointing to Preact (`npm install react@npm:@preact/compat react-dom@npm:@preact/compat`).
   - **Vite SSR Compilation:** Updated `astro.config.mjs` to set `ssr.noExternal: ['framer-motion', 'lucide-react', '@radix-ui/*', 'react-day-picker', 'react-hook-form', 'react-resizable-panels', 'recharts']`. This forces Vite to execute these packages as ES modules during SSR compilation, correctly processing the Preact compatibility hooks instead of throwing Node.js `createElement` or `useRef` errors. This final masterstroke successfully slashed the framework JavaScript footprint by ~80% without breaking any visual components.
+
+## 57. Global Section Spacing rhythm Optimization
+- **Symptom:** Inconsistent spacing between sections, particularly on desktop viewports, and the 30% spacing increase was not rendering properly on some sections.
+- **Root Cause:** A hardcoded `min-height: 80vh` (later `min-height: 104vh`) on desktop sections forced short sections (like Voice, Showreels, Contact) to stretch, producing huge empty gaps, while longer sections (like Credits) didn't stretch. Additionally, the Portfolio and Footer mobile/tablet paddings were smaller (`md:py-24` and `md:py-32`) than other sections (`md:py-48`).
+- **Resolution:** Removed the `min-height` desktop layout constraints entirely in `styles.css`. Implemented a unified global spacing system that applies exactly `5rem` (80px) top/bottom padding on mobile/tablet and `12rem` (192px) on desktop viewports to every section (including the Portfolio inner container and Footer), ensuring a mathematically and visually uniform 30% spacing rhythm across all sections.
+
+## 58. Cookie Consent Trigger Button Transparency
+- **Symptom:** The floating cookie trigger button (containing the arrow/chevron and cookie icon) had a dark semi-opaque background (`bg-ink/95`) and blur effect that blocked underlying layout content.
+- **Root Cause:** The button's classes included a solid background color and heavy backdrop-blur.
+- **Resolution:** Modified the trigger button class list in `CookieConsent.tsx` to use a transparent background (`bg-transparent`) and removed the backdrop-blur, while keeping its border (`border-bone/15` and hover border state `hover:border-ember/40`) to maintain a sleek, clean appearance that respects page visibility.
+
+## 59. Meriter (Credits) Section Action Button Swedish Wording
+- **Symptom:** The action buttons linking to external pages in the "Meriter" (Credits) section used the text "Se" in Swedish, which was requested to be changed to "Titta".
+- **Root Cause:** The label was statically defined as `{lang === "sv" ? "Se" : "Watch"}`.
+- **Resolution:** Updated the button label to use "Titta" (`{lang === "sv" ? "Titta" : "Watch"}`) and revised the accessibility label (`aria-label`) to `"Titta på ${c.title}"` to match the translation phrasing.
+

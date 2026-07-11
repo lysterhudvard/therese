@@ -234,3 +234,13 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Integrated Privacy Policy Modal**: Displays the privacy policy directly inside the cookie banner to prevent redirecting users away from the main landing page, maintaining a cinematic experience.
 - **Persistent Consent & Easy Withdrawal**: Preferences are saved locally in the browser's `localStorage` and can be easily revised or withdrawn at any time by clicking the "Cookie-inställningar" button integrated into the footer metadata row.
 - **Performance Optimized**: Implemented with inline SVGs instead of third-party icon libraries to prevent client-side JS bundle bloat, aligned with Astro's performance principles.
+
+### 44. Unified Section Spacing & Layout Rhythm
+- **Global Spacing System**: Removed all desktop `min-height` constraints on sections to prevent layout stretching. Established a completely uniform padding system in `styles.css` applying exactly `5rem` (80px) on mobile/tablet and `12rem` (192px) on desktop to every page section (Biography, Portfolio mobile, Showreels, Credits, Voice, Contact, and Footer). This delivers a consistent, 30% increased vertical rhythm across all sections and screen sizes.
+
+### 45. Cookie Trigger Aesthetics
+- **Transparent Trigger Button**: Refined the floating cookie trigger button (`CookieConsent.tsx`) to use a transparent background and removed backdrop blur so that the underlying layout remains visible, while keeping its border and hover states.
+
+### 46. Translation and Label Updates
+- **Action Button Swedish Wording**: Updated the external link action buttons in the Meriter (Credits) section from `"Se"` to `"Titta"` for Swedish locales, and updated the accessibility aria-label accordingly.
+
