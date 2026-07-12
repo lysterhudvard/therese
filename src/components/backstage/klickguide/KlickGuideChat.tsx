@@ -2,6 +2,16 @@ import React from "react";
 import { Sparkles, RotateCcw, Sliders, X, ArrowLeft, ArrowRight, CheckCircle, HelpCircle, Send } from "lucide-react";
 import { Step } from "./types";
 
+const SparklesIcon = Sparkles as any;
+const RotateCcwIcon = RotateCcw as any;
+const SlidersIcon = Sliders as any;
+const XIcon = X as any;
+const ArrowLeftIcon = ArrowLeft as any;
+const ArrowRightIcon = ArrowRight as any;
+const CheckCircleIcon = CheckCircle as any;
+const HelpCircleIcon = HelpCircle as any;
+const SendIcon = Send as any;
+
 interface KlickGuideChatProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -58,8 +68,9 @@ export function KlickGuideChat({
   const suggestions = [
     "Hur ändrar jag biografi och FAQ?",
     "Uppdatera status under Nu Aktuellt",
-    "Hur byter jag showreels?",
     "Ladda upp röstinspelning till merit",
+    "Ändra min agent-epost / sociala länkar",
+    "Uppdatera eftertexter eller slutbild",
     "Sökoptimera hemsidan (SEO)",
   ];
 
@@ -68,7 +79,7 @@ export function KlickGuideChat({
       {/* Header */}
       <div className="bg-stage/40 border-b border-bone/10 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sparkles size={16} className="text-ember" />
+          <SparklesIcon size={16} className="text-ember" />
           <div>
             <h3 className="font-display text-xs uppercase tracking-wider text-bone">Klick-guiden</h3>
             <span className="text-[8px] font-mono text-bone/45 tracking-widest uppercase">Interaktiv CMS-assistent</span>
@@ -80,7 +91,7 @@ export function KlickGuideChat({
             className="p-1.5 text-bone/45 hover:text-bone hover:bg-bone/10 rounded transition-colors cursor-pointer"
             title="Rensa chatt & återställ"
           >
-            <RotateCcw size={13} />
+            <RotateCcwIcon size={13} />
           </button>
           <button
             onClick={() => setShowConfig(!showConfig)}
@@ -89,13 +100,13 @@ export function KlickGuideChat({
             }`}
             title="Inställningar & Gemini API-nyckel"
           >
-            <Sliders size={13} />
+            <SlidersIcon size={13} />
           </button>
           <button
             onClick={() => setIsOpen(false)}
             className="p-1.5 text-bone/45 hover:text-bone hover:bg-bone/10 rounded transition-colors cursor-pointer"
           >
-            <X size={13} />
+            <XIcon size={13} />
           </button>
         </div>
       </div>
@@ -219,7 +230,7 @@ export function KlickGuideChat({
                 className="p-2 border border-bone/10 text-bone/60 hover:text-bone hover:border-bone disabled:opacity-20 transition-all rounded cursor-pointer"
                 title="Föregående steg"
               >
-                <ArrowLeft size={12} />
+                <ArrowLeftIcon size={12} />
               </button>
 
               <button
@@ -228,11 +239,11 @@ export function KlickGuideChat({
               >
                 {activeGuide.currentStepIndex === activeGuide.steps.length - 1 ? (
                   <>
-                    Klar <CheckCircle size={10} />
+                    Klar <CheckCircleIcon size={10} />
                   </>
                 ) : (
                   <>
-                    Nästa <ArrowRight size={10} />
+                    Nästa <ArrowRightIcon size={10} />
                   </>
                 )}
               </button>
@@ -275,7 +286,7 @@ export function KlickGuideChat({
             {messages.length === 1 && !loading && (
               <div className="pt-2 space-y-2 text-left">
                 <span className="block text-[8px] font-mono uppercase tracking-widest text-bone/35 flex items-center gap-1">
-                  <HelpCircle size={10} /> Snabba förslag:
+                  <HelpCircleIcon size={10} /> Snabba förslag:
                 </span>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {suggestions.map((s, idx) => (
@@ -314,7 +325,7 @@ export function KlickGuideChat({
                 disabled={loading || !query.trim()}
                 className="px-4 py-1.5 bg-ember hover:bg-ember/90 disabled:bg-bone/10 text-ink disabled:text-bone/35 rounded-sm transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer text-xs font-mono font-bold uppercase tracking-wider"
               >
-                Skicka <Send size={10} />
+                Skicka <SendIcon size={10} />
               </button>
             </div>
           </form>

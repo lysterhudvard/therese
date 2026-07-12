@@ -95,6 +95,10 @@ export function KlickGuideWidget({ activeTab, setActiveTab }: KlickGuideWidgetPr
         setActiveTab("credits");
       } else if (target.startsWith("klick-voice-") && activeTab !== "voice") {
         setActiveTab("voice");
+      } else if (target.startsWith("klick-contact-") && activeTab !== "contact") {
+        setActiveTab("contact");
+      } else if (target.startsWith("klick-curtain-") && activeTab !== "curtain") {
+        setActiveTab("curtain");
       } else if (target.startsWith("klick-seo-") && activeTab !== "seo") {
         setActiveTab("seo");
       } else if (target.startsWith("klick-media-") && activeTab !== "media") {

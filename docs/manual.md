@@ -175,11 +175,12 @@ graph TD
 1. **Fråga chatten:** Skriv en naturlig fråga på svenska, till exempel:
    * *"Hur ändrar jag röstinspelningar på mina meriter?"*
    * *"Jag vill uppdatera min biografi"*
-   * *"Hur lägger jag till en ny showreel?"*
-   * *"Hur ändrar jag sökmotorsoptimering?"*
+   * *"Ändra min agent-epost eller sociala länkar"*
+   * *"Hur ändrar jag eftertexterna eller slutbilden?"*
+   * *"Hur laddar jag upp filer i mediebiblioteket?"*
 2. **Kör turen:** Systemet startar en guidad tur. Du leds då steg-för-steg:
    * Systemet **växlar automatiskt flik** i CMS-sidomenyn till den flik där ändringen utförs.
-   * Det specifika inmatningsfältet, knappen eller uppladdningsytan **börjar blinka med en varm orange glöd** och rullas mjukt in i mitten av skärmen.
+   * Det specifika inmatningsfältet, knappen eller uppladdningsytan **börjar blinka med en varm orange/grön glöd** och rullas mjukt in i mitten av skärmen.
    * En instruktionsruta visar exakt vad du förväntas göra i det steget.
 3. **Navigering:** Klicka på **Nästa** för att gå till nästa steg, **Bakåt** för föregående, eller **Avbryt** för att avsluta turen när som helst.
 
@@ -190,7 +191,7 @@ graph TD
   3. `gemini-2.5-flash`
   4. `gemini-2.5-flash-lite`
 * **API-nyckel:** Klicka på kugghjuls-/inställningsikonen (**Sliders**) i guidens rubrikrad. Här kan du ange och spara din personliga Gemini API-nyckel. Nyckeln sparas säkert lokalt i din webbläsare.
-* **Offline-läge:** Om ingen API-nyckel har angetts, eller om anropen till alla modeller blockeras, använder Klick-guiden en inbyggd offline-simulering som kan matcha och guida dig igenom alla vanliga CMS-sysslor utan avbrott eller krascher!
+* **Offline-läge:** Om ingen API-nyckel har angetts, eller om anropen till alla modeller blockeras, använder Klick-guiden en inbyggd offline-simulering som kan matcha och guida dig igenom alla 10 CMS-avsnitt och vanliga uppgifter (t.ex. biografi, status, meriter, röst, kontakt, eftertexter, bilder och mediebiblioteket) helt lokalt!
 
 ---
 

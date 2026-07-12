@@ -8,6 +8,10 @@ import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 import { GalleryImage } from "./portfolio/types";
 import { PortfolioCardItem } from "./portfolio/PortfolioCardItem";
 
+const SaveIcon = Save as any;
+const ImageIconComponent = ImageIcon as any;
+const UploadIcon = Upload as any;
+
 export function DashboardPortfolio() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -246,7 +250,7 @@ export function DashboardPortfolio() {
         <div className="space-y-4">
           <div className="border-b border-bone/5 pb-2">
             <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-              <ImageIcon size={14} className="text-ember" /> Gällande Portfoliobilder & Sortering
+              <ImageIconComponent size={14} className="text-ember" /> Gällande Portfoliobilder & Sortering
             </h3>
           </div>
 
@@ -271,10 +275,11 @@ export function DashboardPortfolio() {
                   id="portfolio-file-upload-main"
                 />
                 <label
+                  id="klick-portfolio-upload"
                   htmlFor="portfolio-file-upload-main"
                   className="flex items-center justify-center gap-2 px-6 py-3 bg-ember/10 hover:bg-ember/20 border border-ember/30 text-ember text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full"
                 >
-                  <Upload size={14} />
+                  <UploadIcon size={14} />
                   {isUploading ? "Laddar upp..." : "Ladda upp från dator"}
                 </label>
               </div>
@@ -286,7 +291,7 @@ export function DashboardPortfolio() {
                 onClick={() => setIsMediaPickerOpen(true)}
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[10px] font-mono uppercase tracking-widest rounded-sm cursor-pointer transition-colors w-full sm:w-auto"
               >
-                <ImageIcon size={14} />
+                <ImageIconComponent size={14} />
                 Välj från Mediebibliotek
               </button>
             </div>
@@ -302,6 +307,7 @@ export function DashboardPortfolio() {
                     Bild-URL
                   </label>
                   <input
+                    id="klick-portfolio-url-input"
                     type="text"
                     placeholder="https://exempel.se/bild.jpg"
                     value={newImageUrl}
@@ -323,6 +329,7 @@ export function DashboardPortfolio() {
                 </div>
               </div>
               <button
+                id="klick-portfolio-url-add"
                 type="button"
                 onClick={handleAddImageUrl}
                 className="w-full py-1.5 bg-bone/10 hover:bg-bone/20 text-bone text-[9px] font-mono uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
@@ -362,7 +369,7 @@ export function DashboardPortfolio() {
               <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
-                <Save size={12} />
+                <SaveIcon size={12} />
                 Spara ändringar
               </>
             )}

@@ -3,6 +3,9 @@ import { toast } from "sonner";
 import { Save, Link2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
+const SaveIcon = Save as any;
+const LinkIcon = Link2 as any;
+
 export function DashboardContact() {
   const [agentEmail, setAgentEmail] = useState("");
   const [voiceEmail, setVoiceEmail] = useState("");
@@ -127,13 +130,14 @@ export function DashboardContact() {
 
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
         <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Link2 size={14} className="text-ember" /> Kontaktuppgifter & E-post
+          <LinkIcon size={14} className="text-ember" /> Kontaktuppgifter & E-post
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Agent E-post</label>
             <input
+              id="klick-contact-agent-email"
               type="email"
               value={agentEmail}
               onChange={(e) => setAgentEmail(e.target.value)}
@@ -144,6 +148,7 @@ export function DashboardContact() {
           <div className="space-y-2">
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Röst E-post (Direkt)</label>
             <input
+              id="klick-contact-voice-email"
               type="email"
               value={voiceEmail}
               onChange={(e) => setVoiceEmail(e.target.value)}
@@ -156,13 +161,14 @@ export function DashboardContact() {
 
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
         <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Link2 size={14} className="text-ember" /> Sociala Medier & Profiler
+          <LinkIcon size={14} className="text-ember" /> Sociala Medier & Profiler
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Instagram Länk</label>
             <input
+              id="klick-contact-instagram"
               type="url"
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
@@ -203,6 +209,7 @@ export function DashboardContact() {
           <div className="space-y-2">
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">IMDb Profil-Länk</label>
             <input
+              id="klick-contact-imdb"
               type="url"
               value={imdb}
               onChange={(e) => setImdb(e.target.value)}
@@ -225,7 +232,7 @@ export function DashboardContact() {
 
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
         <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Link2 size={14} className="text-ember" /> Anpassade Länkar
+          <LinkIcon size={14} className="text-ember" /> Anpassade Länkar
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -317,6 +324,7 @@ export function DashboardContact() {
 
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
+          id="klick-contact-save"
           type="submit"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
@@ -325,7 +333,7 @@ export function DashboardContact() {
             <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Save size={12} />
+              <SaveIcon size={12} />
               Spara ändringar
             </>
           )}

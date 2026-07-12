@@ -13,6 +13,11 @@ interface FooterCreditItem {
   href: string;
 }
 
+const SaveIcon = Save as any;
+const PlusIcon = Plus as any;
+const TrashIcon = Trash2 as any;
+const ListIcon = List as any;
+
 export function DashboardCurtain() {
   const [footerImage, setFooterImage] = useState("https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000028-5883458837/image-crop-200000014-6.jpeg?ph=a6c2528650");
   const [footerImageAlt, setFooterImageAlt] = useState("");
@@ -207,12 +212,14 @@ export function DashboardCurtain() {
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Liten Sidfotsbild URL</label>
               <div className="flex gap-2">
                 <input
+                  id="klick-curtain-image"
                   type="text"
                   value={footerImage}
                   onChange={(e) => setFooterImage(e.target.value)}
                   className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                 />
                 <button
+                  id="klick-curtain-image-media"
                   type="button"
                   onClick={() => setIsMediaPickerOpen(true)}
                   className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
@@ -226,6 +233,7 @@ export function DashboardCurtain() {
               <div>
                 <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Alt-Text (SEO)</label>
                 <input
+                  id="klick-curtain-image-alt"
                   type="text"
                   value={footerImageAlt}
                   onChange={(e) => setFooterImageAlt(e.target.value)}
@@ -284,6 +292,7 @@ export function DashboardCurtain() {
             <div className="space-y-2 font-sans">
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Sluttext (Svenska)</label>
               <input
+                id="klick-curtain-end-sv"
                 type="text"
                 value={footerEndSv}
                 onChange={(e) => setFooterEndSv(e.target.value)}
@@ -308,14 +317,15 @@ export function DashboardCurtain() {
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
         <div className="flex justify-between items-center border-b border-bone/5 pb-2">
           <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-            <List size={14} className="text-ember" /> Rullande Eftertext-rader (Scrolling Text)
+            <ListIcon size={14} className="text-ember" /> Rullande Eftertext-rader (Scrolling Text)
           </h3>
           <button
+            id="klick-curtain-add-credit"
             type="button"
             onClick={addFooterCredit}
             className="flex items-center gap-1 px-3 py-1 bg-bone/10 hover:bg-bone/20 text-bone hover:text-ember text-[9px] font-mono uppercase tracking-wider transition-colors duration-300 rounded-sm cursor-pointer"
           >
-            <Plus size={10} /> Lägg till rad
+            <PlusIcon size={10} /> Lägg till rad
           </button>
         </div>
 
@@ -328,7 +338,7 @@ export function DashboardCurtain() {
                 className="absolute top-3 right-3 text-bone/30 hover:text-ember transition-colors cursor-pointer"
                 title="Ta bort eftertext"
               >
-                <Trash2 size={12} />
+                <TrashIcon size={12} />
               </button>
               
               <span className="text-[8px] font-mono text-bone/45 uppercase tracking-wider">Rad #{index + 1}</span>
@@ -402,6 +412,7 @@ export function DashboardCurtain() {
 
       <div className="flex justify-end pt-4 border-t border-bone/10">
         <button
+          id="klick-curtain-save"
           type="submit"
           disabled={isSaving}
           className="flex items-center gap-2 px-6 py-3 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
@@ -410,7 +421,7 @@ export function DashboardCurtain() {
             <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Save size={12} />
+              <SaveIcon size={12} />
               Spara ändringar
             </>
           )}

@@ -244,3 +244,10 @@ This document tracks completed features, animation systems, layout updates, and 
 ### 46. Translation and Label Updates
 - **Action Button Swedish Wording**: Updated the external link action buttons in the Meriter (Credits) section from `"Se"` to `"Titta"` for Swedish locales, and updated the accessibility aria-label accordingly.
 
+### 47. Klick-guiden Perfecting (Exhaustive CMS Navigation & Offline Fallback)
+- **Interactive targets for Akt VII & VIII**: Added unique DOM IDs (`klick-contact-*` and `klick-curtain-*`) to inputs and action buttons inside `DashboardContact.tsx` and `DashboardCurtain.tsx` (such as agent e-post, voice e-post, Instagram, IMDb links, sidfotsbild, alt-text, svenska sluttext, lägg till rad, and save buttons).
+- **Auto Tab Switching**: Hooked up the new prefixes (`klick-contact-` and `klick-curtain-`) to the state manager inside `KlickGuideWidget.tsx` to automatically redirect the user's active tab when a guide step highlights these sections.
+- **Offline Simulation & Suggestion Chips**: Expanded the offline fallback engine in `gemini.ts` to support fully localized interactive tours for Kontaktinfo, Ridåfall/Eftertexter, and Mediebiblioteket, and updated recommendation chips in `KlickGuideChat.tsx` to show these guides immediately.
+- **Documentation Alignment**: Synchronized `docs/manual.md` with the new capabilities.
+
+

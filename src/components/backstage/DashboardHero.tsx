@@ -4,6 +4,12 @@ import { Sparkles, ToggleLeft, ToggleRight, Save, Image } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { MediaPickerModal } from "./MediaPickerModal";
 
+const SparklesIcon = Sparkles as any;
+const ToggleLeftIcon = ToggleLeft as any;
+const ToggleRightIcon = ToggleRight as any;
+const SaveIcon = Save as any;
+const ImageIcon = Image as any;
+
 export function DashboardHero() {
   const [currentTextSv, setCurrentTextSv] = useState("");
   const [currentTextEn, setCurrentTextEn] = useState("");
@@ -164,9 +170,9 @@ export function DashboardHero() {
           className="text-bone/60 hover:text-ember transition-colors cursor-pointer"
         >
           {isAutomated ? (
-            <ToggleRight size={38} className="text-ember" />
+            <ToggleRightIcon size={38} className="text-ember" />
           ) : (
-            <ToggleLeft size={38} className="text-bone/25" />
+            <ToggleLeftIcon size={38} className="text-bone/25" />
           )}
         </button>
       </div>
@@ -214,7 +220,7 @@ export function DashboardHero() {
               }}
               className="text-[8px] font-mono tracking-widest text-ember/60 hover:text-ember uppercase transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-20"
             >
-              <Sparkles size={8} /> Auto-översätt
+              <SparklesIcon size={8} /> Auto-översätt
             </button>
           </div>
           <div>
@@ -248,6 +254,7 @@ export function DashboardHero() {
               </label>
               <div className="flex gap-2">
                 <input
+                  id="klick-hero-image"
                   type="text"
                   value={heroImage}
                   onChange={(e) => setHeroImage(e.target.value)}
@@ -255,6 +262,7 @@ export function DashboardHero() {
                   className="flex-1 bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
                 />
                 <button
+                  id="klick-hero-image-media"
                   type="button"
                   onClick={() => setIsMediaPickerOpen(true)}
                   className="px-4 py-3 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-xs font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
@@ -270,6 +278,7 @@ export function DashboardHero() {
                   Alt-Text (SEO - Sökbarhet)
                 </label>
                 <input
+                  id="klick-hero-image-alt"
                   type="text"
                   value={heroImageAlt}
                   onChange={(e) => setHeroImageAlt(e.target.value)}
@@ -343,7 +352,7 @@ export function DashboardHero() {
               </div>
             ) : (
               <div className="aspect-video w-32 border border-dashed border-bone/10 bg-stage/5 rounded-sm flex flex-col items-center justify-center text-bone/20 font-mono text-[9px]">
-                <Image size={18} className="mb-1" />
+                <ImageIcon size={18} className="mb-1" />
                 Ingen bild
               </div>
             )}
@@ -424,7 +433,7 @@ export function DashboardHero() {
             <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Save size={12} />
+              <SaveIcon size={12} />
               Spara ändringar
             </>
           )}

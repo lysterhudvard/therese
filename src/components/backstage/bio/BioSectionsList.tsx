@@ -2,6 +2,9 @@ import React from "react";
 import { Trash2, Quote } from "lucide-react";
 import { BioSection } from "./types";
 
+const QuoteIcon = Quote as any;
+const TrashIcon = Trash2 as any;
+
 interface BioSectionsListProps {
   bioSections: BioSection[];
   addBioSection: () => void;
@@ -21,7 +24,7 @@ export function BioSectionsList({
     <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
       <div className="flex items-center justify-between border-b border-bone/5 pb-2">
         <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-          <Quote size={14} className="text-ember" /> Biografisektioner (Dynamic Sections)
+          <QuoteIcon size={14} className="text-ember" /> Biografisektioner (Dynamic Sections)
         </h3>
         <button
           type="button"
@@ -49,7 +52,7 @@ export function BioSectionsList({
                   onClick={() => removeBioSection(section.id)}
                   className="text-bone/35 hover:text-red-400 transition-colors cursor-pointer animate-pulse-slow"
                 >
-                  <Trash2 size={12} />
+                  <TrashIcon size={12} />
                 </button>
               </div>
 
@@ -115,6 +118,7 @@ export function BioSectionsList({
                     </label>
                     <div className="flex gap-2">
                       <input
+                        id={idx === 0 ? "klick-bio-image" : undefined}
                         type="text"
                         value={section.image}
                         onChange={(e) => updateBioSection(section.id, { image: e.target.value })}
@@ -122,6 +126,7 @@ export function BioSectionsList({
                         className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                       />
                       <button
+                        id={idx === 0 ? "klick-bio-image-media" : undefined}
                         type="button"
                         onClick={() => openMediaPickerForSection(section.id)}
                         className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
@@ -137,6 +142,7 @@ export function BioSectionsList({
                         Alt-Text (SEO)
                       </label>
                       <input
+                        id={idx === 0 ? "klick-bio-image-alt" : undefined}
                         type="text"
                         value={section.image_alt || ""}
                         onChange={(e) => updateBioSection(section.id, { image_alt: e.target.value })}
