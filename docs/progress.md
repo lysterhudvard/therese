@@ -250,4 +250,14 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Offline Simulation & Suggestion Chips**: Expanded the offline fallback engine in `gemini.ts` to support fully localized interactive tours for Kontaktinfo, Ridåfall/Eftertexter, and Mediebiblioteket, and updated recommendation chips in `KlickGuideChat.tsx` to show these guides immediately.
 - **Documentation Alignment**: Synchronized `docs/manual.md` with the new capabilities.
 
+### 48. Klick-guiden Target and Routing Enhancements
+- **Visible Portfolio Highlight**: Assigned the `id="klick-portfolio-upload"` directly to the visible upload label, correcting the missing highlight overlay step.
+- **Section-Specific Image Support**: Integrated specific targeting for Biography moods, SEO OG-images, and Footer sketch-images, and updated the AI and fallback router to evaluate these requests first, resolving routing loops.
+
+### 49. Preact Compilation & Type Safety
+- **Lucide JSX Cast Fixes**: Cast `Quote`, `Trash2`, `ImageIcon`, `Upload`, and `Save` to `any` variables within the backstage panels, resolving TS2786 build-time errors caused by Preact/React compatibility mismatches.
+
+### 50. Performance Critical Path Optimization
+- **Idle Hydration for Cookie Banner**: Swapped the client directive of `<CookieConsent />` from `client:load` to `client:idle`, successfully resolving Lighthouse critical request chain blocks and restoring SpeedInsights performance scores.
+
 

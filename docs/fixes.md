@@ -428,3 +428,18 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** The label was statically defined as `{lang === "sv" ? "Se" : "Watch"}`.
 - **Resolution:** Updated the button label to use "Titta" (`{lang === "sv" ? "Titta" : "Watch"}`) and revised the accessibility label (`aria-label`) to `"Titta på ${c.title}"` to match the translation phrasing.
 
+## 60. Klick-guiden Missing Step 2 (Portfolio) and Vague Image Requests
+- **Symptom:** When triggering the Klick-guide tour for portfolio upload, the second step (instructing to upload a photo) would hover empty space, missing the button highlighting. Also, asking general questions on how to "change an image" in a specific section directed users to general Portfolio gallery uploads instead of their respective sections.
+- **Root Cause:** The `id="klick-portfolio-upload"` was missing from the visible label element trigger (only attached to a hidden file input). Additionally, the fallback Gemini router checked general photo keywords before checking specific sections (like Bio moods, SEO OG-images, or Footer sketch-images).
+- **Resolution:** Assigned `id="klick-portfolio-upload"` to the visible dashboard upload label. Added target IDs (`klick-bio-image`, `klick-bio-image-media`, `klick-curtain-image-media`, `klick-seo-upload-img`) for section-specific images. Restructured the Gemini router in `gemini.ts` to process specific biography, SEO, and footer curtain/scenskiss image requests first, preventing vague questions from routing to portfolio upload.
+
+## 61. Lucide React Icon JSX Type Errors under Preact Compiler
+- **Symptom:** Rerunning the TypeScript compilation threw multiple `TS2786` errors: `'Quote' / 'Trash2' / 'ImageIcon' / 'Upload' / 'Save' cannot be used as a JSX component` in `BioSectionsList.tsx` and `DashboardPortfolio.tsx`.
+- **Root Cause:** In the Preact framework migration, React compatibility typings clashed, causing the compiler to reject standard Lucide-react functional components as valid JSX elements.
+- **Resolution:** Cast Lucide icon imports to `any` variables (e.g. `const QuoteIcon = Quote as any;`, `const SaveIcon = Save as any;`) and rendered the casted variables as JSX elements, successfully returning compilation errors to zero.
+
+## 62. SpeedInsights Performance Drop After Cookie Consent Addition
+- **Symptom:** Google PageSpeed and SpeedInsights performance scores decreased due to a new "Avoid chaining critical requests" Lighthouse warning pointing to the `CookieConsent` JavaScript bundles.
+- **Root Cause:** In `index.astro`, `<CookieConsent />` was mounted using the `client:load` directive, forcing the browser to fetch and execute it during initial page load, blocking critical rendering metrics.
+- **Resolution:** Updated the directive to `<CookieConsent client:idle />`. Since the banner has an intentional `3.5s` delay before showing anyway, this safely defers the script download and hydration until the browser is fully idle, removing it from the critical request chain.
+

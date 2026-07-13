@@ -192,6 +192,7 @@ graph TD
   4. `gemini-2.5-flash-lite`
 * **API-nyckel:** Klicka på kugghjuls-/inställningsikonen (**Sliders**) i guidens rubrikrad. Här kan du ange och spara din personliga Gemini API-nyckel. Nyckeln sparas säkert lokalt i din webbläsare.
 * **Offline-läge:** Om ingen API-nyckel har angetts, eller om anropen till alla modeller blockeras, använder Klick-guiden en inbyggd offline-simulering som kan matcha och guida dig igenom alla 10 CMS-avsnitt och vanliga uppgifter (t.ex. biografi, status, meriter, röst, kontakt, eftertexter, bilder och mediebiblioteket) helt lokalt!
+* **Smarta bild-vägar:** Guiden skiljer intelligent på olika typer av bildförfrågningar. Om du frågar om att byta "huvudbild/hero-bild", "porträtt/biografibilder", "delningsbild/SEO-bild" eller "sidfotsbild/scenskiss", tar guiden dig direkt till rätt sektion och fält istället för att felaktigt skicka dig till den allmänna portföljuppladdningen.
 
 ---
 
