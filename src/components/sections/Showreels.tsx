@@ -9,7 +9,7 @@ import { useT } from "../../hooks/use-t";
 import { VIDEOS, type VideoItem } from "./ShowreelsData";
 import { TheaterPlayer } from "./showreels/TheaterPlayer";
 
-export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
+export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoItem[], teaser?: boolean }) {
   const { lang } = useT();
   const [activeVideo, setActiveVideo] = useState<VideoItem>(videos[0] || VIDEOS[0]);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
@@ -82,7 +82,7 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
         />
 
         {/* Thumbnails Selector Row */}
-        {displayedVideos.length > 0 && (
+        {!teaser && displayedVideos.length > 0 && (
           <div
             className={`mt-12 grid gap-6 max-w-[1400px] mx-auto ${
               showAllVideos
@@ -173,6 +173,19 @@ export function Showreels({ videos = VIDEOS }: { videos?: VideoItem[] }) {
                 </span>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Teaser CTA */}
+        {teaser && (
+          <div className="mt-16 text-center">
+            <a 
+              href="/press"
+              className="inline-flex items-center gap-3 border border-bone/20 bg-stage/10 hover:border-ember hover:bg-ember/5 px-8 py-4 font-mono text-[11px] tracking-[0.25em] uppercase text-bone hover:text-ember transition-all rounded-sm shadow-sm"
+            >
+              {lang === "sv" ? "Se fler produktioner" : "View more productions"}
+              <ArrowRight size={16} />
+            </a>
           </div>
         )}
       </motion.div>

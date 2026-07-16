@@ -46,8 +46,14 @@ export function Nav() {
 
   useEffect(() => {
     const isBypassed = document.documentElement.classList.contains("skip-intro");
-    if (isBypassed) {
+    // If not on the homepage, immediately skip intro delay
+    const isHomePage = window.location.pathname === "/";
+    if (isBypassed || !isHomePage) {
       setHeroDone(true);
+      if (!isHomePage) {
+        setLogoSwapped(true);
+        document.documentElement.classList.add("logo-swapped");
+      }
       return;
     }
     const timer = setTimeout(() => {
@@ -74,18 +80,13 @@ export function Nav() {
   }, [scrolled]);
 
   const links = [
-    { id: "bio", label: t.nav.bio },
-    { id: "portfolio", label: t.nav.portfolio },
-    { id: "showreels", label: t.nav.showreels },
-    { id: "credits", label: t.nav.credits },
-    { id: "voice", label: t.nav.voice },
-    { id: "contact", label: t.nav.contact },
+    { id: "bio", label: "Start", href: "/" },
+    { id: "credits", label: "CV", href: "/cv" },
+    { id: "voice", label: "Röst & Voice Over", href: "/rost" },
+    { id: "portfolio", label: "Media & Foton", href: "/press" },
+    { id: "faq", label: "FAQ", href: "/faq" },
+    { id: "contact", label: "Kontakt", href: "/kontakt" },
   ];
-
-  const go = (id: string) => {
-    setOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   return (
     <header
@@ -96,27 +97,27 @@ export function Nav() {
       <div
         className={`flex items-center justify-between pl-4 pr-6 lg:px-10 transition-all duration-700 ease-in-out ${scrolled ? "py-5 lg:py-3.5" : "py-7 lg:py-5"}`}
       >
-        <button
-          onClick={() => go("top")}
+        <a
+          href="/"
           style={open ? { opacity: 1, pointerEvents: "auto" } : undefined}
           className="font-display text-[14px] lg:text-[15px] tracking-[0.32em] uppercase text-bone flex items-center gap-1.5 nav-header-logo"
         >
           <span className="italic font-light">Therese</span>
           <span>Järvheden</span>
-        </button>
+        </a>
         <div
           style={{ opacity: heroDone ? 1 : 0, transition: 'opacity 0.5s' }}
           className={`flex items-center ${!heroDone ? "pointer-events-none" : ""} nav-header-menu-container`}
         >
           <nav className="hidden lg:flex items-center gap-9 text-[11px] uppercase tracking-[0.32em] text-bone/80">
             {links.map((l) => (
-              <button
+              <a
                 key={l.id}
-                onClick={() => go(l.id)}
-                className="hover:text-bone transition-colors px-3 py-1.5 rounded-sm"
+                href={l.href}
+                className={`hover:text-bone transition-colors px-3 py-1.5 rounded-sm ${typeof window !== 'undefined' && window.location.pathname === l.href ? 'text-bone font-semibold' : ''}`}
               >
                 {l.label}
-              </button>
+              </a>
             ))}
             <div
               style={{
@@ -162,13 +163,14 @@ export function Nav() {
       >
         <div className="flex flex-col px-6 py-6 gap-4">
           {links.map((l) => (
-            <button
+            <a
               key={l.id}
-              onClick={() => go(l.id)}
+              href={l.href}
+              onClick={() => setOpen(false)}
               className="text-left font-display text-2xl text-bone"
             >
               {l.label}
-            </button>
+            </a>
           ))}
           <div className="border-t border-bone/10 pt-5 mt-2 flex justify-start">
             <LangSwitch />

@@ -1,8 +1,9 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Play as PlayOrig } from "lucide-react";
+import { Play as PlayOrig, ArrowRight as ArrowRightOrig } from "lucide-react";
 
 const Play = PlayOrig as any;
+const ArrowRight = ArrowRightOrig as any;
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
 
@@ -11,9 +12,10 @@ interface VoiceProps {
   imageAlt?: string;
   imageTitle?: string;
   imageCaption?: string;
+  teaser?: boolean;
 }
 
-export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption }: VoiceProps) {
+export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, teaser = false }: VoiceProps) {
   const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -41,19 +43,32 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption }: VoicePro
               {t.voice.body[2]}
             </p>
             <div className={`mt-10 flex flex-wrap items-center gap-4 ${imageUrl ? "" : "justify-center"}`}>
-              <button
-                onClick={() =>
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
-                }
-                data-hover
-                className="group inline-flex items-center gap-3 border border-ember/40 bg-ember/5 px-7 py-4 text-[11px] uppercase tracking-[0.3em] text-ember hover:bg-ember hover:text-ink transition-colors"
-              >
-                <Play size={14} className="transition-transform group-hover:translate-x-0.5" />
-                {t.voice.cta}
-              </button>
-              <div className="text-[10px] uppercase tracking-[0.3em] text-bone/70">
-                {t.voice.demo}
-              </div>
+              {teaser ? (
+                <a
+                  href="/rost"
+                  data-hover
+                  className="group inline-flex items-center gap-3 border border-ember/40 bg-ember/5 px-7 py-4 text-[11px] uppercase tracking-[0.3em] text-ember hover:bg-ember hover:text-ink transition-colors"
+                >
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                  {t.lang.label === "Language" ? "Go to Voice & Dubbing" : "Gå till röst & dubbning"}
+                </a>
+              ) : (
+                <>
+                  <button
+                    onClick={() =>
+                      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+                    }
+                    data-hover
+                    className="group inline-flex items-center gap-3 border border-ember/40 bg-ember/5 px-7 py-4 text-[11px] uppercase tracking-[0.3em] text-ember hover:bg-ember hover:text-ink transition-colors"
+                  >
+                    <Play size={14} className="transition-transform group-hover:translate-x-0.5" />
+                    {t.voice.cta}
+                  </button>
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/70">
+                    {t.voice.demo}
+                  </div>
+                </>
+              )}
             </div>
           </div>
           {imageUrl && (

@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Nav } from '../components/Nav';
+import { Spotlight } from '../components/ui/Spotlight';
+import { Portfolio } from '../components/sections/Portfolio';
+import { Showreels } from '../components/sections/Showreels';
+import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
+import { CookieConsent } from '../components/ui/CookieConsent';
+import { setGlobalDbData } from '../hooks/use-t';
+import { getPageData } from '../lib/supabase-server';
+
+const dbData = await getPageData();
+let processedDbData = dbData || { biography: {}, credits: [], showreels: [], seo: null, portfolioImages: [] };
+
+const seoTitle = "Pressbilder, Foton & Showreels | Therese Järvheden";
+const seoDesc = processedDbData.seo?.description_sv || "Ladda ner pressbilder och foton. Titta på showreels för skådespelerskan Therese Järvheden.";
+const seoImage = processedDbData.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+
+setGlobalDbData(processedDbData);
+---
+
+<Layout title={seoTitle} description={seoDesc} image={seoImage}>
+  <script is:inline define:vars={{ processedDbData }}>
+    window.__INITIAL_DB_DATA__ = processedDbData;
+  </script>
+  
+  <Spotlight client:media="(min-width: 1024px)" />
+  <Nav client:idle />
+  
+  <div class="pt-20 md:pt-32 min-h-screen">
+    <Portfolio client:visible images={processedDbData.portfolioImages} />
+    
+    {processedDbData.showreels && processedDbData.showreels.length > 0 ? (
+      <Showreels client:visible videos={processedDbData.showreels} />
+    ) : (
+      <Showreels client:visible />
+    )}
+  </div>
+
+  <CommentaryPlayer client:visible />
+  <CookieConsent client:idle />
+</Layout>

@@ -75,6 +75,11 @@ export function Footer({ bioData }: { bioData?: any }) {
       { label: lang === "sv" ? "SMINK" : "MAKEUP", value: "Sara Zetterström" },
       { label: lang === "sv" ? "SCENBILDER" : "STILLS", value: "SVT · Filmlance · C More" },
       {
+        label: lang === "sv" ? "FRÅGOR & SVAR" : "FAQ",
+        value: "theresejarvheden.se/faq",
+        href: "/faq",
+      },
+      {
         label: lang === "sv" ? "PRODUCENT HEMSIDA" : "WEBSITE PRODUCER",
         value: "Sirin Öngörür",
       },

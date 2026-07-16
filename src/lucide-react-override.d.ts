@@ -1,0 +1,90 @@
+declare module 'lucide-react' {
+  import { ComponentType } from 'react';
+  
+  const Icon: ComponentType<any>;
+  
+  export {
+    Icon as Lock,
+    Icon as Eye,
+    Icon as EyeOff,
+    Icon as FileText,
+    Icon as Quote,
+    Icon as Trash2,
+    Icon as RefreshCw,
+    Icon as ImageIcon,
+    Icon as Plus,
+    Icon as Save,
+    Icon as Sparkles,
+    Icon as X,
+    Icon as FileImage,
+    Icon as Info,
+    Icon as AlertTriangle,
+    Icon as ArrowRight,
+    Icon as Check,
+    Icon as ArrowLeft,
+    Icon as CheckCircle,
+    Icon as Copy,
+    Icon as ExternalLink,
+    Icon as Upload,
+    Icon as LinkIcon,
+    Icon as Video,
+    Icon as Music,
+    Icon as ArrowUp,
+    Icon as ArrowDown,
+    Icon as PanelLeft,
+    Icon as MessageCircleQuestion,
+    Icon as Star,
+    Icon as User,
+    Icon as List,
+    Icon as Settings,
+    Icon as Database,
+    Icon as FolderOpen,
+    Icon as Volume2,
+    Icon as Mail,
+    Icon as Film,
+    Icon as LogOut,
+    Icon as Home,
+    Icon as AlertCircle,
+    
+    // Additional UI Icons
+    Icon as ChevronRight,
+    Icon as Circle,
+    Icon as Minus,
+    Icon as ChevronDown,
+    Icon as ChevronLeft,
+    Icon as MoreHorizontal,
+    Icon as GripVertical,
+    Icon as ChevronUp,
+
+    // Public Page Icons
+    Icon as ArrowUpRight,
+    Icon as Download,
+    Icon as Play,
+    Icon as Pause,
+    Icon as VolumeX,
+    Icon as Maximize2,
+    Icon as ChevronDownIcon,
+    Icon as ChevronLeftIcon,
+    Icon as ChevronRightIcon,
+    Icon as Search,
+
+    // Newly found missing icons
+    Icon as Sliders,
+    Icon as HelpCircle,
+    Icon as Send,
+    Icon as Link,
+    Icon as Image,
+    Icon as Globe,
+    Icon as Award,
+    Icon as Briefcase,
+    Icon as Phone,
+
+    // Backstage & Klick Guide Icons
+    Icon as AlignLeft,
+    Icon as Link2,
+    Icon as ToggleLeft,
+    Icon as ToggleRight,
+    Icon as Share2,
+    Icon as RotateCcw
+  };
+}

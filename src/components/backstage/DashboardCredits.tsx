@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { moveArrayItem } from "../../lib/utils";
 import { MediaPickerModal } from "./MediaPickerModal";
 import { CreditRow } from "./credits/types";
 import { CreditItemCard } from "./credits/CreditItemCard";
@@ -42,15 +43,11 @@ export function DashboardCredits() {
   }, []);
 
   const moveCredit = (index: number, direction: "up" | "down") => {
-    const nextIndex = direction === "up" ? index - 1 : index + 1;
-    if (nextIndex < 0 || nextIndex >= credits.length) return;
-
-    const newCredits = [...credits];
-    const temp = newCredits[index];
-    newCredits[index] = newCredits[nextIndex];
-    newCredits[nextIndex] = temp;
-    setCredits(newCredits);
-    toast.info("Sorteringsordning ändrad.");
+    const updated = moveArrayItem(credits, index, direction);
+    if (updated !== credits) {
+      setCredits(updated);
+      toast.info("Sorteringsordning ändrad.");
+    }
   };
 
   const filteredCredits = filterType === "Alla" 

@@ -433,10 +433,12 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** The `id="klick-portfolio-upload"` was missing from the visible label element trigger (only attached to a hidden file input). Additionally, the fallback Gemini router checked general photo keywords before checking specific sections (like Bio moods, SEO OG-images, or Footer sketch-images).
 - **Resolution:** Assigned `id="klick-portfolio-upload"` to the visible dashboard upload label. Added target IDs (`klick-bio-image`, `klick-bio-image-media`, `klick-curtain-image-media`, `klick-seo-upload-img`) for section-specific images. Restructured the Gemini router in `gemini.ts` to process specific biography, SEO, and footer curtain/scenskiss image requests first, preventing vague questions from routing to portfolio upload.
 
-## 61. Lucide React Icon JSX Type Errors under Preact Compiler
-- **Symptom:** Rerunning the TypeScript compilation threw multiple `TS2786` errors: `'Quote' / 'Trash2' / 'ImageIcon' / 'Upload' / 'Save' cannot be used as a JSX component` in `BioSectionsList.tsx` and `DashboardPortfolio.tsx`.
-- **Root Cause:** In the Preact framework migration, React compatibility typings clashed, causing the compiler to reject standard Lucide-react functional components as valid JSX elements.
-- **Resolution:** Cast Lucide icon imports to `any` variables (e.g. `const QuoteIcon = Quote as any;`, `const SaveIcon = Save as any;`) and rendered the casted variables as JSX elements, successfully returning compilation errors to zero.
+## 61. Global Preact Compiler & JSX Type Errors Resolution
+- **Symptom:** Rerunning the TypeScript compilation threw multiple `TS2786` errors (`'Quote' cannot be used as a JSX component`) for Lucide icons, and `TS2322` errors (`Type 'Element' is not assignable to type 'ReactNode'`) for Framer Motion components inside Astro islands.
+- **Root Cause:** In the Preact framework migration, React compatibility typings clashed. Framer Motion and Lucide expect React's `@types/react` `ReactNode`, but the local environment rendered Preact `VNode`s.
+- **Resolution:** 
+  1. Aliased `"react"` and `"react-dom"` paths in `tsconfig.json` to `"./node_modules/preact/compat"`, forcing libraries to digest Preact's element structures instead of React's, clearing Framer Motion `TS2322` errors.
+  2. Created a global declaration file `src/lucide-react-override.d.ts` casting all imported Lucide components to `ComponentType<any>`, seamlessly satisfying the compiler across all 15+ Backstage CMS panels without injecting inline type casts.
 
 ## 62. SpeedInsights Performance Drop After Cookie Consent Addition
 - **Symptom:** Google PageSpeed and SpeedInsights performance scores decreased due to a new "Avoid chaining critical requests" Lighthouse warning pointing to the `CookieConsent` JavaScript bundles.

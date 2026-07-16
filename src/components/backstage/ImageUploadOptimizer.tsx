@@ -15,7 +15,7 @@ interface ImageProfile {
   maxHeight: number;
   targetKb: number;
   description: string;
-  seoGuideline: string;
+  seoGuideline?: string;
 }
 
 const SECTION_PROFILES: Record<string, ImageProfile> = {
@@ -326,10 +326,12 @@ export function ImageUploadOptimizer({
                   <p className="text-[10px] text-bone/50 mt-0.5 leading-relaxed">{currentProfile.description}</p>
                 </div>
               </div>
-              <div className="border-t border-bone/5 pt-2 mt-2">
-                <p className="text-[9px] font-mono uppercase tracking-widest text-ember/80">Sökmotoroptimering (SEO):</p>
-                <p className="text-[10px] text-bone/60 mt-1 leading-relaxed">{currentProfile.seoGuideline}</p>
-              </div>
+              {currentProfile.seoGuideline && (
+                <div className="border-t border-bone/5 pt-2 mt-2">
+                  <p className="text-[9px] font-mono uppercase tracking-widest text-ember/80">Sökmotoroptimering (SEO):</p>
+                  <p className="text-[10px] text-bone/60 mt-1 leading-relaxed">{currentProfile.seoGuideline}</p>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,20 +1,26 @@
 import React from "react";
-import { HelpCircle, Trash2 } from "lucide-react";
+import { HelpCircle, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { FAQItem } from "./types";
+
+const HelpCircleIcon = HelpCircle as any;
+const Trash2Icon = Trash2 as any;
+const ArrowUpIcon = ArrowUp as any;
+const ArrowDownIcon = ArrowDown as any;
 
 interface BioFaqBuilderProps {
   faqs: FAQItem[];
   addFaq: () => void;
   removeFaq: (id: string) => void;
   updateFaq: (id: string, field: "q" | "a", lang: "sv" | "en", value: string) => void;
+  moveFaq: (index: number, direction: "up" | "down") => void;
 }
 
-export function BioFaqBuilder({ faqs, addFaq, removeFaq, updateFaq }: BioFaqBuilderProps) {
+export function BioFaqBuilder({ faqs, addFaq, removeFaq, updateFaq, moveFaq }: BioFaqBuilderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between border-b border-bone/5 pb-2">
         <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
-          <HelpCircle size={14} className="text-ember" /> FAQ Builder & AEO Scheman
+          <HelpCircleIcon size={14} className="text-ember" /> FAQ Builder & AEO Scheman
         </h3>
         <button
           type="button"
@@ -32,14 +38,37 @@ export function BioFaqBuilder({ faqs, addFaq, removeFaq, updateFaq }: BioFaqBuil
       <div className="space-y-6 mt-4">
         {faqs.map((faq, index) => (
           <div key={faq.id} className="border border-bone/5 bg-stage/5 p-4 rounded-sm relative space-y-4">
-            <button
-              type="button"
-              onClick={() => removeFaq(faq.id)}
-              className="absolute top-4 right-4 text-bone/35 hover:text-red-400 transition-colors cursor-pointer"
-              aria-label="Ta bort"
-            >
-              <Trash2 size={14} />
-            </button>
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+              <button
+                type="button"
+                disabled={index === 0}
+                onClick={() => moveFaq(index, "up")}
+                className="p-1 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 transition-all rounded cursor-pointer"
+                aria-label="Flytta upp"
+                title="Flytta upp"
+              >
+                <ArrowUpIcon size={14} />
+              </button>
+              <button
+                type="button"
+                disabled={index === faqs.length - 1}
+                onClick={() => moveFaq(index, "down")}
+                className="p-1 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 transition-all rounded cursor-pointer"
+                aria-label="Flytta ned"
+                title="Flytta ned"
+              >
+                <ArrowDownIcon size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => removeFaq(faq.id)}
+                className="p-1 text-bone/35 hover:text-red-400 transition-colors cursor-pointer"
+                aria-label="Ta bort"
+                title="Ta bort"
+              >
+                <Trash2Icon size={14} />
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
               {/* SV FAQ */}
@@ -83,6 +112,18 @@ export function BioFaqBuilder({ faqs, addFaq, removeFaq, updateFaq }: BioFaqBuil
           </div>
         ))}
       </div>
+
+      {faqs.length > 0 && (
+        <div className="flex justify-start pt-2">
+          <button
+            type="button"
+            onClick={addFaq}
+            className="px-3 py-1.5 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[9px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
+          >
+            + Lägg till FAQ
+          </button>
+        </div>
+      )}
     </div>
   );
 }

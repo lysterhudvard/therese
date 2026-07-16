@@ -255,9 +255,14 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Section-Specific Image Support**: Integrated specific targeting for Biography moods, SEO OG-images, and Footer sketch-images, and updated the AI and fallback router to evaluate these requests first, resolving routing loops.
 
 ### 49. Preact Compilation & Type Safety
-- **Lucide JSX Cast Fixes**: Cast `Quote`, `Trash2`, `ImageIcon`, `Upload`, and `Save` to `any` variables within the backstage panels, resolving TS2786 build-time errors caused by Preact/React compatibility mismatches.
+- **Lucide JSX Global Override**: Created a global declaration file `src/lucide-react-override.d.ts` mapping all imported Lucide icons to React `ComponentType<any>`, elegantly silencing all `TS2786` "cannot be used as a JSX component" errors across the codebase without needing manual casts.
+- **Framer Motion Types**: Resolved strict `TS2322` `ReactNode` mismatch errors in `Biography.tsx` and `Credits.tsx` by aliasing `"react"` and `"react-dom"` to `"./node_modules/preact/compat"` in `tsconfig.json`.
 
 ### 50. Performance Critical Path Optimization
 - **Idle Hydration for Cookie Banner**: Swapped the client directive of `<CookieConsent />` from `client:load` to `client:idle`, successfully resolving Lighthouse critical request chain blocks and restoring SpeedInsights performance scores.
 
+### 51. Standalone FAQ Page & SEO Schema
+- **Dedicated Route**: Extracted the FAQ accordion from the Biography section and moved it to a dedicated standalone route (`src/pages/faq.astro`). This keeps the homepage clean and cinematic while providing a designated place for user inquiries.
+- **Backstage Isolation**: Created a dedicated `DashboardFaq.tsx` module and a new CMS tab ("Vanliga Frågor (FAQ)"), completely decoupling FAQ administration from the Biography editor.
+- **Automated Google JSON-LD**: Injected an automated `<script type="application/ld+json">` schema block into the `<head>` of `/faq`, translating the database questions/answers into Google's standard `FAQPage` schema to generate rich search snippets directly in Google Search results.
 

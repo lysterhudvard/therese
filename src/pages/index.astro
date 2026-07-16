@@ -7,7 +7,6 @@ import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { Biography } from '../components/sections/Biography';
 import { Portfolio } from '../components/sections/Portfolio';
 import { Showreels } from '../components/sections/Showreels';
-import { Credits } from '../components/sections/Credits';
 import { Voice } from '../components/sections/Voice';
 import { Contact } from '../components/sections/Contact';
 import { Footer } from '../components/sections/Footer';
@@ -145,10 +144,9 @@ if (processedDbData?.biography?.review_quotes) {
     parsedReviewQuotes = typeof processedDbData.biography.review_quotes === "string"
       ? JSON.parse(processedDbData.biography.review_quotes)
       : processedDbData.biography.review_quotes;
-  } catch (e) {
-    console.error("Failed to parse review quotes:", e);
-  }
+  } catch (e) {}
 }
+
 ---
 
 <Layout title={seoTitle} description={seoDesc} image={seoImage} heroImage={heroImage}>
@@ -172,30 +170,19 @@ if (processedDbData?.biography?.review_quotes) {
   <Spotlight client:media="(min-width: 1024px)" />
   <Nav client:idle />
 
-  <!-- Cinematic Anamorphic Scope Bars (driven purely by intersection observer class) -->
-  <div class="scope-bar-top pointer-events-none fixed inset-x-0 top-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"></div>
-  <div class="scope-bar-bottom pointer-events-none fixed inset-x-0 bottom-0 z-[65] bg-ink transition-transform duration-[750ms] ease-in-out h-[8vh] md:h-[12vh]"></div>
-
   <Biography 
     client:visible 
     sections={parsedSections} 
     imageCredits={imageCredits} 
-    faqs={processedDbData?.biography?.faqs} 
   />
-  
-  <Portfolio client:visible images={processedDbData?.portfolioImages} />
+
+  <Portfolio client:visible images={processedDbData?.portfolioImages} teaser={true} />
   
   {processedDbData?.showreels && processedDbData.showreels.length > 0 ? (
-    <Showreels client:visible videos={processedDbData.showreels} />
+    <Showreels client:visible videos={processedDbData.showreels} teaser={true} />
   ) : (
-    <Showreels client:visible />
+    <Showreels client:visible teaser={true} />
   )}
-  
-  <Credits
-    client:visible
-    credits={processedDbData?.credits}
-    reviewQuotes={parsedReviewQuotes}
-  />
   
   <Voice 
     client:visible
@@ -203,31 +190,16 @@ if (processedDbData?.biography?.review_quotes) {
     imageAlt={voiceImageData.alt} 
     imageTitle={voiceImageData.title}
     imageCaption={voiceImageData.caption}
+    teaser={true}
   />
   
-  <Contact client:visible bioData={processedDbData?.biography} />
+  <Contact client:visible bioData={processedDbData?.biography} teaser={true} />
+  
   <Footer client:visible bioData={processedDbData?.biography} />
   <CommentaryPlayer client:visible />
   <CookieConsent client:idle />
 
-  <!-- Anamorphic Scope Bars intersection observer trigger script -->
-  <script>
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          document.documentElement.classList.add('in-portfolio');
-        } else {
-          document.documentElement.classList.remove('in-portfolio');
-        }
-      },
-      {
-        rootMargin: "-10% 0px -10% 0px",
-        threshold: 0.05,
-      }
-    );
-    const portfolioEl = document.getElementById('portfolio');
-    if (portfolioEl) observer.observe(portfolioEl);
-  </script>
+  <!-- Intersection observer script removed as Portfolio is on a separate page -->
 
   <!-- Dynamic JSON-LD structured data for SEO/AEO search optimization -->
   {processedDbData && (

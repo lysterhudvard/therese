@@ -371,7 +371,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
         <Biography 
           sections={parsedSections} 
           imageCredits={imageCredits} 
-          faqs={dbData?.biography?.faqs} 
         />
         <Portfolio images={dbData?.portfolioImages} />
         {dbData?.showreels && dbData.showreels.length > 0 ? (

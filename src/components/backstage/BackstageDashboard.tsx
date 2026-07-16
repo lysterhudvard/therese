@@ -9,7 +9,8 @@ import { DashboardSeo } from "./DashboardSeo";
 import { DashboardMedia } from "./DashboardMedia";
 import { DashboardContact } from "./DashboardContact";
 import { DashboardCurtain } from "./DashboardCurtain";
-import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2, Mail, Film } from "lucide-react";
+import { DashboardFaq } from "./DashboardFaq";
+import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2, Mail, Film, MessageCircleQuestion } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { KlickGuideWidget } from "./KlickGuideWidget";
@@ -18,11 +19,16 @@ interface BackstageDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "contact" | "curtain" | "seo" | "media";
+type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "contact" | "curtain" | "faq" | "seo" | "media";
 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
   const [isConfigured, setIsConfigured] = useState(false);
+  
+  const HomeIcon = Home as any;
+  const LogOutIcon = LogOut as any;
+  const AlertCircleIcon = AlertCircle as any;
+
   useEffect(() => {
     setIsConfigured(isSupabaseConfigured());
   }, []);
@@ -36,6 +42,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
     { id: "voice", label: "Akt VI: Röst", icon: Volume2 },
     { id: "contact", label: "Akt VII: Kontaktinfo", icon: Mail },
     { id: "curtain", label: "Akt VIII: Ridåfall", icon: Film },
+    { id: "faq", label: "Vanliga Frågor (FAQ)", icon: MessageCircleQuestion },
     { id: "seo", label: "SEO & Inställningar", icon: Settings },
     { id: "media", label: "Mediebibliotek", icon: FolderOpen },
   ];
@@ -66,6 +73,8 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
         return <DashboardContact />;
       case "curtain":
         return <DashboardCurtain />;
+      case "faq":
+        return <DashboardFaq />;
       case "seo":
         return <DashboardSeo />;
       case "media":
@@ -98,7 +107,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
           {/* Navigation Links */}
           <nav className="space-y-1">
             {navigationItems.map((item) => {
-              const Icon = item.icon;
+              const Icon = item.icon as any;
               const isActive = activeTab === item.id;
               return (
                 <button
@@ -125,14 +134,14 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
             href="/"
             className="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest font-mono text-bone/50 hover:text-bone transition-colors cursor-pointer"
           >
-            <Home size={13} />
+            <HomeIcon size={13} />
             Visa Webbplats
           </a>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-[10px] uppercase tracking-widest font-mono text-red-400/70 hover:text-red-400 transition-colors cursor-pointer text-left"
           >
-            <LogOut size={13} />
+            <LogOutIcon size={13} />
             Logga Ut
           </button>
         </div>
@@ -145,7 +154,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
           {!isConfigured && (
             <div className="border border-red-500/20 bg-red-500/5 p-6 rounded-sm">
               <h3 className="text-sm font-semibold text-bone flex items-center gap-2 font-mono uppercase tracking-wider">
-                <AlertCircle size={16} className="text-red-400" />
+                <AlertCircleIcon size={16} className="text-red-400" />
                 Supabase-anslutning saknas
               </h3>
               <p className="text-xs text-bone/70 mt-1 leading-relaxed">

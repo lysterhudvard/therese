@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Nav } from '../components/Nav';
+import { Spotlight } from '../components/ui/Spotlight';
+import { FAQ } from '../components/sections/FAQ';
+import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
+import { CookieConsent } from '../components/ui/CookieConsent';
+import { setGlobalDbData } from '../hooks/use-t';
+import { supabase } from '../lib/supabase';
+
+// Fetch the data on the server for instant SSR and SEO injection
+const { data, error } = await supabase
+  .from('biography')
+  .select('*')
+  .eq('id', 'main')
+  .maybeSingle();
+
+const processedDbData = data || null;
+setGlobalDbData(processedDbData);
+
+// Basic SEO
+const seoTitle = "Vanliga Frågor (FAQ) | Therese Järvheden";
+const seoDesc = "Vanliga frågor och svar om skådespelerskan och röstskådespelerskan Therese Järvheden.";
+const seoImage = "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+
+// Google FAQ JSON-LD Schema
+let faqSchema = null;
+if (processedDbData?.faqs && Array.isArray(processedDbData.faqs) && processedDbData.faqs.length > 0) {
+  const faqItems = processedDbData.faqs.filter(faq => faq.q?.sv && faq.a?.sv).map(faq => ({
+    "@type": "Question",
+    "name": faq.q.sv,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.a.sv
+    }
+  }));
+
+  if (faqItems.length > 0) {
+    faqSchema = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqItems
+    });
+  }
+}
+---
+
+<Layout title={seoTitle} description={seoDesc} image={seoImage}>
+  {faqSchema && (
+    <script type="application/ld+json" set:html={faqSchema} slot="head" />
+  )}
+  <script is:inline define:vars={{ processedDbData }}>
+    window.__INITIAL_DB_DATA__ = processedDbData;
+  </script>
+  
+  <Spotlight client:media="(min-width: 1024px)" />
+  <Nav client:idle />
+  
+  <div class="pt-20 md:pt-32 min-h-screen">
+    <FAQ client:visible faqs={processedDbData?.faqs} />
+  </div>
+  
+  <CommentaryPlayer client:idle />
+  <CookieConsent client:idle />
+</Layout>

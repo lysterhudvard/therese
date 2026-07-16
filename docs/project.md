@@ -59,6 +59,7 @@ The application has been successfully migrated to **Astro** to maximize performa
 | Route          | File Path                 | Rendering Type | Notes                                                     |
 | :------------- | :------------------------ | :------------- | :-------------------------------------------------------- |
 | `/` (Home)     | `src/pages/index.astro`   | SSG (Static)   | Hero section, short bio, key showreels, direct links.     |
+| `/faq`         | `src/pages/faq.astro`     | SSG (Static)   | Standalone FAQ page with automated Google JSON-LD schema. |
 | `/backstage`   | `src/pages/backstage.astro` | SPA (Preact)   | Secure portal for backstage admin updates.                 |
 
 ---

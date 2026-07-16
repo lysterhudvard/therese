@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { moveArrayItem } from "../../lib/utils";
 import { MediaPickerModal } from "./MediaPickerModal";
 import { BioSection, FAQItem, ReviewQuoteItem } from "./bio/types";
 import { BioSectionsList } from "./bio/BioSectionsList";
@@ -9,7 +10,6 @@ import { BioImageCredits } from "./bio/BioImageCredits";
 import { BioTextsForm } from "./bio/BioTextsForm";
 import { BioQuickFacts } from "./bio/BioQuickFacts";
 import { BioReviewQuotes } from "./bio/BioReviewQuotes";
-import { BioFaqBuilder } from "./bio/BioFaqBuilder";
 
 export function DashboardBio() {
   // Biography Headings & Paragraphs
@@ -67,18 +67,6 @@ export function DashboardBio() {
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
   const [activePickingSectionId, setActivePickingSectionId] = useState<string | null>(null);
 
-  // FAQs List for AEO Schema
-  const [faqs, setFaqs] = useState<FAQItem[]>([
-    {
-      id: "faq-1",
-      q: { sv: "Vilka serier har Therese medverkat i?", en: "What series has Therese appeared in?" },
-      a: {
-        sv: "Therese har medverkat i Karatefylla (SVT), Jävla klåpare (SVT), Anna Blomberg show och Beck — Utan uppsåt.",
-        en: "Therese has appeared in Karatefylla (SVT), Jävla klåpare (SVT), Anna Blomberg show, and Beck — Utan uppsåt.",
-      },
-    },
-  ]);
-
   // Background Quotes
   const [reviewQuotes, setReviewQuotes] = useState<ReviewQuoteItem[]>([
     { id: "quote-1", sv: "en närvaro som river ner väggar", en: "a presence that tears down walls" },
@@ -100,7 +88,7 @@ export function DashboardBio() {
     const fetchBioData = async () => {
       const { data, error } = await supabase
         .from("biography")
-        .select("quote_sv, quote_en, dialects_sv, dialects_en, languages_sv, languages_en, faqs, heading_sv, heading_en, paragraph1_sv, paragraph1_en, paragraph2_sv, paragraph2_en, paragraph3_sv, paragraph3_en, review_quotes, quote_comedic_sv, quote_comedic_en, quote_classical_sv, quote_classical_en, mood_images, footer_image, footer_end_sv, footer_end_en, footer_credits, bio_image_credits_sv, bio_image_credits_en, bio_sections")
+        .select("quote_sv, quote_en, dialects_sv, dialects_en, languages_sv, languages_en, heading_sv, heading_en, paragraph1_sv, paragraph1_en, paragraph2_sv, paragraph2_en, paragraph3_sv, paragraph3_en, review_quotes, quote_comedic_sv, quote_comedic_en, quote_classical_sv, quote_classical_en, mood_images, footer_image, footer_end_sv, footer_end_en, footer_credits, bio_image_credits_sv, bio_image_credits_en, bio_sections")
         .eq("id", "main")
         .maybeSingle();
 
@@ -203,9 +191,7 @@ export function DashboardBio() {
           }
         }
         
-        if (data.faqs && Array.isArray(data.faqs) && data.faqs.length > 0) {
-          setFaqs(data.faqs as FAQItem[]);
-        }
+
         if (data.review_quotes && Array.isArray(data.review_quotes) && data.review_quotes.length > 0) {
           setReviewQuotes(data.review_quotes as ReviewQuoteItem[]);
         }
@@ -281,34 +267,6 @@ export function DashboardBio() {
     );
   };
 
-  const addFaq = () => {
-    const newItem: FAQItem = {
-      id: `faq-${Date.now()}`,
-      q: { sv: "", en: "" },
-      a: { sv: "", en: "" },
-    };
-    setFaqs([...faqs, newItem]);
-  };
-
-  const removeFaq = (id: string) => {
-    setFaqs(faqs.filter((f) => f.id !== id));
-  };
-
-  const updateFaq = (id: string, field: "q" | "a", lang: "sv" | "en", value: string) => {
-    setFaqs(
-      faqs.map((f) => {
-        if (f.id !== id) return f;
-        return {
-          ...f,
-          [field]: {
-            ...f[field],
-            [lang]: value,
-          },
-        };
-      })
-    );
-  };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -350,7 +308,6 @@ export function DashboardBio() {
       dialects_en: dialectsEn,
       languages_sv: languagesSv,
       languages_en: languagesEn,
-      faqs: faqs,
       review_quotes: reviewQuotes,
       mood_images,
       bio_image_credits_sv: imageCreditsSv,
@@ -373,15 +330,15 @@ export function DashboardBio() {
       setIsSaving(false);
       if (coreError) {
         toast.error(`Kunde inte spara i databasen: ${coreError.message}`);
-        alert(`Misslyckades med att spara Akt II (Biografi & FAQ): ${coreError.message}`);
+        alert(`Misslyckades med att spara Akt II (Biografi): ${coreError.message}`);
       } else {
         toast.warning("Sparade endast grundläggande fält (citat, dialekter, språk). För full funktionalitet, kör 'supabase_migration_5.sql' i din Supabase SQL Editor.");
         alert("Sparade grundläggande fält framgångsrikt (vissa tabellkolumner saknas i din Supabase-databas)!");
       }
     } else {
       setIsSaving(false);
-      toast.success("Akt II (Biografi & FAQ) har sparats framgångsrikt i Supabase!");
-      alert("Akt II (Biografi & FAQ) har sparats framgångsrikt!");
+      toast.success("Akt II (Biografi) har sparats framgångsrikt i Supabase!");
+      alert("Akt II (Biografi) har sparats framgångsrikt!");
     }
   };
 
@@ -401,7 +358,7 @@ export function DashboardBio() {
           Akt II — <span className="italic text-ember">Biografi</span>
         </h2>
         <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
-          Här redigerar du Thereses biografi, egenskaper, samt sökmotorernas FAQ-frågor (AEO/GEO).
+          Här redigerar du Thereses biografi och egenskaper.
         </p>
       </div>
 
@@ -455,13 +412,6 @@ export function DashboardBio() {
         addReviewQuote={addReviewQuote}
         removeReviewQuote={removeReviewQuote}
         updateReviewQuote={updateReviewQuote}
-      />
-
-      <BioFaqBuilder
-        faqs={faqs}
-        addFaq={addFaq}
-        removeFaq={removeFaq}
-        updateFaq={updateFaq}
       />
 
       <div className="flex justify-end pt-4 border-t border-bone/10">

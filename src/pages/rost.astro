@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Nav } from '../components/Nav';
+import { Spotlight } from '../components/ui/Spotlight';
+import { Voice } from '../components/sections/Voice';
+import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
+import { CookieConsent } from '../components/ui/CookieConsent';
+import { setGlobalDbData } from '../hooks/use-t';
+import { getPageData } from '../lib/supabase-server';
+
+const dbData = await getPageData();
+let processedDbData = dbData || { biography: {}, credits: [], showreels: [], seo: null, portfolioImages: [] };
+
+const seoTitle = "Röstskådespelare & Voice Over (Skånska/Svenska) | Therese Järvheden";
+const seoDesc = processedDbData.seo?.description_sv || "Boka Therese Järvheden för voice over, dubbning och reklam på svenska och skånska.";
+const seoImage = processedDbData.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+
+setGlobalDbData(processedDbData);
+
+let voiceImageData = {
+  url: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650",
+  alt: "Therese — röst",
+  title: "",
+  caption: ""
+};
+if (processedDbData.biography?.voice_settings) {
+  try {
+    const vs = typeof processedDbData.biography.voice_settings === "string"
+      ? JSON.parse(processedDbData.biography.voice_settings)
+      : processedDbData.biography.voice_settings;
+    if (vs) {
+      if (vs.hasOwnProperty("image_url") && vs.image_url) voiceImageData.url = vs.image_url;
+      if (vs.image_alt) voiceImageData.alt = vs.image_alt;
+      if (vs.image_title) voiceImageData.title = vs.image_title;
+      if (vs.image_caption) voiceImageData.caption = vs.image_caption;
+    }
+  } catch (e) {}
+}
+
+const faqs = processedDbData.biography?.faqs?.filter((f: any) => f.q_sv && f.q_sv.toLowerCase().includes('röst'));
+---
+
+<Layout title={seoTitle} description={seoDesc} image={seoImage}>
+  <script is:inline define:vars={{ processedDbData }}>
+    window.__INITIAL_DB_DATA__ = processedDbData;
+  </script>
+  
+  <Spotlight client:media="(min-width: 1024px)" />
+  <Nav client:idle />
+  
+  <div class="pt-20 md:pt-32 min-h-screen">
+    <Voice 
+      client:visible
+      imageUrl={voiceImageData.url} 
+      imageAlt={voiceImageData.alt} 
+      imageTitle={voiceImageData.title}
+      imageCaption={voiceImageData.caption}
+    />
+  </div>
+
+  <CommentaryPlayer client:visible />
+  <CookieConsent client:idle />
+  
+  {faqs && faqs.length > 0 && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map((faq: any) => ({
+          "@type": "Question",
+          "name": faq.q_sv,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.a_sv
+          }
+        }))
+      })}
+    />
+  )}
+</Layout>

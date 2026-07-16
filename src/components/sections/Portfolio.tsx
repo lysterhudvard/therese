@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
-import { Download as DownloadOrig } from "lucide-react";
+import { Download as DownloadOrig, ArrowRight as ArrowRightOrig } from "lucide-react";
 
 const Download = DownloadOrig as any;
+const ArrowRight = ArrowRightOrig as any;
 
 export interface PortfolioImage {
   url: string;
@@ -15,7 +16,7 @@ export interface PortfolioImage {
   download_url?: string;
 }
 
-export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[] }) {
+export function Portfolio({ images = [], teaser = false }: { images?: (string | PortfolioImage)[], teaser?: boolean }) {
   const { t, lang } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -27,7 +28,7 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
   const [maxX, setMaxX] = useState(0);
 
   // Normalize image data to objects
-  const normalizedImages = images.map((img, idx) => {
+  let normalizedImages = images.map((img, idx) => {
     if (typeof img === "string") {
       return {
         url: img,
@@ -49,6 +50,10 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
       allow_download: img.allow_download !== false,
     };
   });
+
+  if (teaser) {
+    normalizedImages = normalizedImages.slice(0, 4);
+  }
 
   useEffect(() => {
     const calc = () => {
@@ -167,6 +172,15 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
                 )}
               </div>
             ))}
+
+            {teaser && (
+              <div className="flex items-center justify-center shrink-0 ml-12">
+                <a href="/press" className="inline-flex items-center gap-3 border border-bone/20 bg-stage hover:border-ember px-8 py-5 font-mono text-[11px] tracking-[0.25em] uppercase text-bone hover:text-ember transition-all rounded-sm cursor-pointer shadow-sm">
+                  {lang === "sv" ? "Fler pressbilder" : "More press photos"}
+                  <ArrowRight size={16} />
+                </a>
+              </div>
+            )}
           </motion.div>
         )}
         {/* Mobile / Tablet layout - natural height, does not lock page scrolling */}
@@ -214,6 +228,17 @@ export function Portfolio({ images = [] }: { images?: (string | PortfolioImage)[
                     )}
                   </div>
                 ))}
+                
+                {teaser && (
+                  <div className="shrink-0 w-[240px] h-[320px] flex items-center justify-center border border-bone/10 bg-stage/50 rounded">
+                    <a href="/press" className="flex flex-col items-center gap-4 text-bone/70 hover:text-ember transition-colors font-mono uppercase tracking-[0.2em] text-[10px] p-6 text-center">
+                      <div className="w-12 h-12 rounded-full border border-bone/20 flex items-center justify-center">
+                        <ArrowRight size={18} />
+                      </div>
+                      {lang === "sv" ? "Se hela arkivet" : "View full archive"}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           )}

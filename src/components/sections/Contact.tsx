@@ -11,7 +11,8 @@ import {
   Award as AwardOrig, 
   Briefcase as BriefcaseOrig, 
   Music as MusicOrig, 
-  Phone as PhoneOrig 
+  Phone as PhoneOrig,
+  ArrowRight as ArrowRightOrig
 } from "lucide-react";
 
 const Mail = MailOrig as any;
@@ -25,6 +26,7 @@ const Award = AwardOrig as any;
 const Briefcase = BriefcaseOrig as any;
 const Music = MusicOrig as any;
 const Phone = PhoneOrig as any;
+const ArrowRight = ArrowRightOrig as any;
 import { useT } from "../../hooks/use-t";
 import { Field } from "../ui/Field";
 import { Instagram, Facebook, Youtube, XLogo } from "./contact/SocialIcons";
@@ -40,8 +42,8 @@ type Status =
   | "flying"
   | "sent";
 
-export function Contact({ bioData }: { bioData?: any }) {
-  const { t } = useT();
+export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: boolean }) {
+  const { t, lang } = useT();
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", msg: "" });
 
@@ -264,18 +266,35 @@ export function Contact({ bioData }: { bioData?: any }) {
           </div>
 
           <div className="lg:col-span-7">
-            <div
-              ref={formCardRef}
-              style={{
-                background: isSpotlightActive
-                  ? "radial-gradient(circle 750px at 50% 50%, rgba(235, 94, 40, 0.22) 0%, rgba(28, 28, 28, 0.35) 60%, rgba(10, 10, 10, 0.8) 100%)"
-                  : undefined,
-                borderColor: isSpotlightActive ? "rgba(235, 94, 40, 0.55)" : undefined,
-                boxShadow: isSpotlightActive ? "0 0 60px rgba(235, 94, 40, 0.15)" : undefined,
-                transition: "background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease",
-              }}
-              className="relative border border-bone/10 bg-stage/40 backdrop-blur-sm p-8 md:p-12 min-h-[550px] md:min-h-[600px] flex items-center justify-center [perspective:1200px]"
-            >
+            {teaser ? (
+              <div className="relative border border-bone/10 bg-stage/40 backdrop-blur-sm p-8 md:p-12 min-h-[300px] flex flex-col items-center justify-center text-center">
+                <Mail size={40} className="text-ember mb-6 opacity-80" />
+                <h3 className="font-display text-2xl md:text-3xl text-bone mb-4">
+                  {lang === "sv" ? "Letar du efter rätt skådespelare eller röst?" : "Looking for the right actor or voice?"}
+                </h3>
+                <p className="text-bone/60 mb-8 max-w-sm text-sm">
+                  {lang === "sv" 
+                    ? "Skicka ett meddelande till Therese eller kontakta agenturen direkt." 
+                    : "Send a message to Therese or contact the agency directly."}
+                </p>
+                <a href="/kontakt" className="inline-flex items-center gap-3 border border-ember bg-ember px-8 py-4 text-[11px] uppercase tracking-[0.3em] text-ink transition-all hover:bg-bone hover:border-bone">
+                  {lang === "sv" ? "Gå till kontakt" : "Go to Contact"}
+                  <ArrowRight size={14} />
+                </a>
+              </div>
+            ) : (
+              <div
+                ref={formCardRef}
+                style={{
+                  background: isSpotlightActive
+                    ? "radial-gradient(circle 750px at 50% 50%, rgba(235, 94, 40, 0.22) 0%, rgba(28, 28, 28, 0.35) 60%, rgba(10, 10, 10, 0.8) 100%)"
+                    : undefined,
+                  borderColor: isSpotlightActive ? "rgba(235, 94, 40, 0.55)" : undefined,
+                  boxShadow: isSpotlightActive ? "0 0 60px rgba(235, 94, 40, 0.15)" : undefined,
+                  transition: "background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease",
+                }}
+                className="relative border border-bone/10 bg-stage/40 backdrop-blur-sm p-8 md:p-12 min-h-[550px] md:min-h-[600px] flex items-center justify-center [perspective:1200px]"
+              >
               {/* Spotlight Glow Overlay */}
               <div
                 style={{
@@ -384,6 +403,7 @@ export function Contact({ bioData }: { bioData?: any }) {
                 )}
               </AnimatePresence>
             </div>
+            )}
           </div>
         </div>
       </motion.div>
