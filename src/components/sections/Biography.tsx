@@ -3,6 +3,10 @@ import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
 import { useT } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
 
+const MotionDiv = motion.div as any;
+const MotionP = motion.p as any;
+const MotionSpan = motion.span as any;
+
 export interface BioSection {
   id: string;
   title_sv: string;
@@ -61,20 +65,27 @@ export function Biography({
     return DEFAULT_SECTIONS;
   }, [sections]);
 
-  const [activeId, setActiveId] = useState<string>(activeSections[0]?.id || "Dramatic");
+  const [activeId, setActiveId] = useState(() => {
+    if (activeSections.length > 0) {
+      const sorted = [...activeSections].sort((a, b) => (a.weight || 300) - (b.weight || 300));
+      return sorted[0].id;
+    }
+    return "";
+  });
 
-  // Find current active section data
-  const data = useMemo(() => {
-    return activeSections.find(s => s.id === activeId) || activeSections[0] || DEFAULT_SECTIONS[0];
-  }, [activeSections, activeId]);
-
-  // Adjust activeId if it's no longer in activeSections
   useEffect(() => {
-    if (!activeSections.some(s => s.id === activeId) && activeSections.length > 0) {
-      setActiveId(activeSections[0].id);
+    if (activeSections.length > 0) {
+      const sorted = [...activeSections].sort((a, b) => (a.weight || 300) - (b.weight || 300));
+      const hasActive = sorted.some(s => s.id === activeId);
+      if (!hasActive) {
+        setActiveId(sorted[0].id);
+      }
     }
   }, [activeSections, activeId]);
 
+  const data = useMemo(() => {
+    return activeSections.find((s) => s.id === activeId) || activeSections[0];
+  }, [activeSections, activeId]);
 
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -83,7 +94,7 @@ export function Biography({
   const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
   return (
     <section id="bio" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
-      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
+      <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className={data.image ? "mx-auto grid max-w-7xl grid-cols-1 gap-14 lg:grid-cols-12" : "mx-auto max-w-4xl flex flex-col items-center justify-center text-center"}>
 
           <div className={data.image ? "lg:col-span-7" : "w-full flex flex-col items-center max-w-3xl"}>
@@ -97,12 +108,11 @@ export function Biography({
               {t.bio.heading[2]}
             </h2>
 
-            {/* Mobile Image, right below the title */}
             {data.image && (
               <div className="block lg:hidden mt-8 w-full">
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
                   <AnimatePresence mode="wait">
-                    <motion.div
+                    <MotionDiv
                       key={activeId}
                       initial={{ opacity: 0, scale: 1.06 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -116,7 +126,7 @@ export function Biography({
                         title={data.image_title}
                         className="h-full w-full"
                       />
-                    </motion.div>
+                    </MotionDiv>
                   </AnimatePresence>
                   <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
                 </div>
@@ -134,22 +144,22 @@ export function Biography({
               </div>
             )}
 
-            <div className="mt-10">
-              <div className="text-[10px] uppercase tracking-[0.4em] text-bone/50 mb-3 font-mono">
-                {t.bio.director}
-              </div>
-              <div className="flex w-full hairline border-t-0 border border-bone/15 overflow-hidden">
-                {activeSections.map((s) => (
+            <div className={`mt-14 ${data.image ? "" : "flex flex-col items-center"}`}>
+              <div className="flex flex-wrap gap-2.5">
+                {[...activeSections]
+                  .sort((a, b) => (a.weight || 300) - (b.weight || 300))
+                  .map((s) => (
                   <button
                     key={s.id}
                     onClick={() => setActiveId(s.id)}
-                    data-hover
-                    className={`relative flex-1 min-w-0 px-2 min-[375px]:px-3 sm:px-5 py-3 text-[9px] min-[375px]:text-[10px] sm:text-[11px] uppercase tracking-[0.15em] min-[375px]:tracking-[0.25em] sm:tracking-[0.32em] transition-colors truncate ${
-                      activeId === s.id ? "text-ink" : "text-bone/70 hover:text-bone"
+                    className={`relative px-4 py-2 text-[10px] font-mono uppercase tracking-[0.25em] transition-all rounded-sm duration-300 cursor-pointer ${
+                      activeId === s.id
+                        ? "text-ink font-semibold"
+                        : "text-bone/60 border border-bone/10 hover:border-ember/40 hover:text-ember"
                     }`}
                   >
                     {activeId === s.id && (
-                      <motion.span
+                      <MotionSpan
                         layoutId="moodPill"
                         className="absolute inset-0 bg-ember"
                         transition={{ type: "spring", stiffness: 320, damping: 30 }}
@@ -160,7 +170,7 @@ export function Biography({
                 ))}
               </div>
               <AnimatePresence mode="wait">
-                <motion.p
+                <MotionP
                   key={activeId}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -168,43 +178,63 @@ export function Biography({
                   transition={{ duration: 0.4 }}
                   className={`mt-5 font-display italic text-bone/80 text-xl lg:text-2xl max-w-lg ${data.image ? "" : "mx-auto"}`}
                 >
-                  "{lang === "sv" ? data.quote_sv : data.quote_en}"
-                </motion.p>
+                  "
+                  <span dangerouslySetInnerHTML={{ __html: (lang === "sv" ? data.quote_sv : data.quote_en) }} />
+                  "
+                </MotionP>
               </AnimatePresence>
             </div>
 
             <div className={`mt-14 space-y-7 text-bone/75 leading-relaxed ${data.image ? "max-w-xl text-left" : "max-w-2xl text-center mx-auto"}`}>
-              <p>
-                {t.bio.p1Pre}
-                {t.bio.p1Link && (
-                  <a
-                    href="https://www.svtplay.se/en-valdsam-karlek"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-ember underline-offset-4 hover:underline"
-                  >
-                    {t.bio.p1Link}
-                  </a>
+              <p className="formatted-text">
+                {t.bio.p1Pre ? (
+                  <>
+                    {t.bio.p1Pre}
+                    {t.bio.p1Link && (
+                      <a
+                        href="https://www.svtplay.se/en-valdsam-karlek"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-ember underline-offset-4 hover:underline"
+                      >
+                        {t.bio.p1Link}
+                      </a>
+                    )}
+                    <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
+                  </>
+                ) : (
+                  <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
                 )}
-                {t.bio.p1Post}
               </p>
-              <p>
-                {t.bio.p2[0]}
-                <em className="text-bone">{t.bio.p2[1]}</em>
-                {t.bio.p2[2]}
-                <em className="text-bone">{t.bio.p2[3]}</em>
-                {t.bio.p2[4]}
-                <em className="text-bone">{t.bio.p2[5]}</em>
-                {t.bio.p2[6]}
-                <em className="text-bone">{t.bio.p2[7]}</em>
-                {t.bio.p2[8]}
+              <p className="formatted-text">
+                {t.bio.p2[1] ? (
+                  <>
+                    {t.bio.p2[0]}
+                    <em className="text-bone">{t.bio.p2[1]}</em>
+                    {t.bio.p2[2]}
+                    <em className="text-bone">{t.bio.p2[3]}</em>
+                    {t.bio.p2[4]}
+                    <em className="text-bone">{t.bio.p2[5]}</em>
+                    {t.bio.p2[6]}
+                    <em className="text-bone">{t.bio.p2[7]}</em>
+                    {t.bio.p2[8]}
+                  </>
+                ) : (
+                  <span dangerouslySetInnerHTML={{ __html: t.bio.p2[0] }} />
+                )}
               </p>
-              <p>
-                {t.bio.p3[0]}
-                <em className="text-bone">{t.bio.p3[1]}</em>
-                {t.bio.p3[2]}
-                <span className="text-ember">{t.bio.p3[3]}</span>
-                {t.bio.p3[4]}
+              <p className="formatted-text">
+                {t.bio.p3[1] ? (
+                  <>
+                    {t.bio.p3[0]}
+                    <em className="text-bone">{t.bio.p3[1]}</em>
+                    {t.bio.p3[2]}
+                    <span className="text-ember">{t.bio.p3[3]}</span>
+                    {t.bio.p3[4]}
+                  </>
+                ) : (
+                  <span dangerouslySetInnerHTML={{ __html: t.bio.p3[0] }} />
+                )}
               </p>
             </div>
  
@@ -223,7 +253,7 @@ export function Biography({
               <div className="sticky top-28">
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
                   <AnimatePresence mode="wait">
-                    <motion.div
+                    <MotionDiv
                       key={activeId}
                       initial={{ opacity: 0, scale: 1.06 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -237,7 +267,7 @@ export function Biography({
                         title={data.image_title}
                         className="h-full w-full"
                       />
-                    </motion.div>
+                    </MotionDiv>
                   </AnimatePresence>
                   <div className="absolute inset-0 bg-gradient-to-t from-stage/70 via-transparent to-transparent pointer-events-none" />
                 </div>
@@ -258,7 +288,7 @@ export function Biography({
           )}
         </div>
 
-      </motion.div>
+      </MotionDiv>
     </section>
   );
 }

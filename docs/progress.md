@@ -262,7 +262,15 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Idle Hydration for Cookie Banner**: Swapped the client directive of `<CookieConsent />` from `client:load` to `client:idle`, successfully resolving Lighthouse critical request chain blocks and restoring SpeedInsights performance scores.
 
 ### 51. Standalone FAQ Page & SEO Schema
-- **Dedicated Route**: Extracted the FAQ accordion from the Biography section and moved it to a dedicated standalone route (`src/pages/faq.astro`). This keeps the homepage clean and cinematic while providing a designated place for user inquiries.
+- **Standalone Route**: Extracted the FAQ accordion from the Biography section and moved it to a dedicated standalone route (`src/pages/faq.astro`). This keeps the homepage clean and cinematic while providing a designated place for user inquiries.
 - **Backstage Isolation**: Created a dedicated `DashboardFaq.tsx` module and a new CMS tab ("Vanliga Frågor (FAQ)"), completely decoupling FAQ administration from the Biography editor.
 - **Automated Google JSON-LD**: Injected an automated `<script type="application/ld+json">` schema block into the `<head>` of `/faq`, translating the database questions/answers into Google's standard `FAQPage` schema to generate rich search snippets directly in Google Search results.
+
+### 52. FAQ Live Syncing & Language Fail-Safes
+- **Client-Side Live Synchronization**: Implemented client-side fetches directly from the Supabase `biography` table on mount in `FAQ.tsx`. This bridges the static build latency gap by immediately updating static pages with live CMS changes.
+- **Translation Fallbacks**: Enhanced filtering logic to fall back to Swedish or English when translations for either language are missing. This keeps the FAQ complete even with partial entries.
+
+### 53. Rich Text Editing Toolbar in CMS & Dynamic Formatting
+- **Admin Text formatting Toolbar**: Developed and integrated a reusable `FormattingToolbar` component that allows content managers to style text with bold, italic, and inline links in Biography paragraphs, sections quotes, and FAQ answers.
+- **HTML Render Integration**: Applied dynamic HTML rendering on the frontend for these rich-text fields with a tailored `.formatted-text` style block. This seamlessly displays formatted styles using theme-compliant colors and layouts.
 

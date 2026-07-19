@@ -1,6 +1,7 @@
 import React from "react";
 import { Trash2, Quote } from "lucide-react";
 import { BioSection } from "./types";
+import { FormattingToolbar } from "../FormattingToolbar";
 
 const QuoteIcon = Quote as any;
 const TrashIcon = Trash2 as any;
@@ -85,27 +86,43 @@ export function BioSectionsList({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                    Citat (Svenska)
-                  </label>
+                  <div className="flex justify-between items-end mb-1">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                      Citat (Svenska)
+                    </label>
+                    <FormattingToolbar
+                      textareaId={`klick-bio-section-quote-sv-${section.id}`}
+                      value={section.quote_sv}
+                      onValueChange={(val) => updateBioSection(section.id, { quote_sv: val })}
+                    />
+                  </div>
                   <textarea
+                    id={`klick-bio-section-quote-sv-${section.id}`}
                     value={section.quote_sv}
                     onChange={(e) => updateBioSection(section.id, { quote_sv: e.target.value })}
                     rows={2}
                     placeholder="Drama är något jag..."
-                    className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                    className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
                   />
                 </div>
                 <div>
-                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-                    Citat (Engelska)
-                  </label>
+                  <div className="flex justify-between items-end mb-1">
+                    <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                      Citat (Engelska)
+                    </label>
+                    <FormattingToolbar
+                      textareaId={`klick-bio-section-quote-en-${section.id}`}
+                      value={section.quote_en}
+                      onValueChange={(val) => updateBioSection(section.id, { quote_en: val })}
+                    />
+                  </div>
                   <textarea
+                    id={`klick-bio-section-quote-en-${section.id}`}
                     value={section.quote_en}
                     onChange={(e) => updateBioSection(section.id, { quote_en: e.target.value })}
                     rows={2}
                     placeholder="Drama is something..."
-                    className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
+                    className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
                   />
                 </div>
               </div>

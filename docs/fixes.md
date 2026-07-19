@@ -445,3 +445,23 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Root Cause:** In `index.astro`, `<CookieConsent />` was mounted using the `client:load` directive, forcing the browser to fetch and execute it during initial page load, blocking critical rendering metrics.
 - **Resolution:** Updated the directive to `<CookieConsent client:idle />`. Since the banner has an intentional `3.5s` delay before showing anyway, this safely defers the script download and hydration until the browser is fully idle, removing it from the critical request chain.
 
+## 63. Static Build Latency & Strict Translation Filter in FAQ Section
+- **Symptom:** Only a few FAQ questions added in the Backstage panel were rendering on the live `/faq` page.
+- **Root Cause:**
+  1. The site is generated as static HTML (`output: "static"`). When changes were made to FAQs in the CMS database, they didn't show up on the frontend until a full static build/redeploy occurred.
+  2. The FAQ list filtered out questions if they were missing translation text for the active language, causing questions with empty English fields to completely vanish when browsing in English.
+- **Resolution:**
+  1. Added a client-side `useEffect` query in `FAQ.tsx` that fetches the fresh `faqs` list from Supabase immediately on mount, updating the page state dynamically in the background without losing SSG benefits.
+  2. Updated the language filter to gracefully fall back to the available language if the text for the current language is empty, ensuring all questions are displayed.
+
+## 64. TypeScript Compiler Error: 'motion.div' & 'motion.span' JSX Type Clash
+- **Symptom:** TypeScript compilation inside the IDE reported errors: `'motion.div' cannot be used as a JSX component... Type 'Element' is not assignable to type 'ReactNode'`.
+- **Root Cause:** Due to Preact replacing React (`react-compat`), the TypeScript language server sometimes expects React JSX namespace return values but receives Preact's `VNode`s.
+- **Resolution:** Explicitly casted Framer Motion's `motion.div`, `motion.span`, and `motion.p` objects to `any` (e.g., `const MotionDiv = motion.div as any;`) inside `FAQ.tsx` and `Biography.tsx`, satisfying the type compiler and eliminating IDE compiler errors.
+
+## 65. Rich Text Formatting & HTML Rendering support in CMS Fields
+- **Symptom:** Users had no way to add basic styling (like bold, cursive/italics, or hyperlinks) to Biography paragraphs, section quotes, and FAQ answers.
+- **Root Cause:** Text fields were standard `<textarea>` elements, and their values were rendered as raw text nodes (`{text}`) on the front end, which would print raw HTML/markdown tags.
+- **Resolution:**
+  1. Created a reusable `FormattingToolbar` backstage component connected to the textareas in `BioTextsForm`, `BioFaqBuilder`, and `BioSectionsList`. It wraps selected text with HTML tags (`<strong>`, `<em>`, `<a href="...">`) upon clicking.
+  2. Modified paragraph, quote, and FAQ answer components to interpret HTML elements dynamically using `dangerouslySetInnerHTML` combined with a new `.formatted-text` CSS class in `styles.css` that styles text links, bold headers, and italic text with theme tokens (ember, bone, Display font).

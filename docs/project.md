@@ -128,7 +128,9 @@ Recent enhancements to the admin panel streamline content management and align t
 - **Shared Media Selector:** A reusable component `MediaPickerModal` retrieves files from the Supabase storage bucket (`portfolio`), filtering assets by type (images, videos, audio) for one-click selection across Portfolio, Showreels, Meriter, and SEO (OpenGraph image).
 - **Showreel Poster Previews:** Embeds real-time image previews within the Showreels dashboard to verify poster asset links.
 - **Year-Based Auto-Sorting & Custom Ordering:** Merit list elements are sorted automatically by year descending. The addition of manual move-up/down arrows updates the sorting indexes locally so users can customize production display orders.
-- **Act Nomenclature Alignment:** Updated sidebar navigation to strictly match the website's acts, renaming tabs to "Akt VII: Kontaktinfo" and "Akt VIII: Ridåfall". Spacing padding was tightened, and icon dimensions were locked using `flex-shrink-0` to protect sidebar layouts.
 - **Safe Database Mutations:** Switched mutations to `.update().eq('id', 'main')` to avoid database null constraint violations when saving partial states.
 - **Socials & Custom Link Styling:** Integrated custom selectors to pick descriptive icons for custom URLs, and expanded default social configurations to support YouTube and X profiles with custom visual branding.
+- **Rich Text Formatting Toolbar:** Added a visual `FormattingToolbar` helper to the CMS textareas (Biography, FAQ, and custom sections quotes) to easily apply bold, cursive, and hyperlink formatting without raw HTML knowledge.
+- **Safe HTML & Theme Styling:** Configured the frontend views to interpret formatted text using standard styling classes (`.formatted-text`) that adhere to color and typography rules.
+- **Background Live Synchronization**: Resolved the SSG deployment latency by querying database updates on client mount, immediately refreshing the static FAQ layout with the newest CMS state.
 

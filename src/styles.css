@@ -323,3 +323,26 @@ section#portfolio .lg\:hidden {
     padding-bottom: 12rem !important;
   }
 }
+
+/* Rich Text Formatting Styles for CMS Input Support */
+.formatted-text a {
+  color: var(--color-ember);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+  font-weight: 500;
+}
+.formatted-text a:hover {
+  color: var(--color-ember-soft);
+}
+.formatted-text strong, 
+.formatted-text b {
+  color: var(--color-bone);
+  font-weight: 600;
+}
+.formatted-text em, 
+.formatted-text i {
+  font-style: italic;
+  font-family: var(--font-display);
+}
+

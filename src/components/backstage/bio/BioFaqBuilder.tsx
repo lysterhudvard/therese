@@ -1,6 +1,7 @@
 import React from "react";
 import { HelpCircle, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { FAQItem } from "./types";
+import { FormattingToolbar } from "../FormattingToolbar";
 
 const HelpCircleIcon = HelpCircle as any;
 const Trash2Icon = Trash2 as any;
@@ -81,13 +82,21 @@ export function BioFaqBuilder({ faqs, addFaq, removeFaq, updateFaq, moveFaq }: B
                   placeholder="Skriv fråga på svenska..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
-                <textarea
-                  value={faq.a.sv}
-                  onChange={(e) => updateFaq(faq.id, "a", "sv", e.target.value)}
-                  placeholder="Skriv svar på svenska..."
-                  rows={2}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
-                />
+                <div>
+                  <FormattingToolbar
+                    textareaId={`klick-faq-a-sv-${faq.id}`}
+                    value={faq.a.sv}
+                    onValueChange={(val) => updateFaq(faq.id, "a", "sv", val)}
+                  />
+                  <textarea
+                    id={`klick-faq-a-sv-${faq.id}`}
+                    value={faq.a.sv}
+                    onChange={(e) => updateFaq(faq.id, "a", "sv", e.target.value)}
+                    placeholder="Skriv svar på svenska..."
+                    rows={2}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
+                  />
+                </div>
               </div>
 
               {/* EN FAQ */}
@@ -100,13 +109,21 @@ export function BioFaqBuilder({ faqs, addFaq, removeFaq, updateFaq, moveFaq }: B
                   placeholder="Write question in English..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
-                <textarea
-                  value={faq.a.en}
-                  onChange={(e) => updateFaq(faq.id, "a", "en", e.target.value)}
-                  placeholder="Write answer in English..."
-                  rows={2}
-                  className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
-                />
+                <div>
+                  <FormattingToolbar
+                    textareaId={`klick-faq-a-en-${faq.id}`}
+                    value={faq.a.en}
+                    onValueChange={(val) => updateFaq(faq.id, "a", "en", val)}
+                  />
+                  <textarea
+                    id={`klick-faq-a-en-${faq.id}`}
+                    value={faq.a.en}
+                    onChange={(e) => updateFaq(faq.id, "a", "en", e.target.value)}
+                    placeholder="Write answer in English..."
+                    rows={2}
+                    className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
+                  />
+                </div>
               </div>
             </div>
           </div>

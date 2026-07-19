@@ -107,6 +107,7 @@ export function DashboardFaq() {
     } else {
       setIsSaving(false);
       toast.success("FAQ har sparats framgångsrikt i Supabase!");
+      alert("FAQ har sparats framgångsrikt!");
     }
   };
 
