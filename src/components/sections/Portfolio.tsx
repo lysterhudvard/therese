@@ -98,8 +98,18 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
 
   useEffect(() => {
     const calc = () => {
-      if (!trackRef.current) return;
-      setMaxX(trackRef.current.scrollWidth - window.innerWidth);
+      // Use setTimeout to ensure DOM is fully repainted before measuring width
+      setTimeout(() => {
+        if (!trackRef.current) return;
+        const vw = window.innerWidth;
+        // Track starts at 42vw from left. We want to scroll so the right edge 
+        // is fully visible with a 10vw padding on the right.
+        // Total scrollable width = scrollWidth - (window.innerWidth - 42vw) + 10vw padding
+        const visibleWidth = vw * 0.58; 
+        const paddingRight = vw * 0.10;
+        const maxScroll = trackRef.current.scrollWidth - visibleWidth + paddingRight;
+        setMaxX(Math.max(0, maxScroll));
+      }, 100);
     };
     calc();
     window.addEventListener("resize", calc);
