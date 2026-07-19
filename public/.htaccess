@@ -1,3 +1,25 @@
+# Apache Routing for Astro Clean URLs (Hostinger Fix)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Serve existing files and directories normally (e.g., _astro assets)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # If a directory index (e.g. /cv/index.html) exists, serve it
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^(.*[^/])/?$ $1/index.html [L]
+
+  # If a flat HTML file (e.g. /cv.html) exists, serve it
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.*[^/])/?$ $1.html [L]
+</IfModule>
+
+# Ensure index.html is recognized as the default page document
+DirectoryIndex index.html
+
 # Enable browser caching / Expires headers
 <IfModule mod_expires.c>
   ExpiresActive On
