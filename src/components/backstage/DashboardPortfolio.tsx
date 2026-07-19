@@ -129,7 +129,7 @@ export function DashboardPortfolio() {
     await proceedWithUpload(file);
   };
 
-  const proceedWithUpload = async (fileToUpload: File) => {
+  const proceedWithUpload = async (fileToUpload: File, uploadOriginal: boolean = false) => {
     const originalFile = pendingUploadFile; // Keep reference to original file before we reset it
     setIsOptimizerOpen(false);
     setPendingUploadFile(null);
@@ -160,9 +160,8 @@ export function DashboardPortfolio() {
       const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(filePath);
       optimizedUrl = urlData.publicUrl;
 
-      // 2. If it is an optimized file, also upload the original file for the high-res download
-      const isOptimized = fileToUpload.name.includes("-optimized.");
-      if (isOptimized && originalFile) {
+      // 2. If uploadOriginal is true, also upload the original file for the high-res download
+      if (uploadOriginal && originalFile) {
         const origExt = originalFile.name.split(".").pop();
         const origFileName = `${Math.random().toString(36).substring(2)}-original.${origExt}`;
         const origFilePath = `portfolio/${origFileName}`;
@@ -443,8 +442,8 @@ export function DashboardPortfolio() {
           setIsOptimizerOpen(false);
           setPendingUploadFile(null);
         }}
-        onUpload={(finalFile) => {
-          proceedWithUpload(finalFile);
+        onUpload={(finalFile, category, uploadOriginal) => {
+          proceedWithUpload(finalFile, uploadOriginal);
         }}
       />
     </>

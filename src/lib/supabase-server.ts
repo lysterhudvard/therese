@@ -71,7 +71,11 @@ export async function getPageData() {
       url: p.url,
       download_url: p.download_url || p.url,
       alt: p.alt || "Therese Järvheden porträtt",
-      allow_download: p.allow_download !== false
+      allow_download: p.allow_download !== false,
+      title: p.title || "",
+      caption: p.caption || "",
+      filename: p.filename || "",
+      description: p.description || ""
     }));
 
     return {

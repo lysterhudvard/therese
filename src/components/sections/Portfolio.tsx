@@ -16,12 +16,26 @@ export interface PortfolioImage {
   filename?: string;
   allow_download?: boolean;
   download_url?: string;
+  description?: string;
 }
+
+const parseCropPosition = (descriptionStr: string | undefined | null) => {
+  if (!descriptionStr) return "50% 50%";
+  if (descriptionStr.startsWith("crop:")) {
+    const parts = descriptionStr.split(";desc:");
+    return parts[0].replace("crop:", "");
+  }
+  if (["center", "top", "bottom", "left", "right"].includes(descriptionStr)) {
+    return descriptionStr;
+  }
+  return "50% 50%";
+};
 
 export function Portfolio({ images = [], teaser = false }: { images?: (string | PortfolioImage)[], teaser?: boolean }) {
   const { t, lang } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const { scrollYProgress: exitProgress } = useScroll({
     target: ref,
@@ -40,6 +54,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
         caption: "",
         filename: "",
         allow_download: true,
+        description: "center",
       };
     }
     return {
@@ -50,6 +65,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
       caption: img.caption || "",
       filename: img.filename || "",
       allow_download: img.allow_download !== false,
+      description: img.description || "center",
     };
   });
 
@@ -80,6 +96,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
             caption: img.caption || "",
             filename: img.filename || "",
             allow_download: img.allow_download !== false,
+            description: img.description || "",
           }));
 
           if (teaser) {
@@ -121,7 +138,16 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
   const exitScale = useTransform(exitProgress, [0, 0.8], [1, 1.05]);
 
   // Force trigger browser download by fetching as blob to avoid same-origin restrictions
-  const triggerDownload = async (url: string, filename: string) => {
+  const triggerDownload = async (img: PortfolioImage, index: number) => {
+    const url = img.download_url || img.url;
+    // Extract actual extension from the URL if filename isn't provided or lacks extension
+    const urlExt = url.split('.').pop()?.split('?')[0] || 'jpg';
+    const fallbackFilename = `therese-jarvheden-press-${index + 1}.${urlExt}`;
+    const filename = img.filename 
+      ? (img.filename.includes('.') ? img.filename : `${img.filename}.${urlExt}`) 
+      : fallbackFilename;
+
+    setDownloadingId(img.url);
     try {
       const response = await fetch(url);
       const blob = await response.blob();
@@ -136,6 +162,8 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
     } catch (error) {
       console.warn("Direct download failed, falling back to open in tab:", error);
       window.open(url, "_blank");
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -202,22 +230,32 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
                   title={img.title || undefined}
                   loading="lazy"
                   className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.02]"
+                  style={{ objectPosition: parseCropPosition(img.description) }}
                 />
                 <div className="absolute left-3 top-3 font-mono text-[10px] text-bone/60 bg-ink/40 backdrop-blur-xs px-2 py-0.5 rounded-sm">
                   {String(i + 1).padStart(2, "0")} / {String(liveImages.length).padStart(2, "0")}
                 </div>
-                <div className="absolute bottom-3 left-3 font-mono text-[9px] text-bone/70 tracking-wider">
-                  THESS · {String(2020 + (i % 4))}
-                </div>
+                {img.caption && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/95 via-black/60 to-transparent translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                    <span className="font-mono text-[10px] font-bold text-bone tracking-wider">
+                      {img.caption}
+                    </span>
+                  </div>
+                )}
 
                 {img.allow_download && (
                   <button
                     type="button"
-                    onClick={() => triggerDownload(img.download_url || img.url, img.filename || `therese-jarvheden-press-${i + 1}.jpg`)}
-                    className="absolute bottom-3 right-3 p-2 bg-ink/75 hover:bg-ember border border-bone/10 hover:border-ember text-bone hover:text-ink rounded-full transition-all duration-300 shadow-md flex items-center justify-center cursor-pointer scale-90 group-hover:scale-100 opacity-0 group-hover:opacity-100"
+                    disabled={downloadingId === img.url}
+                    onClick={() => triggerDownload(img, i)}
+                    className="absolute bottom-3 right-3 p-2 bg-ink/75 hover:bg-ember border border-bone/10 hover:border-ember text-bone hover:text-ink rounded-full transition-all duration-300 shadow-md flex items-center justify-center cursor-pointer scale-90 group-hover:scale-100 opacity-0 group-hover:opacity-100 disabled:opacity-100 disabled:bg-stage disabled:text-bone/50"
                     title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
                   >
-                    <Download size={14} />
+                    {downloadingId === img.url ? (
+                      <span className="w-3.5 h-3.5 border-2 border-bone/50 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Download size={14} />
+                    )}
                   </button>
                 )}
               </div>
@@ -254,26 +292,40 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
             <div className="w-full overflow-x-auto no-scrollbar">
               <div className="flex items-center gap-4 px-6">
                 {liveImages.map((img, i) => (
-                  <div key={img.url + i} className="relative shrink-0 w-[240px] aspect-[3/4] rounded overflow-hidden border border-bone/10">
+                  <div key={img.url + i} className="relative shrink-0 w-[240px] aspect-[3/4] rounded overflow-hidden border border-bone/10 group">
                     <img
                       src={img.url}
                       alt={img.alt}
                       title={img.title || undefined}
                       loading="lazy"
                       className="h-full w-full object-cover"
+                      style={{ objectPosition: parseCropPosition(img.description) }}
                     />
                     <div className="absolute left-2 top-2 font-mono text-[10px] text-bone/70 bg-black/50 px-1.5 py-0.5 rounded-sm">
                       {String(i + 1).padStart(2, "0")}
                     </div>
 
+                    {img.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/95 via-black/60 to-transparent translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                        <span className="font-mono text-[10px] font-bold text-bone tracking-wider">
+                          {img.caption}
+                        </span>
+                      </div>
+                    )}
+
                     {img.allow_download && (
                       <button
                         type="button"
-                        onClick={() => triggerDownload(img.download_url || img.url, img.filename || `therese-jarvheden-press-${i + 1}.jpg`)}
-                        className="absolute bottom-2 right-2 p-2 bg-black/60 text-bone hover:text-ember rounded-full transition-colors flex items-center justify-center cursor-pointer"
+                        disabled={downloadingId === img.url}
+                        onClick={() => triggerDownload(img, i)}
+                        className="absolute bottom-2 right-2 p-2 bg-black/60 text-bone hover:text-ember rounded-full transition-colors flex items-center justify-center cursor-pointer disabled:opacity-100 disabled:bg-stage disabled:text-bone/50"
                         title={lang === "sv" ? "Ladda ner pressbild" : "Download press photo"}
                       >
-                        <Download size={12} />
+                        {downloadingId === img.url ? (
+                          <span className="w-3 h-3 border-2 border-bone/50 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Download size={12} />
+                        )}
                       </button>
                     )}
                   </div>

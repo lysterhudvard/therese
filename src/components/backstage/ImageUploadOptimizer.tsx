@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { X, Sparkles, Check, AlertTriangle, Info, ArrowRight, FileImage } from "lucide-react";
 
+const XIcon = X as any;
+const SparklesIcon = Sparkles as any;
+const CheckIcon = Check as any;
+const AlertTriangleIcon = AlertTriangle as any;
+const InfoIcon = Info as any;
+const ArrowRightIcon = ArrowRight as any;
+const FileImageIcon = FileImage as any;
+
 interface ImageUploadOptimizerProps {
   isOpen: boolean;
   file: File | null;
   defaultSection?: "hero" | "bio" | "portfolio" | "showreel" | "seo" | "credits" | "voice" | "curtain" | "general";
   onCancel: () => void;
-  onUpload: (finalFile: File, category: string) => void;
+  onUpload: (finalFile: File, category: string, uploadOriginal?: boolean) => void;
 }
 
 interface ImageProfile {
@@ -117,6 +125,7 @@ export function ImageUploadOptimizer({
   const [optimizedDetails, setOptimizedDetails] = useState<{ width: number; height: number; size: number } | null>(null);
   const [isCompiling, setIsCompiling] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [keepOriginal, setKeepOriginal] = useState(defaultSection === "portfolio");
 
   useEffect(() => {
     if (file) {
@@ -226,7 +235,7 @@ export function ImageUploadOptimizer({
     
     // If the optimized file is actually larger than the original, upload the original instead
     if (optimizedBlob.size >= file.size) {
-      onUpload(file, selectedSection);
+      onUpload(file, selectedSection, keepOriginal);
       return;
     }
     
@@ -238,11 +247,11 @@ export function ImageUploadOptimizer({
     const optimizedFileName = `${nameWithoutExt}-optimized.${extension}`;
 
     const optimizedFile = new File([optimizedBlob], optimizedFileName, { type: mimeType });
-    onUpload(optimizedFile, selectedSection);
+    onUpload(optimizedFile, selectedSection, keepOriginal);
   };
 
   const handleUploadOriginal = () => {
-    onUpload(file, selectedSection);
+    onUpload(file, selectedSection, false);
   };
 
   const formatKb = (bytes: number) => {
@@ -264,22 +273,23 @@ export function ImageUploadOptimizer({
       <div className="bg-stage border border-bone/10 w-full max-w-2xl flex flex-col rounded-md shadow-2xl relative overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-bone/5 bg-stage/50">
-          <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-ember animate-pulse" />
-            <h2 className="text-sm font-mono uppercase tracking-widest text-bone">
+          <div className="bg-stage p-1.5 rounded-sm shrink-0 border border-ember/20">
+          <SparklesIcon size={14} className="text-ember" />
+        </div>
+        <div>    <h2 className="text-sm font-mono uppercase tracking-widest text-bone">
               Medieoptimering & SEO-koll
             </h2>
           </div>
-          <button onClick={onCancel} className="p-1 text-bone/50 hover:text-bone hover:bg-bone/5 rounded-sm transition-colors cursor-pointer">
-            <X size={18} />
-          </button>
+          <button onClick={onCancel} className="p-1 hover:bg-bone/10 rounded-sm text-bone/60 hover:text-bone transition-colors cursor-pointer">
+          <XIcon size={16} />
+        </button>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
           {/* File summary */}
           <div className="flex items-center gap-3 bg-ink/30 border border-bone/5 p-3 rounded-sm">
-            <FileImage size={24} className="text-bone/45" />
+            <FileImageIcon size={24} className="text-bone/45" />
             <div className="truncate text-left">
               <span className="block text-[11px] font-mono text-bone truncate">{file.name}</span>
               <span className="block text-[9px] text-bone/40 uppercase tracking-widest mt-0.5">
@@ -320,7 +330,7 @@ export function ImageUploadOptimizer({
           {currentProfile && (
             <div className="bg-stage/40 border border-bone/5 p-4 rounded-sm space-y-2 text-left text-xs text-bone/70">
               <div className="flex items-start gap-2">
-                <Info size={14} className="text-ember mt-0.5 flex-shrink-0" />
+                <InfoIcon size={14} className="text-ember mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-bone">{currentProfile.name}</p>
                   <p className="text-[10px] text-bone/50 mt-0.5 leading-relaxed">{currentProfile.description}</p>
@@ -362,7 +372,7 @@ export function ImageUploadOptimizer({
 
                 {isOversized(originalDetails.size, currentProfile.targetKb) && (
                   <div className="flex items-start gap-1.5 text-[9px] text-red-400 bg-red-950/20 border border-red-900/30 p-2 rounded-sm mt-2">
-                    <AlertTriangle size={12} className="flex-shrink-0 mt-0.5" />
+                    <AlertTriangleIcon size={12} className="flex-shrink-0 mt-0.5" />
                     <span>Filen är större än rekommenderade {currentProfile.targetKb} KB och kommer att slöa ner webbplatsen.</span>
                   </div>
                 )}
@@ -404,18 +414,18 @@ export function ImageUploadOptimizer({
                         Storleksminskning:
                       </span>
                       <span className="font-mono text-emerald-400 font-bold flex items-center gap-1">
-                        <ArrowRight size={10} /> {optimizedDetails.size >= originalDetails.size ? "0" : calculateReduction()}% mindre!
+                        <ArrowRightIcon size={10} /> {optimizedDetails.size >= originalDetails.size ? "0" : calculateReduction()}% mindre!
                       </span>
                     </div>
 
                     {optimizedDetails.size >= originalDetails.size ? (
                       <div className="flex items-start gap-1.5 text-[9px] text-amber-400 bg-amber-950/25 border border-amber-900/30 p-2 rounded-sm mt-2">
-                        <AlertTriangle size={12} className="flex-shrink-0 mt-0.5 text-amber-400" />
+                        <AlertTriangleIcon size={12} className="flex-shrink-0 mt-0.5 text-amber-400" />
                         <span>Originalfilen är mindre ({formatKb(originalDetails.size)}) än den optimerade WebP-versionen. Vi kommer automatiskt att ladda upp originalet.</span>
                       </div>
                     ) : (
                       <div className="flex items-start gap-1.5 text-[9px] text-emerald-400 bg-emerald-950/20 border border-emerald-900/30 p-2 rounded-sm mt-2">
-                        <Check size={12} className="flex-shrink-0 mt-0.5" />
+                        <CheckIcon size={12} className="flex-shrink-0 mt-0.5" />
                         <span>Komprimerad till det moderna {selectedSection === "seo" ? "JPEG" : "WebP"} formatet, laddar snabbt på Google!</span>
                       </div>
                     )}
@@ -426,6 +436,26 @@ export function ImageUploadOptimizer({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Upload Original Checkbox (Below Optimiser Details) */}
+        <div className="px-6 pb-2">
+          <label className="flex items-center gap-2 p-3 border border-bone/10 bg-stage/40 rounded-sm cursor-pointer hover:bg-stage/60 transition-colors">
+            <input
+              type="checkbox"
+              checked={keepOriginal}
+              onChange={(e) => setKeepOriginal(e.target.checked)}
+              className="rounded border-bone/20 text-ember focus:ring-0 focus:ring-offset-0 bg-transparent w-4 h-4 cursor-pointer"
+            />
+            <div className="flex flex-col">
+              <span className="text-[11px] uppercase tracking-widest text-bone font-mono font-semibold">
+                Spara även originalfilen
+              </span>
+              <span className="text-[9px] text-bone/50">
+                Gör originalfilen nedladdningsbar i CMS-galleriet
+              </span>
+            </div>
+          </label>
         </div>
 
         {/* Footer actions */}
