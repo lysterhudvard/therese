@@ -25,23 +25,33 @@ export function DashboardPortfolio() {
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
   const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
 
+  const fetchImages = async () => {
+    if (!isSupabaseConfigured()) return;
+    const { data: imgData } = await supabase
+      .from("portfolio_images")
+      .select("*")
+      .order("sort_order", { ascending: true });
+
+    if (imgData) {
+      setImages(imgData as GalleryImage[]);
+    }
+  };
+
   // Fetch data from Supabase on mount
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
-
-    const fetchData = async () => {
-      const { data: imgData } = await supabase
-        .from("portfolio_images")
-        .select("*")
-        .order("sort_order", { ascending: true });
-
-      if (imgData) {
-        setImages(imgData as GalleryImage[]);
-      }
-    };
-
-    fetchData();
+    fetchImages();
   }, []);
+
+  const generateUUID = () => {
+    if (typeof window !== "undefined" && window.crypto && window.crypto.randomUUID) {
+      return window.crypto.randomUUID();
+    }
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  };
 
   // Image manipulation operations
   const moveImage = (index: number, direction: "up" | "down") => {
@@ -103,11 +113,12 @@ export function DashboardPortfolio() {
     toast.success("Bild lagd till i listan. Klicka på Spara för att bekräfta.");
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileUpload = async (e: any) => {
+    const target = e.target as HTMLInputElement;
+    const file = target?.files?.[0];
     if (!file) return;
 
-    e.target.value = "";
+    target.value = "";
 
     if (file.type.startsWith("image/")) {
       setPendingUploadFile(file);
@@ -190,7 +201,7 @@ export function DashboardPortfolio() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 
@@ -214,7 +225,9 @@ export function DashboardPortfolio() {
           download_url: download_url || url, 
           sort_order 
         };
-        if (!id.startsWith("temp-")) {
+        if (id.startsWith("temp-")) {
+          item.id = generateUUID();
+        } else {
           item.id = id;
         }
         return item;
@@ -222,6 +235,8 @@ export function DashboardPortfolio() {
 
       const { error: imgErr } = await supabase.from("portfolio_images").upsert(imagesToUpsert);
       if (imgErr) throw imgErr;
+
+      await fetchImages();
 
       toast.success("Akt III (Portfolio Bilder) har sparats i Supabase!");
       alert("Akt III (Portfolio Bilder) har sparats framgångsrikt!");

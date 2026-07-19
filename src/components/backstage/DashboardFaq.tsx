@@ -86,28 +86,34 @@ export function DashboardFaq() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 
     if (!isSupabaseConfigured()) {
       toast.error("Supabase är inte anslutet. Ändringen sparas endast lokalt.");
-      setTimeout(() => setIsSaving(false), 500);
+      setIsSaving(false);
       return;
     }
 
-    const { error } = await supabase.from("biography").update({
-      faqs: faqs,
-    }).eq('id', 'main');
+    try {
+      const { error } = await supabase.from("biography").update({
+        faqs: faqs,
+      }).eq('id', 'main');
 
-    if (error) {
+      if (error) {
+        toast.error(`Kunde inte spara i databasen: ${error.message}`);
+        alert(`Misslyckades med att spara FAQ: ${error.message}`);
+      } else {
+        toast.success("FAQ har sparats framgångsrikt i Supabase!");
+        alert("FAQ har sparats framgångsrikt!");
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Ett fel uppstod: ${err.message || err}`);
+      alert(`Misslyckades med att spara FAQ: ${err.message || err}`);
+    } finally {
       setIsSaving(false);
-      toast.error(`Kunde inte spara i databasen: ${error.message}`);
-      alert(`Misslyckades med att spara FAQ: ${error.message}`);
-    } else {
-      setIsSaving(false);
-      toast.success("FAQ har sparats framgångsrikt i Supabase!");
-      alert("FAQ har sparats framgångsrikt!");
     }
   };
 
