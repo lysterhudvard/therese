@@ -1,28 +1,62 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft as ArrowLeftOrig, ArrowRight as ArrowRightOrig, Video as VideoOrig } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 const ArrowLeft = ArrowLeftOrig as any;
 const ArrowRight = ArrowRightOrig as any;
 const Video = VideoOrig as any;
+const MotionDiv = motion.div as any;
 import { useT } from "../../hooks/use-t";
 import { VIDEOS, type VideoItem } from "./ShowreelsData";
 import { TheaterPlayer } from "./showreels/TheaterPlayer";
 
 export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoItem[], teaser?: boolean }) {
   const { lang } = useT();
-  const [activeVideo, setActiveVideo] = useState<VideoItem>(videos[0] || VIDEOS[0]);
+  const [liveVideos, setLiveVideos] = useState<VideoItem[]>(videos || VIDEOS);
+  const [activeVideo, setActiveVideo] = useState<VideoItem>(liveVideos[0] || VIDEOS[0]);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
 
   useEffect(() => {
-    if (videos && videos.length > 0) {
-      setActiveVideo(videos[0]);
-    }
-  }, [videos]);
+    if (!isSupabaseConfigured()) return;
+    
+    let active = true;
+    const fetchShowreels = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("showreels")
+          .select("*")
+          .order("sort_order", { ascending: true });
 
-  const remainingVideos = videos.filter((v) => v.id !== activeVideo.id);
+        if (error) throw error;
+        if (data && Array.isArray(data) && active) {
+          let fetched = data.map((item: any) => ({
+            id: item.id || String(item.sort_order),
+            title: { sv: item.title_sv || "", en: item.title_en || "" },
+            sub: { sv: item.sub_sv || "", en: item.sub_en || "" },
+            url: item.url || undefined,
+            vimeoId: item.vimeo_id || undefined,
+            youtubeId: item.youtube_id || undefined,
+            poster: item.poster || "",
+            genre: item.genre || "SHOWREEL",
+            specs: item.specs || "16:9 // HD",
+            glow: item.glow || "rgba(235, 94, 40, 0.15)",
+          }));
+          setLiveVideos(fetched);
+          if (fetched.length > 0) setActiveVideo(fetched[0]);
+        }
+      } catch (e) {
+        console.error("Failed to fetch showreels client-side:", e);
+      }
+    };
+
+    fetchShowreels();
+    return () => { active = false; };
+  }, []);
+
+  const remainingVideos = liveVideos.filter((v) => v.id !== activeVideo.id);
   const hasMoreVideos = remainingVideos.length > 3;
   const displayedVideos = showAllVideos ? remainingVideos : remainingVideos.slice(0, 3);
 
@@ -52,7 +86,7 @@ export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoI
         }}
       />
 
-      <motion.div
+      <MotionDiv
         style={{ opacity: exitOpacity, scale: exitScale, zIndex: isEnlarged ? 9999 : 10 }}
         className="relative mx-auto max-w-7xl"
       >
@@ -155,7 +189,7 @@ export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoI
                 onClick={() => setShowAllVideos(!showAllVideos)}
                 className="relative border border-bone/10 hover:border-ember bg-stage/10 cursor-pointer rounded-sm overflow-hidden flex flex-col items-center justify-center p-6 text-center group transition-all duration-500 min-h-[150px] md:h-auto"
               >
-                <motion.div
+                <MotionDiv
                   animate={{ x: showAllVideos ? 0 : [0, 5, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
                   className="w-10 h-10 rounded-full border border-bone/20 flex items-center justify-center text-bone/60 group-hover:text-ember group-hover:border-ember transition-colors mb-2"
@@ -165,7 +199,7 @@ export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoI
                   ) : (
                     <ArrowRight size={16} className="rotate-90 md:rotate-0" />
                   )}
-                </motion.div>
+                </MotionDiv>
                 <span className="font-mono text-[9px] tracking-widest text-bone/60 group-hover:text-bone transition-colors uppercase">
                   {showAllVideos
                     ? (lang === "sv" ? "Visa färre" : "Show Less")
@@ -188,7 +222,7 @@ export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoI
             </a>
           </div>
         )}
-      </motion.div>
+      </MotionDiv>
 
     </section>
   );

@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useT } from "../../hooks/use-t";
 import { Download as DownloadOrig, ArrowRight as ArrowRightOrig } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 const Download = DownloadOrig as any;
 const ArrowRight = ArrowRightOrig as any;
+const MotionDiv = motion.div as any;
 
 export interface PortfolioImage {
   url: string;
@@ -55,6 +57,45 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
     normalizedImages = normalizedImages.slice(0, 4);
   }
 
+  const [liveImages, setLiveImages] = useState<PortfolioImage[]>(normalizedImages);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    
+    let active = true;
+    const fetchPortfolioImages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("portfolio_images")
+          .select("*")
+          .order("sort_order", { ascending: true });
+
+        if (error) throw error;
+        if (data && Array.isArray(data) && active) {
+          let fetched = data.map((img: any, idx: number) => ({
+            url: img.url,
+            download_url: img.download_url || img.url,
+            alt: img.alt || `Therese Järvheden portfolio ${idx + 1}`,
+            title: img.title || "",
+            caption: img.caption || "",
+            filename: img.filename || "",
+            allow_download: img.allow_download !== false,
+          }));
+
+          if (teaser) {
+            fetched = fetched.slice(0, 4);
+          }
+          setLiveImages(fetched);
+        }
+      } catch (e) {
+        console.error("Failed to fetch portfolio images client-side:", e);
+      }
+    };
+
+    fetchPortfolioImages();
+    return () => { active = false; };
+  }, [teaser]);
+
   useEffect(() => {
     const calc = () => {
       if (!trackRef.current) return;
@@ -63,7 +104,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
-  }, [normalizedImages.length]);
+  }, [liveImages.length]);
 
   const x = useTransform(scrollYProgress, [0, 1], [0, -maxX]);
   const exitOpacity = useTransform(exitProgress, [0, 0.8], [1, 0]);
@@ -92,9 +133,9 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
     <section 
       id="portfolio" 
       ref={ref} 
-      className={`relative ${normalizedImages.length > 0 ? "h-auto lg:h-[320vh]" : "h-auto lg:h-[100svh]"}`}
+      className={`relative ${liveImages.length > 0 ? "h-auto lg:h-[320vh]" : "h-auto lg:h-[100svh]"}`}
     >
-      <motion.div
+      <MotionDiv
         style={{ opacity: exitOpacity, scale: exitScale }}
         className="relative lg:sticky top-0 h-auto lg:h-[100svh] w-full overflow-hidden bg-ink"
       >
@@ -110,7 +151,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
         </div>
 
         {/* Dark barrier on the left to fade out images as they approach the text */}
-        {normalizedImages.length > 0 && (
+        {liveImages.length > 0 && (
           <div className="absolute left-0 top-0 bottom-0 z-20 w-[42vw] bg-gradient-to-r from-ink via-ink/90 to-transparent pointer-events-none hidden lg:block" />
         )}
 
@@ -123,24 +164,23 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
             <br />
             {t.portfolio.title[1]}
           </div>
-          {normalizedImages.length > 0 && (
+          {liveImages.length > 0 && (
             <div className="mt-4 text-xs text-bone/70 max-w-[180px]">{t.portfolio.hint}</div>
           )}
         </div>
 
         {/* Desktop Image Track / Placeholder */}
-        {normalizedImages.length === 0 ? (
-          <div className="hidden lg:flex absolute left-[45vw] top-1/2 -translate-y-1/2 items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow">
-            <span>//</span>
-            <span>{lang === "sv" ? "Bilder kommer snart" : "Images coming soon"}</span>
+        {liveImages.length === 0 ? (
+          <div className="hidden lg:flex items-center justify-center w-full h-full font-mono text-[10px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow">
+            <span className="mr-3">//</span> {lang === "sv" ? "Bilder kommer snart" : "Images coming soon"}
           </div>
         ) : (
-          <motion.div
+          <MotionDiv
             ref={trackRef}
             style={{ x }}
-            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 items-center gap-8 px-[40vw] will-change-transform z-10"
+            className="hidden lg:flex absolute left-[42vw] top-1/2 h-[55vh] min-h-[400px] -translate-y-1/2 items-center gap-6"
           >
-            {normalizedImages.map((img, i) => (
+            {liveImages.map((img, i) => (
               <div
                 key={img.url + i}
                 className="relative shrink-0 group overflow-hidden border border-bone/5 hover:border-ember/30 transition-colors duration-500"
@@ -154,7 +194,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
                   className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.02]"
                 />
                 <div className="absolute left-3 top-3 font-mono text-[10px] text-bone/60 bg-ink/40 backdrop-blur-xs px-2 py-0.5 rounded-sm">
-                  {String(i + 1).padStart(2, "0")} / {String(normalizedImages.length).padStart(2, "0")}
+                  {String(i + 1).padStart(2, "0")} / {String(liveImages.length).padStart(2, "0")}
                 </div>
                 <div className="absolute bottom-3 left-3 font-mono text-[9px] text-bone/70 tracking-wider">
                   THESS · {String(2020 + (i % 4))}
@@ -181,7 +221,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
                 </a>
               </div>
             )}
-          </motion.div>
+          </MotionDiv>
         )}
         {/* Mobile / Tablet layout - natural height, does not lock page scrolling */}
         <div className="lg:hidden relative z-10 flex flex-col py-20 md:py-24">
@@ -195,7 +235,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
             </h3>
           </div>
           
-          {normalizedImages.length === 0 ? (
+          {liveImages.length === 0 ? (
             <div className="px-6 py-6 font-mono text-[9px] uppercase tracking-[0.3em] text-bone/45 animate-pulse-slow flex items-center gap-2">
               <span>//</span>
               <span>{lang === "sv" ? "Bilder kommer snart" : "Images coming soon"}</span>
@@ -203,7 +243,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
           ) : (
             <div className="w-full overflow-x-auto no-scrollbar">
               <div className="flex items-center gap-4 px-6">
-                {normalizedImages.map((img, i) => (
+                {liveImages.map((img, i) => (
                   <div key={img.url + i} className="relative shrink-0 w-[240px] aspect-[3/4] rounded overflow-hidden border border-bone/10">
                     <img
                       src={img.url}
@@ -243,7 +283,7 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
             </div>
           )}
         </div>
-      </motion.div>
+      </MotionDiv>
     </section>
   );
 }

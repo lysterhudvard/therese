@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { useT, useCommentaryStore, playCommentary, stopCommentary } from "../../hooks/use-t";
 import { type Credit, type FilterKey } from "../../types";
+
+const MotionDiv = motion.div as any;
+const MotionLi = motion.li as any;
 
 export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -77,7 +81,7 @@ export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
         const layout = quoteLayouts[i] || quoteLayouts[0];
         
         return (
-          <motion.div
+          <MotionDiv
             key={q}
             style={{
               y: layers[i].y,
@@ -100,7 +104,7 @@ export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
                 "{q}"
               </text>
             </svg>
-          </motion.div>
+          </MotionDiv>
         );
       })}
     </div>
@@ -121,7 +125,67 @@ export function Credits({
   const { lang, t } = useT();
   const { active } = useCommentaryStore();
   const activeCommentaryUrl = active?.url || propActiveCommentaryUrl;
+  const [liveCredits, setLiveCredits] = useState<Credit[]>(credits);
   const [filter, setFilter] = useState<FilterKey>("Alla");
+  
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    
+    let activeSync = true;
+    const fetchCredits = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("credits")
+          .select("*")
+          .order("sort_order", { ascending: true });
+
+        if (error) throw error;
+        if (data && Array.isArray(data) && activeSync) {
+          const fetched = data.map((c: any) => {
+            const credit: any = {
+              year: c.year || "—",
+              title: c.title || "",
+              role: { sv: c.role_sv || "", en: c.role_en || "" },
+              type: c.type,
+              category: { sv: c.category_sv || "", en: c.category_en || "" },
+              network: c.network || "",
+              url: c.url || undefined,
+              img: c.img || "",
+              is_current_production: c.is_current_production
+            };
+            if (c.commentary_url) {
+              credit.commentary = {
+                url: c.commentary_url,
+                duration: c.commentary_duration || "0:10",
+                svText: c.commentary_sv || "",
+                enText: c.commentary_en || ""
+              };
+            }
+            if (c.script_scene) {
+              credit.script = {
+                scene: c.script_scene,
+                dialogue: {
+                  char: c.script_char || "CHARACTER",
+                  line: {
+                    sv: c.script_line_sv || "",
+                    en: c.script_line_en || ""
+                  }
+                }
+              };
+            }
+            return credit;
+          });
+          setLiveCredits(fetched);
+        }
+      } catch (e) {
+        console.error("Failed to fetch credits client-side:", e);
+      }
+    };
+
+    fetchCredits();
+    return () => { activeSync = false; };
+  }, []);
+
   const [hoveredCredit, setHoveredCredit] = useState<Credit | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [showAllCredits, setShowAllCredits] = useState(false);
@@ -160,8 +224,8 @@ export function Credits({
   const activeQuotes = parsedReviewQuotes || defaultQuotes;
 
   const rows = useMemo(
-    () => (filter === "Alla" ? credits : credits.filter((c) => c.type === filter)),
-    [filter, credits],
+    () => (filter === "Alla" ? liveCredits : liveCredits.filter((c) => c.type === filter)),
+    [filter, liveCredits],
   );
 
   const visibleRows = useMemo(() => {
@@ -177,7 +241,7 @@ export function Credits({
   const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
   return (
     <section id="credits" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
-      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
+      <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <ParallaxQuotes quotes={activeQuotes} />
 
 
@@ -204,7 +268,7 @@ export function Credits({
                 >
                   {t.credits.filters[f]}
                   <span className="ml-2 font-mono text-[9px] text-bone/30">
-                    {f === "Alla" ? credits.length : credits.filter((c) => c.type === f).length}
+                    {f === "Alla" ? liveCredits.length : liveCredits.filter((c) => c.type === f).length}
                   </span>
                 </button>
               ))}
@@ -214,7 +278,7 @@ export function Credits({
           <ul className="mt-14 border-t border-bone/20">
             <AnimatePresence initial={false}>
               {visibleRows.map((c, i) => (
-                <motion.li
+                <MotionLi
                   key={c.title}
                   layout
                   initial={{ opacity: 0, y: 16 }}
@@ -322,7 +386,7 @@ export function Credits({
                       {c.network} · {c.category[lang]}
                     </div>
                   </div>
-                </motion.li>
+                </MotionLi>
               ))}
             </AnimatePresence>
           </ul>
@@ -344,7 +408,7 @@ export function Credits({
 
         <AnimatePresence>
           {hoveredCredit && hoveredCredit.img && hoveredCredit.script && (
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -383,10 +447,10 @@ export function Credits({
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </MotionDiv>
           )}
         </AnimatePresence>
-      </motion.div>
+      </MotionDiv>
     </section>
   );
 }
