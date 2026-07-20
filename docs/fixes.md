@@ -465,3 +465,16 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Resolution:**
   1. Created a reusable `FormattingToolbar` backstage component connected to the textareas in `BioTextsForm`, `BioFaqBuilder`, and `BioSectionsList`. It wraps selected text with HTML tags (`<strong>`, `<em>`, `<a href="...">`) upon clicking.
   2. Modified paragraph, quote, and FAQ answer components to interpret HTML elements dynamically using `dangerouslySetInnerHTML` combined with a new `.formatted-text` CSS class in `styles.css` that styles text links, bold headers, and italic text with theme tokens (ember, bone, Display font).
+
+## 66. Drag-to-Crop Alignment Blocks & Missing Frontend Coordinates Sync
+- **Symptom:** The drag-to-crop interface on the portfolio image thumbnails was locked and wouldn't register drags. Furthermore, even if drag values were updated locally in the dashboard state, they failed to render on the live website.
+- **Root Cause:**
+  1. The CMS thumbnail was covered by a full-height absolute button overlay (`absolute inset-0`) that activated on hover to change the image. This button swallowed mouse clicks/drags and launched the media picker modal on release.
+  2. The mouse and touch event parameters in `PortfolioCardItem.tsx` threw Preact type compilation errors due to JSX compatibility conflicts.
+  3. The data querying pipelines (`supabase-server.ts` for SSR and `Portfolio.tsx` for client-side fallbacks) explicitly mapped the database results into standard objects while dropping the `description` column (where crop coordinates were serialized).
+  4. The frontend images were setting `style={{ objectPosition: img.description }}` directly, but the raw database value (e.g. `crop:50% 30%;desc:Text`) is not a valid CSS `object-position` value.
+- **Resolution:**
+  1. Relocated the "Change Image" hover button to a compact, z-indexed button in the top-right corner of the thumbnail. This leaves the central preview area completely clear for dragging.
+  2. Changed event parameter types in `PortfolioCardItem.tsx` handlers (`handleMouseDown`, `handleMouseMove`, `handleTouchStart`, `handleTouchMove`) to `any`, silencing Preact JSX mismatch warnings.
+  3. Included the `description`, `title`, `caption`, and `filename` columns in the mapped outputs of both the server-side `getPageData` queries and the client-side `Portfolio.tsx` fetchers.
+  4. Built a `parseCropPosition` parser utility in `Portfolio.tsx` that extracts the `X% Y%` substring from `description` and applies it as a valid `objectPosition` inline style, rendering the custom cropped alignment on the live website.

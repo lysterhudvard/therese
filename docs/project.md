@@ -133,4 +133,5 @@ Recent enhancements to the admin panel streamline content management and align t
 - **Rich Text Formatting Toolbar:** Added a visual `FormattingToolbar` helper to the CMS textareas (Biography, FAQ, and custom sections quotes) to easily apply bold, cursive, and hyperlink formatting without raw HTML knowledge.
 - **Safe HTML & Theme Styling:** Configured the frontend views to interpret formatted text using standard styling classes (`.formatted-text`) that adhere to color and typography rules.
 - **Background Live Synchronization**: Resolved the SSG deployment latency by querying database updates on client mount, immediately refreshing the static FAQ layout with the newest CMS state.
+- **Drag-to-Crop Portfolio Alignment:** Replaced static image positioning dropdowns with an interactive click-and-drag thumbnail handler. The selected X/Y percentage values are dynamically serialized and written to the database under the `description` column, then fetched and parsed as `object-position` rules on the live site's image tags.
 

@@ -274,3 +274,10 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Admin Text formatting Toolbar**: Developed and integrated a reusable `FormattingToolbar` component that allows content managers to style text with bold, italic, and inline links in Biography paragraphs, sections quotes, and FAQ answers.
 - **HTML Render Integration**: Applied dynamic HTML rendering on the frontend for these rich-text fields with a tailored `.formatted-text` style block. This seamlessly displays formatted styles using theme-compliant colors and layouts.
 
+### 54. Drag-to-Crop Portfolio Alignment System
+- **CMS Drag Interface:** Implemented a direct click-and-drag visual adjustment overlay on the portfolio image thumbnails within `PortfolioCardItem.tsx`. Content editors can position the image crop focal point horizontally or vertically, seeing real-time percentages updated on screen.
+- **Unblocked CMS Interaction:** Shrunk the "Change Image" overlay into a neat, z-indexed top-right button, preventing the media picker modal from hijacking mouse events during image dragging.
+- **Preact Touch/Mouse Compiler Fix:** Resolved event signature errors on mouse and touch event handlers by casting types to `any`, ensuring compatibility with Preact's specific JSX event signatures.
+- **Astro SSR & Client Query Preservation:** Updated the Supabase fetch mappings in both `supabase-server.ts` (for initial Astro SSG/SSR hydration) and `Portfolio.tsx` (for client-side dynamic updates) to preserve the `description`, `title`, `caption`, and `filename` columns that were previously discarded.
+- **Frontend Object Position Parser:** Created a helper `parseCropPosition` in `Portfolio.tsx` that extracts coordinates (e.g., `crop:45% 20%`) from the image's `description` field and applies them as a dynamic inline CSS `objectPosition` style on the live website.
+
