@@ -478,3 +478,17 @@ This document details critical bugs, layout errors, and interaction blocks found
   2. Changed event parameter types in `PortfolioCardItem.tsx` handlers (`handleMouseDown`, `handleMouseMove`, `handleTouchStart`, `handleTouchMove`) to `any`, silencing Preact JSX mismatch warnings.
   3. Included the `description`, `title`, `caption`, and `filename` columns in the mapped outputs of both the server-side `getPageData` queries and the client-side `Portfolio.tsx` fetchers.
   4. Built a `parseCropPosition` parser utility in `Portfolio.tsx` that extracts the `X% Y%` substring from `description` and applies it as a valid `objectPosition` inline style, rendering the custom cropped alignment on the live website.
+
+## 67. Preact vs React IDE TypeScript JSX Conflicts
+- **Symptom:** After migrating from `@astrojs/react` to `@astrojs/preact` for performance, the IDE (and `tsc`) displayed over 50 JSX Element and Event mismatch errors inside `.tsx` files (e.g., `'Lock' cannot be used as a JSX component`, `Property 'children' is missing in type 'VNode<any>' but required in type 'ReactPortal'`, and `SubmitEvent<HTMLFormElement> is not assignable to TargetedEvent`).
+- **Root Cause:** While `@preact/compat` successfully aliased React components at build time to Preact equivalents, the standard IDE TypeScript compiler checked the strict definitions from `@types/react`. Frameworks like Framer Motion and Lucide-React returned types that didn't mathematically align with Preact's `JSX.Element` and `VNode` types.
+- **Resolution:**
+  1. Updated `lucide-react-override.d.ts` to globally cast all imported `Icon` components to `any`.
+  2. Substituted all explicit `React.FormEvent` and `React.ChangeEvent` handlers with `any` across the `src/` directory, naturally solving both the `TargetedEvent` mismatches and `e.target.files` property checks.
+  3. Re-assigned used Framer Motion tags (like `motion.div`) via local `as any` aliases (`const MotionDiv = motion.div as any;`) within files triggering `ReactNode` mismatch errors (e.g., `Spotlight`, `TheaterPlayer`, `Contact`).
+  4. Modified a conditional portal statement inside `TheaterPlayer.tsx` from `A && B` to a ternary `A ? B : null` to satisfy React's strict portal branch typings.
+
+## 68. Supabase Error: column biography.voice_section does not exist
+- **Symptom:** The Supabase database log reported `column biography.voice_section does not exist` (PostgreSQL error 42703).
+- **Root Cause:** In `Voice.tsx`, the client-side `useEffect` query attempted to retrieve the `voice_section` column from the `biography` table instead of the correct `voice_settings` column.
+- **Resolution:** Modified the query in `src/components/sections/Voice.tsx` to retrieve `voice_settings` instead, parsing it safely as a JSON object, resolving the PostgreSQL undefined column exception.

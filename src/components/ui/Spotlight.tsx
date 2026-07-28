@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
+const MotionDiv = motion.div as any;
+
 export function Spotlight() {
   const x = useMotionValue(-500);
   const y = useMotionValue(-500);
@@ -36,14 +38,14 @@ export function Spotlight() {
 
   return (
     <>
-      <motion.div
+      <MotionDiv
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[90] will-change-transform"
         style={{ x: sx, y: sy }}
         animate={{ opacity: hidden ? 0 : 1 }}
         transition={{ duration: 0.2 }}
       >
-        <motion.div
+        <MotionDiv
           animate={{ scale: 1 }}
           className="-translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
@@ -53,8 +55,8 @@ export function Spotlight() {
             mixBlendMode: "difference",
           }}
         />
-      </motion.div>
-      <motion.div
+      </MotionDiv>
+      <MotionDiv
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[80] will-change-transform"
         style={{ x: sx, y: sy }}
@@ -71,7 +73,7 @@ export function Spotlight() {
             filter: "blur(8px)",
           }}
         />
-      </motion.div>
+      </MotionDiv>
     </>
   );
 }

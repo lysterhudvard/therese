@@ -28,7 +28,7 @@ interface KlickGuideChatProps {
   handleClearChat: () => void;
   handleClearKey: () => void;
   handleSaveKey: () => void;
-  handleQuerySubmit: (e: React.FormEvent) => void;
+  handleQuerySubmit: (e: any) => void;
   handleSuggestionClick: (suggestion: string) => void;
   activeGuide: { message: string; steps: Step[]; currentStepIndex: number } | null;
   activeQuery: string;

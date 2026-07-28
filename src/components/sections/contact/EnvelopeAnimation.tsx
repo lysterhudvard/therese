@@ -1,5 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
+const MotionDiv = motion.div as any;
+const MotionP = motion.p as any;
+const MotionImg = motion.img as any;
+const MotionButton = motion.button as any;
+const MotionH3 = motion.h3 as any;
+const MotionForm = motion.form as any;
+
 
 interface EnvelopeAnimationProps {
   status: string;
@@ -15,7 +22,7 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap');
       `}</style>
-      <motion.div
+      <MotionDiv
         className="relative w-[380px] h-[250px] [transform-style:preserve-3d]"
         initial={{ scale: 0.85, opacity: 0, y: 100 }}
         animate={
@@ -33,7 +40,7 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
           <div className="absolute inset-0 bg-[#cbb8a0] rounded-sm shadow-inner" />
 
           {/* FAKE LETTER */}
-          <motion.div
+          <MotionDiv
             className="absolute top-4 left-6 right-6 bg-stage border border-bone/10 p-5 rounded-sm flex flex-col justify-between shadow-lg z-10"
             style={{ height: "190px" }}
             initial={{ y: -150 }}
@@ -68,10 +75,10 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
               <span>Therese Järvheden</span>
               <span className="text-ember font-medium">Skickat</span>
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* TOP FLAP */}
-          <motion.div
+          <MotionDiv
             className="absolute inset-0 bg-[#d9c4ad] origin-top drop-shadow-lg"
             style={{
               clipPath: "polygon(0 0, 100% 0, 50% 50%)",
@@ -125,7 +132,7 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
 
           <div className="w-full mt-8 rotate-[-4deg] pl-2">
             {status === "writing" || status === "flying" ? (
-              <motion.div
+              <MotionDiv
                 initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
                 animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
                 transition={{ duration: 1.5, ease: "linear" }}
@@ -133,11 +140,11 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
                 style={{ fontFamily: "'Caveat', cursive" }}
               >
                 Till Therese Järvheden
-              </motion.div>
+              </MotionDiv>
             ) : null}
           </div>
         </div>
-      </motion.div>
+      </MotionDiv>
     </div>
   );
 }

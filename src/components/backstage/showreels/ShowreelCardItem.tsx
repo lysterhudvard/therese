@@ -9,7 +9,7 @@ interface ShowreelCardItemProps {
   handleReelChange: (id: string, field: keyof ShowreelItem, value: any) => void;
   moveReel: (index: number, direction: "up" | "down") => void;
   handleDeleteReel: (id: string) => void;
-  handlePosterUpload: (id: string, e: React.ChangeEvent<HTMLInputElement>) => void;
+  handlePosterUpload: (id: string, e: any) => void;
   isUploadingPoster: boolean;
   setActivePickerId: (id: string | null) => void;
 }

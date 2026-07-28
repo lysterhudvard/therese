@@ -11,7 +11,7 @@ export function SpotlightImage({
   alt: string;
   title?: string;
   className?: string;
-  style?: React.CSSProperties;
+  style?: any;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const maskRef = useRef<HTMLImageElement>(null);

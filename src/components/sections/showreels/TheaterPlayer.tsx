@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+const MotionDiv = motion.div as any;
+const MotionP = motion.p as any;
+const MotionImg = motion.img as any;
+const MotionButton = motion.button as any;
+const MotionH3 = motion.h3 as any;
+const MotionForm = motion.form as any;
+
 import { Play, Pause, Volume2, VolumeX, Maximize2, X } from "lucide-react";
 import { type VideoItem } from "./../ShowreelsData";
 
@@ -180,8 +187,8 @@ export function TheaterPlayer({
   return (
     <div className="relative mx-auto w-full h-full aspect-[16/9] md:aspect-[21/9]">
       {/* Inline Preview Canvas */}
-      {!isEnlarged ? (
-        <motion.div
+      {((!isEnlarged ? (
+        <MotionDiv
           layoutId="theater-player-canvas"
           className="absolute inset-0 bg-stage/20 shadow-2xl group overflow-hidden"
           onClick={() => setIsEnlarged(true)}
@@ -228,7 +235,7 @@ export function TheaterPlayer({
             <div>REEL // {activeVideo.genre}</div>
             <div className="text-[8px] text-bone/40">{activeVideo.specs}</div>
           </div>
-        </motion.div>
+        </MotionDiv>
       ) : (
         // Blank placeholder inline to preserve space and aspect ratio during playback
         <div className="w-full h-full bg-black/40 shadow-inner flex items-center justify-center border border-bone/5">
@@ -238,12 +245,12 @@ export function TheaterPlayer({
             </div>
           </div>
         </div>
-      )}
+      )) as any)}
 
       {/* Enlarged Theater Mode Modal via React Portal */}
-      {mounted && isEnlarged && createPortal(
+      {mounted && isEnlarged ? createPortal(
         <AnimatePresence>
-          <motion.div
+          <MotionDiv
             layoutId="theater-player-canvas"
             data-no-spotlight
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -281,7 +288,7 @@ export function TheaterPlayer({
                   // Poster image fading to black background during scale-up
                   <div className="w-full h-full relative bg-black">
                     {activeVideo.poster ? (
-                      <motion.img
+                      <MotionImg
                         initial={{ opacity: 1 }}
                         animate={{ opacity: 0 }}
                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -295,7 +302,7 @@ export function TheaterPlayer({
                   </div>
                 ) : (
                   // Video starts playing only after layout scale-up is completed
-                  <motion.div
+                  <MotionDiv
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4 }}
@@ -329,7 +336,7 @@ export function TheaterPlayer({
                         className="w-full h-full object-cover select-none cursor-pointer"
                       />
                     )}
-                  </motion.div>
+                  </MotionDiv>
                 )}
 
                 {/* Film Grain overlay */}
@@ -340,10 +347,10 @@ export function TheaterPlayer({
                 <div className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-t from-black/15 to-transparent pointer-events-none z-20" />
               </div>
             </div>
-          </motion.div>
+          </MotionDiv>
         </AnimatePresence>,
         document.body
-      )}
+      ) : null}
     </div>
   );
 }

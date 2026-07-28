@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock } from "lucide-react";
 
+const MotionDiv = motion.div as any;
+const MotionP = motion.p as any;
+
 interface BackstageLoginProps {
   onLoginSuccess: () => void;
 }
@@ -12,7 +15,7 @@ export function BackstageLogin({ onLoginSuccess }: BackstageLoginProps) {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     setError(false);
@@ -41,7 +44,7 @@ export function BackstageLogin({ onLoginSuccess }: BackstageLoginProps) {
       {/* Film grain */}
       <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.015]" />
 
-      <motion.div
+      <MotionDiv
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -87,13 +90,13 @@ export function BackstageLogin({ onLoginSuccess }: BackstageLoginProps) {
               </button>
             </div>
             {error && (
-              <motion.p
+              <MotionP
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-2 text-[10px] text-red-400 font-mono"
               >
                 Felaktig tillträdesnyckel. Försök igen.
-              </motion.p>
+              </MotionP>
             )}
           </div>
 
@@ -116,7 +119,7 @@ export function BackstageLogin({ onLoginSuccess }: BackstageLoginProps) {
             </span>
           </div>
         </form>
-      </motion.div>
+      </MotionDiv>
     </div>
   );
 }

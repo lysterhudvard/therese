@@ -74,7 +74,7 @@ export function DashboardHero() {
     fetchHeroData();
   }, []);
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 

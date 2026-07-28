@@ -281,7 +281,7 @@ export function KlickGuideWidget({ activeTab, setActiveTab }: KlickGuideWidgetPr
     toast.info("Chatthistorik rensad.");
   };
 
-  const handleQuerySubmit = async (e: React.FormEvent) => {
+  const handleQuerySubmit = async (e: any) => {
     e.preventDefault();
     if (!query.trim()) return;
 

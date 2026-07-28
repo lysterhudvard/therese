@@ -22,7 +22,7 @@ interface CreditItemCardProps {
   moveCredit: (index: number, direction: "up" | "down") => void;
   removeCredit: (id: string) => void;
   updateCredit: (id: string, field: keyof CreditRow, value: any) => void;
-  handleAudioUpload: (id: string, e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAudioUpload: (id: string, e: any) => void;
   isUploadingAudio: boolean;
   setActivePickerId: (id: string | null) => void;
 }

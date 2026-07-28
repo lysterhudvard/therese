@@ -97,7 +97,7 @@ export function DashboardShowreels() {
     toast.success("Ny showreel lagt till i listan. Konfigurera den nedan och klicka på Spara.");
   };
 
-  const handlePosterUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePosterUpload = async (id: string, e: any) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -142,7 +142,7 @@ export function DashboardShowreels() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 
@@ -153,10 +153,21 @@ export function DashboardShowreels() {
     }
 
     try {
+      const generateUUID = () => {
+        if (typeof window !== "undefined" && window.crypto && window.crypto.randomUUID) {
+          return window.crypto.randomUUID();
+        }
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
       const reelsToUpsert = showreels.map((reel) => {
         const item: any = { ...reel };
         if (item.id.startsWith("temp-")) {
-          delete item.id;
+          item.id = generateUUID();
         }
         return item;
       });

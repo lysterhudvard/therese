@@ -73,7 +73,7 @@ export function DashboardContact() {
     fetchContactData();
   }, []);
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 

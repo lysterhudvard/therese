@@ -116,30 +116,8 @@ export function DashboardMedia() {
     fetchFiles();
   }, []);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Reset file input value so same file can be selected again
-    e.target.value = "";
-
-    // Intercept images for optimization
-    if (file.type.startsWith("image/")) {
-      setPendingUploadFile(file);
-      setIsOptimizerOpen(true);
-      return;
-    }
-
-    // Non-images (e.g. videos) go straight to upload
-    await proceedWithUpload(file, "general");
-  };
-
-  const proceedWithUpload = async (fileToUpload: File, category: string = "general") => {
-    setIsOptimizerOpen(false);
-    setPendingUploadFile(null);
-    setIsUploading(true);
+  const uploadSingleFileDirectly = async (fileToUpload: File, category: string) => {
     const toastId = toast.loading(`Laddar upp ${fileToUpload.name}...`);
-
     try {
       const fileExt = fileToUpload.name.split(".").pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
@@ -148,12 +126,62 @@ export function DashboardMedia() {
       const { error } = await supabase.storage.from("portfolio").upload(fileFullPath, fileToUpload, { cacheControl: "public, max-age=31536000", upsert: true });
 
       if (error) throw error;
+      toast.success(`${fileToUpload.name} uppladdad!`, { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Uppladdning misslyckades för ${fileToUpload.name}: ${err.message}`, { id: toastId });
+      throw err;
+    }
+  };
 
-      toast.success("Fil uppladdad till Supabase Storage!", { id: toastId });
+  const handleFileUpload = async (e: any) => {
+    const selectedFiles = e.target.files ? Array.from(e.target.files) as File[] : [];
+    if (selectedFiles.length === 0) return;
+
+    // Reset file input value so same file can be selected again
+    e.target.value = "";
+
+    // If single image upload, keep the existing crop / optimize wizard modal flow
+    if (selectedFiles.length === 1 && selectedFiles[0].type.startsWith("image/")) {
+      setPendingUploadFile(selectedFiles[0]);
+      setIsOptimizerOpen(true);
+      return;
+    }
+
+    setIsUploading(true);
+    let successCount = 0;
+    try {
+      for (const file of selectedFiles) {
+        // Detect audio files (either by mime type or file extensions)
+        const isAudio = file.type.startsWith("audio/") || 
+          ["mp3", "wav", "ogg", "aac", "m4a", "flac"].includes(file.name.split(".").pop()?.toLowerCase() || "");
+        
+        // Voice files go strictly to "voice" folder. Others go to "general".
+        const category = isAudio ? "voice" : "general";
+        
+        await uploadSingleFileDirectly(file, category);
+        successCount++;
+      }
+      if (selectedFiles.length > 1) {
+        toast.success(`${successCount} av ${selectedFiles.length} filer har laddats upp!`);
+      }
       fetchFiles();
     } catch (err: any) {
       console.error(err);
-      toast.error(`Uppladdning misslyckades: ${err.message}`, { id: toastId });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const proceedWithUpload = async (fileToUpload: File, category: string = "general") => {
+    setIsOptimizerOpen(false);
+    setPendingUploadFile(null);
+    setIsUploading(true);
+    try {
+      await uploadSingleFileDirectly(fileToUpload, category);
+      fetchFiles();
+    } catch (err: any) {
+      console.error(err);
     } finally {
       setIsUploading(false);
     }
@@ -277,7 +305,7 @@ export function DashboardMedia() {
     }
   };
 
-  const handleAddExternal = async (e: React.FormEvent) => {
+  const handleAddExternal = async (e: any) => {
     e.preventDefault();
     if (!externalUrl) {
       toast.error("Vänligen ange en URL.");

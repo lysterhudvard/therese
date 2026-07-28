@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+const MotionDiv = motion.div as any;
+const MotionP = motion.p as any;
+const MotionImg = motion.img as any;
+const MotionButton = motion.button as any;
+const MotionH3 = motion.h3 as any;
+const MotionForm = motion.form as any;
+
 import { 
   Mail as MailOrig, 
   Check as CheckOrig, 
@@ -81,7 +88,7 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
     }
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: any) => {
     e.preventDefault();
     setStatus("shrinking");
     await new Promise((r) => setTimeout(r, 800));
@@ -128,7 +135,7 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
 
   return (
     <section id="contact" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
-      <motion.div style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
+      <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-14">
 
 
@@ -310,7 +317,7 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
 
               <AnimatePresence mode="wait">
                 {status === "sent" ? (
-                  <motion.div
+                  <MotionDiv
                     key="ok"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -318,29 +325,29 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="flex flex-col items-center justify-center text-center relative z-30 w-full max-w-[300px]"
                   >
-                    <motion.div
+                    <MotionDiv
                       initial={{ scale: 0, rotate: -45 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ delay: 0.15, type: "spring", stiffness: 220, damping: 16 }}
                       className="grid h-16 w-16 place-items-center rounded-full border border-ember bg-ember/10"
                     >
                       <Check size={26} className="text-ember" />
-                    </motion.div>
-                    <motion.h3
+                    </MotionDiv>
+                    <MotionH3
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1, transition: { delay: 0.4 } }}
                       className="mt-6 font-display text-3xl text-bone"
                     >
                       {t.contact.okTitle}
-                    </motion.h3>
-                    <motion.p
+                    </MotionH3>
+                    <MotionP
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1, transition: { delay: 0.55 } }}
                       className="mt-3 text-sm text-bone/60"
                     >
                       {t.contact.okBody(form.name)}
-                    </motion.p>
-                    <motion.button
+                    </MotionP>
+                    <MotionButton
                       onClick={() => {
                         setStatus("idle");
                         setForm({ name: "", email: "", msg: "" });
@@ -348,10 +355,10 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
                       className="mt-8 text-[10px] uppercase tracking-[0.35em] text-bone/40 hover:text-ember transition-colors"
                     >
                       {t.contact.again}
-                    </motion.button>
-                  </motion.div>
+                    </MotionButton>
+                  </MotionDiv>
                 ) : status === "idle" ? (
-                  <motion.form
+                  <MotionForm
                     key="form"
                     onSubmit={submit}
                     initial={{ opacity: 0 }}
@@ -397,16 +404,16 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
                       {t.contact.submit}{" "}
                       <Send size={14} className="transition-transform group-hover:translate-x-1" />
                     </button>
-                  </motion.form>
+                  </MotionForm>
                 ) : (
-                  <motion.div key="placeholder" className="w-full h-[400px]" />
+                  <MotionDiv key="placeholder" className="w-full h-[400px]" />
                 )}
               </AnimatePresence>
             </div>
             )}
           </div>
         </div>
-      </motion.div>
+      </MotionDiv>
     </section>
   );
 }

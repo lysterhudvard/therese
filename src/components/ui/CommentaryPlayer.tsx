@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+const MotionDiv = motion.div as any;
+const MotionP = motion.p as any;
+const MotionImg = motion.img as any;
+const MotionButton = motion.button as any;
+const MotionH3 = motion.h3 as any;
+const MotionForm = motion.form as any;
+
 
 
 import { useCommentaryStore } from "../../hooks/use-t";
@@ -77,7 +84,7 @@ export function CommentaryPlayer() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSliderChange = (e: any) => {
     const val = parseFloat(e.target.value);
     setCurrentTime(val);
     if (audioRef.current) {
@@ -86,7 +93,7 @@ export function CommentaryPlayer() {
   };
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ y: 80, opacity: 0, scale: 0.95 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
       exit={{ y: 80, opacity: 0, scale: 0.95 }}
@@ -238,6 +245,6 @@ export function CommentaryPlayer() {
           )}
         </button>
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 }

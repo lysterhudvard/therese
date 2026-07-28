@@ -2,9 +2,9 @@ import React from "react";
 import { Upload, Link as LinkIcon, Plus, RefreshCw } from "lucide-react";
 
 interface MediaUploadColumnProps {
-  handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFileUpload: (e: any) => void;
   isUploading: boolean;
-  handleAddExternal: (e: React.FormEvent) => void;
+  handleAddExternal: (e: any) => void;
   externalType: "image" | "video";
   setExternalType: (type: "image" | "video") => void;
   externalUrl: string;
@@ -32,15 +32,16 @@ export function MediaUploadColumn({
           <Upload size={14} className="text-ember" /> Molnuppladdning
         </h3>
         <p className="text-[10px] text-bone/50 leading-relaxed">
-          Välj filer från din lokala hårddisk för att spara dem permanent i Supabase molnlagring. Både bilder och videor stöds.
+          Välj filer från din lokala hårddisk för att spara dem permanent i Supabase molnlagring. Bilder, videor och röstfiler stöds.
         </p>
 
         <div className="relative">
           <input
             type="file"
-            accept="image/*,video/*"
+            accept="image/*,video/*,audio/*"
             onChange={handleFileUpload}
             disabled={isUploading}
+            multiple
             className="hidden"
             id="media-library-upload"
           />
@@ -57,8 +58,8 @@ export function MediaUploadColumn({
               <Upload size={24} className="text-bone/30" />
             )}
             <div className="text-center">
-              <span className="block text-bone font-semibold">Välj en fil</span>
-              <span className="block text-[9px] text-bone/35 mt-0.5">Bilder eller MP4-videor</span>
+              <span className="block text-bone font-semibold">Välj filer</span>
+              <span className="block text-[9px] text-bone/35 mt-0.5">Bilder, videor eller ljudfiler</span>
             </div>
           </label>
         </div>

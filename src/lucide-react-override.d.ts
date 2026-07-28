@@ -1,7 +1,5 @@
 declare module 'lucide-react' {
-  import { ComponentType } from 'react';
-  
-  const Icon: ComponentType<any>;
+  const Icon: any;
   
   export {
     Icon as Lock,

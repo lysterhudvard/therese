@@ -117,7 +117,9 @@ let voiceImageData = {
   url: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000001-a2d05a2d07/unnamed-5.jpg?ph=a6c2528650",
   alt: "Therese — röst",
   title: "",
-  caption: ""
+  caption: "",
+  sampleUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  bookingEmail: ""
 };
 if (processedDbData?.biography?.voice_settings) {
   try {
@@ -131,6 +133,8 @@ if (processedDbData?.biography?.voice_settings) {
       if (vs.image_alt) voiceImageData.alt = vs.image_alt;
       if (vs.image_title) voiceImageData.title = vs.image_title;
       if (vs.image_caption) voiceImageData.caption = vs.image_caption;
+      if (vs.sample_url) voiceImageData.sampleUrl = vs.sample_url;
+      if (vs.booking_email) voiceImageData.bookingEmail = vs.booking_email;
     }
   } catch (e) {
     console.error("Failed to parse voice settings image:", e);
@@ -190,6 +194,8 @@ if (processedDbData?.biography?.review_quotes) {
     imageAlt={voiceImageData.alt} 
     imageTitle={voiceImageData.title}
     imageCaption={voiceImageData.caption}
+    sampleUrl={voiceImageData.sampleUrl}
+    bookingEmail={voiceImageData.bookingEmail}
     teaser={true}
   />
   

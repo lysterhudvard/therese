@@ -115,7 +115,7 @@ export function DashboardCredits() {
     );
   };
 
-  const handleAudioUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAudioUpload = async (id: string, e: any) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -160,7 +160,7 @@ export function DashboardCredits() {
     }
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 
@@ -177,6 +177,18 @@ export function DashboardCredits() {
         if (delErr) throw delErr;
         setDeletedIds([]);
       }
+
+      // UUID generator for new items
+      const generateUUID = () => {
+        if (typeof window !== "undefined" && window.crypto && window.crypto.randomUUID) {
+          return window.crypto.randomUUID();
+        }
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
 
       // 2. Process upserts
       const itemsToUpsert = credits.map((c, index) => {
@@ -207,9 +219,9 @@ export function DashboardCredits() {
           script_line_sv: c.script_line_sv || null,
           script_line_en: c.script_line_en || null,
         };
-        if (!c.id.startsWith("temp-")) {
-          item.id = c.id;
-        }
+        
+        item.id = c.id.startsWith("temp-") ? generateUUID() : c.id;
+        
         return item;
       });
 

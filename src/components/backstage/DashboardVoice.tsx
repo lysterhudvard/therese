@@ -19,6 +19,8 @@ interface VoiceSettings {
   image_title?: string;
   image_filename?: string;
   image_description?: string;
+  sample_url?: string;
+  booking_email?: string;
 }
 
 export function DashboardVoice() {
@@ -37,10 +39,13 @@ export function DashboardVoice() {
     image_title: "",
     image_filename: "",
     image_description: "",
+    sample_url: "",
+    booking_email: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+  const [isAudioPickerOpen, setIsAudioPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -80,7 +85,7 @@ export function DashboardVoice() {
     setSettings((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: any) => {
     e.preventDefault();
     setIsSaving(true);
 
@@ -220,6 +225,57 @@ export function DashboardVoice() {
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Boknings-E-post (E-postlänk för Boka röst)</label>
+            <input
+              type="email"
+              id="klick-voice-booking-email"
+              value={settings.booking_email || ""}
+              onChange={(e) => handleChange("booking_email", e.target.value)}
+              placeholder="exempel@domän.se (lämna tom för att skrolla till kontaktformuläret på startsidan)"
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Röstprov (Audio Sample) */}
+      <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
+        <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
+          <Volume2 size={14} className="text-ember" /> Röstprov (Audio-ljudfil)
+        </h3>
+
+        <div className="space-y-4">
+          <p className="text-[10px] text-bone/40 font-mono uppercase tracking-wider">
+            Välj en ljudinspelning (.mp3, .wav, etc.) som besökare kan spela upp på hemsidan under Akt VI.
+          </p>
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Ljudfils-URL</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                id="klick-voice-sample-url"
+                value={settings.sample_url || ""}
+                onChange={(e) => handleChange("sample_url", e.target.value)}
+                placeholder="Skriv in ljudfilens URL eller klicka på Välj Ljud för att hämta från mediebiblioteket"
+                className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+              />
+              <button
+                type="button"
+                onClick={() => setIsAudioPickerOpen(true)}
+                className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+              >
+                Välj Ljud
+              </button>
+            </div>
+          </div>
+
+          {settings.sample_url && (
+            <div className="pt-2">
+              <span className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-2">Förhandslyssna på röstprov</span>
+              <audio src={settings.sample_url} controls className="max-w-md w-full" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -360,6 +416,19 @@ export function DashboardVoice() {
           setIsMediaPickerOpen(false);
         }}
         typeFilter="image"
+      />
+
+      <MediaPickerModal
+        isOpen={isAudioPickerOpen}
+        onClose={() => setIsAudioPickerOpen(false)}
+        onSelect={(url) => {
+          setSettings((prev) => ({
+            ...prev,
+            sample_url: url
+          }));
+          setIsAudioPickerOpen(false);
+        }}
+        typeFilter="audio"
       />
     </form>
   );
