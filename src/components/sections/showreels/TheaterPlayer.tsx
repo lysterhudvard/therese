@@ -18,10 +18,39 @@ interface TheaterPlayerProps {
   lang: "sv" | "en";
 }
 
-function getDurationAndType(item: VideoItem) {
+export function parseVideoSource(item: VideoItem) {
+  let vimeoId = item.vimeoId || "";
+  let youtubeId = item.youtubeId || "";
+  let url = item.url || "";
   let type = "VIDEO";
-  if (item.vimeoId) type = "VIMEO";
-  else if (item.youtubeId) type = "YOUTUBE";
+
+  // Check if URL is a YouTube link
+  const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/||user\/(?:[^\/]+)\/)|youtu\.be\/|youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/;
+  const ytMatch = url.match(ytRegex);
+  
+  // Check if URL is a Vimeo link
+  const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
+  const vimeoMatch = url.match(vimeoRegex);
+
+  if (ytMatch) {
+    youtubeId = ytMatch[1];
+    type = "YOUTUBE";
+    vimeoId = "";
+  } else if (vimeoMatch) {
+    vimeoId = vimeoMatch[1];
+    type = "VIMEO";
+    youtubeId = "";
+  } else if (vimeoId) {
+    type = "VIMEO";
+  } else if (youtubeId) {
+    type = "YOUTUBE";
+  }
+
+  return { type, vimeoId, youtubeId, url };
+}
+
+function getDurationAndType(item: VideoItem) {
+  const { type } = parseVideoSource(item);
 
   const durationMatch = item.specs.match(/\b\d{1,2}:\d{2}\b/);
   let durationStr = durationMatch ? durationMatch[0] : "";
@@ -50,6 +79,8 @@ export function TheaterPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [isTransitionComplete, setIsTransitionComplete] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const { type, vimeoId: parsedVimeoId, youtubeId: parsedYoutubeId } = parseVideoSource(activeVideo);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -107,7 +138,7 @@ export function TheaterPlayer({
   // Autoplay local HTML5 video only after transition is fully complete
   useEffect(() => {
     if (isTransitionComplete) {
-      if (!activeVideo.youtubeId && !activeVideo.vimeoId && videoRef.current) {
+      if (type === "VIDEO" && videoRef.current) {
         videoRef.current
           .play()
           .then(() => {
@@ -123,7 +154,7 @@ export function TheaterPlayer({
         setIsPlaying(false);
       }
     }
-  }, [isTransitionComplete, activeVideo]);
+  }, [isTransitionComplete, activeVideo, type]);
 
   // Video play/pause toggle
   const togglePlay = () => {
@@ -308,16 +339,16 @@ export function TheaterPlayer({
                     transition={{ duration: 0.4 }}
                     className="w-full h-full absolute inset-0 z-10 bg-black"
                   >
-                    {activeVideo.vimeoId ? (
+                    {type === "VIMEO" ? (
                       <iframe
-                        src={`https://player.vimeo.com/video/${activeVideo.vimeoId}?autoplay=1&muted=0&badge=0&autopause=0`}
+                        src={`https://player.vimeo.com/video/${parsedVimeoId}?autoplay=1&muted=0&badge=0&autopause=0`}
                         className="w-full h-full border-0 absolute inset-0 z-10"
                         allow="autoplay; fullscreen; picture-in-picture"
                         allowFullScreen
                       />
-                    ) : activeVideo.youtubeId ? (
+                    ) : type === "YOUTUBE" ? (
                       <iframe
-                        src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
+                        src={`https://www.youtube.com/embed/${parsedYoutubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
                         className="w-full h-full border-0 absolute inset-0 z-10"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen

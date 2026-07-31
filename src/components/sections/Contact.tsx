@@ -38,6 +38,7 @@ import { useT } from "../../hooks/use-t";
 import { Field } from "../ui/Field";
 import { Instagram, Facebook, Youtube, XLogo } from "./contact/SocialIcons";
 import { EnvelopeAnimation } from "./contact/EnvelopeAnimation";
+import { toast } from "sonner";
 
 type Status =
   | "idle"
@@ -91,6 +92,16 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
   const submit = async (e: any) => {
     e.preventDefault();
     setStatus("shrinking");
+    
+    // Trigger Netlify serverless function concurrently
+    const sendPromise = fetch("/.netlify/functions/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
     await new Promise((r) => setTimeout(r, 800));
     setStatus("dropping");
     await new Promise((r) => setTimeout(r, 1400));
@@ -100,9 +111,25 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
     await new Promise((r) => setTimeout(r, 800));
     setStatus("writing");
     await new Promise((r) => setTimeout(r, 1800));
-    setStatus("flying");
-    await new Promise((r) => setTimeout(r, 900));
-    setStatus("sent");
+    
+    try {
+      const response = await sendPromise;
+      if (!response.ok) {
+        throw new Error("Failed to send message via Netlify Function");
+      }
+      
+      setStatus("flying");
+      await new Promise((r) => setTimeout(r, 900));
+      setStatus("sent");
+    } catch (err) {
+      console.error("Failed to send email:", err);
+      setStatus("idle");
+      toast.error(
+        lang === "sv" 
+          ? "Kunde inte skicka meddelandet. Kontrollera din anslutning eller skicka direkt via e-post." 
+          : "Could not send the message. Please check your connection or send directly via email."
+      );
+    }
   };
 
   const ref = useRef<HTMLDivElement>(null);

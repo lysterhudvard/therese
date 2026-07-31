@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Contact } from '../components/sections/Contact';
+import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
@@ -30,6 +31,7 @@ setGlobalDbData(processedDbData);
     <Contact client:visible bioData={processedDbData.biography} />
   </div>
 
+  <Footer client:visible simple={true} />
   <CommentaryPlayer client:visible />
   <CookieConsent client:idle />
 </Layout>

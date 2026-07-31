@@ -80,6 +80,13 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
     };
   }, []);
 
+  // Load audio source when sampleUrl changes (e.g. when database updates state client-side)
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+    }
+  }, [liveVoice.sampleUrl]);
+
   // Sync state if audio ends or is paused elsewhere
   const handleEnded = () => {
     setIsPlaying(false);
@@ -92,6 +99,12 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
       setIsPlaying(false);
     } else {
       stopCommentary();
+      
+      // Ensure the audio source is loaded if it's currently uninitialized
+      if (audioRef.current.readyState === 0) {
+        audioRef.current.load();
+      }
+
       audioRef.current.play()
         .then(() => {
           setIsPlaying(true);

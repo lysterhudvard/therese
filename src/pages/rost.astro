@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Voice } from '../components/sections/Voice';
+import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
@@ -64,6 +65,7 @@ const faqs = processedDbData.biography?.faqs?.filter((f: any) => f.q_sv && f.q_s
     />
   </div>
 
+  <Footer client:visible simple={true} />
   <CommentaryPlayer client:visible />
   <CookieConsent client:idle />
   

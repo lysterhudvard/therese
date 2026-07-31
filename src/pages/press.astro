@@ -4,6 +4,7 @@ import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Portfolio } from '../components/sections/Portfolio';
 import { Showreels } from '../components/sections/Showreels';
+import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
@@ -37,6 +38,7 @@ setGlobalDbData(processedDbData);
     )}
   </div>
 
+  <Footer client:visible simple={true} />
   <CommentaryPlayer client:visible />
   <CookieConsent client:idle />
 </Layout>

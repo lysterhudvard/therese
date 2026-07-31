@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Credits } from '../components/sections/Credits';
+import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
@@ -39,6 +40,7 @@ if (processedDbData.biography?.review_quotes) {
     <Credits client:visible credits={processedDbData.credits} reviewQuotes={parsedReviewQuotes} />
   </div>
 
+  <Footer client:visible simple={true} />
   <CommentaryPlayer client:visible />
   <CookieConsent client:idle />
 </Layout>

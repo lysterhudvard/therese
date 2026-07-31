@@ -37,7 +37,51 @@ export function DashboardShowreels() {
   }, []);
 
   const handleReelChange = (id: string, field: keyof ShowreelItem, value: any) => {
-    setShowreels(showreels.map((reel) => (reel.id === id ? { ...reel, [field]: value } : reel)));
+    setShowreels(
+      showreels.map((reel) => {
+        if (reel.id !== id) return reel;
+
+        let updatedReel = { ...reel, [field]: value };
+
+        // Smart parsing for YouTube and Vimeo URLs pasted in the main URL field
+        if (field === "url" && typeof value === "string") {
+          const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/||user\/(?:[^\/]+)\/)|youtu\.be\/|youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/;
+          const ytMatch = value.match(ytRegex);
+
+          const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
+          const vimeoMatch = value.match(vimeoRegex);
+
+          if (ytMatch) {
+            updatedReel.youtube_id = ytMatch[1];
+            updatedReel.vimeo_id = "";
+          } else if (vimeoMatch) {
+            updatedReel.vimeo_id = vimeoMatch[1];
+            updatedReel.youtube_id = "";
+          }
+        }
+
+        // Clean up full URLs pasted into specific video ID fields
+        if (field === "vimeo_id" && typeof value === "string" && value) {
+          const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
+          const vimeoMatch = value.match(vimeoRegex);
+          if (vimeoMatch) {
+            updatedReel.vimeo_id = vimeoMatch[1];
+            updatedReel.youtube_id = "";
+          }
+        }
+
+        if (field === "youtube_id" && typeof value === "string" && value) {
+          const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/||user\/(?:[^\/]+)\/)|youtu\.be\/|youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/;
+          const ytMatch = value.match(ytRegex);
+          if (ytMatch) {
+            updatedReel.youtube_id = ytMatch[1];
+            updatedReel.vimeo_id = "";
+          }
+        }
+
+        return updatedReel;
+      })
+    );
   };
 
   const moveReel = (index: number, direction: "up" | "down") => {
