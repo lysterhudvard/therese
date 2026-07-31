@@ -319,52 +319,6 @@ export function Credits({
                         ) : (
                           <span>{c.title}</span>
                         )}
-                        {c.commentary && (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const comm = c.commentary;
-                              if (!comm) return;
-                              if (activeCommentaryUrl === comm.url) {
-                                stopCommentary();
-                              } else {
-                                playCommentary({
-                                  title: c.title,
-                                  role: c.role[lang],
-                                  url: comm.url,
-                                  text: lang === "sv" ? comm.svText : comm.enText,
-                                });
-                              }
-                            }}
-                            data-hover
-                            className={`relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300 font-mono text-[9px] uppercase tracking-wider after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer ${
-                              activeCommentaryUrl === c.commentary.url
-                                ? "bg-ember border-ember text-ink font-semibold"
-                                : "border-bone/35 text-bone/75 hover:text-ember hover:border-ember/40 bg-bone/[0.03]"
-                            }`}
-                          >
-                            <span className="relative flex h-1.5 w-1.5 shrink-0">
-                              {activeCommentaryUrl === c.commentary.url ? (
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ink opacity-75"></span>
-                              ) : null}
-                              <span
-                                className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
-                                  activeCommentaryUrl === c.commentary.url ? "bg-ink" : "bg-ember"
-                                  }`}
-                              ></span>
-                            </span>
-                            <span>
-                              {activeCommentaryUrl === c.commentary.url
-                                ? lang === "sv"
-                                  ? "Spelar"
-                                  : "Playing"
-                                : lang === "sv"
-                                  ? "Kommentar"
-                                  : "Commentary"}
-                            </span>
-                          </button>
-                        )}
                       </div>
                       <div className="mt-1 text-xs text-bone/65 group-hover:text-bone/85 transition-colors duration-300">
                         {c.role[lang]}
@@ -376,7 +330,7 @@ export function Credits({
                     <td className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.network}
                     </td>
-                    <td className="col-span-3 lg:col-span-2 flex justify-end block">
+                    <td className="col-span-3 lg:col-span-2 flex flex-col items-end gap-2 justify-center block">
                       {c.url ? (
                         <a
                           href={c.url}
@@ -388,6 +342,54 @@ export function Credits({
                         >
                           {lang === "sv" ? "Titta" : "Watch"}
                         </a>
+                      ) : null}
+                      {c.commentary ? (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const comm = c.commentary;
+                            if (!comm) return;
+                            if (activeCommentaryUrl === comm.url) {
+                              stopCommentary();
+                            } else {
+                              playCommentary({
+                                title: c.title,
+                                role: c.role[lang],
+                                url: comm.url,
+                                text: lang === "sv" ? comm.svText : comm.enText,
+                              });
+                            }
+                          }}
+                          data-hover
+                          className={`relative inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto px-0 sm:px-4 py-0 sm:py-1.5 rounded-sm border transition-all duration-300 font-mono text-[10px] font-bold uppercase tracking-[0.2em] shadow-md after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer ${
+                            activeCommentaryUrl === c.commentary.url
+                              ? "bg-ember border-ember text-ink shadow-ember/15"
+                              : "border-ember/40 bg-ember/5 text-ember hover:bg-ember hover:text-ink shadow-ember/5 hover:shadow-ember/15"
+                          }`}
+                        >
+                          <span className="relative flex items-center justify-center shrink-0">
+                            {activeCommentaryUrl === c.commentary.url ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="14" y="4" width="4" height="16" rx="1" />
+                                <rect x="6" y="4" width="4" height="16" rx="1" />
+                              </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[0.5px]">
+                                <polygon points="6 3 20 12 6 21 6 3" />
+                              </svg>
+                            )}
+                          </span>
+                          <span className="hidden sm:inline ml-1.5">
+                            {activeCommentaryUrl === c.commentary.url
+                              ? lang === "sv"
+                                ? "Spelar"
+                                : "Playing"
+                              : lang === "sv"
+                                ? "Kommentar"
+                                : "Commentary"}
+                          </span>
+                        </button>
                       ) : null}
                     </td>
                     <td className="col-span-12 text-xs text-bone/55 lg:hidden group-hover:text-bone/80 transition-colors duration-300 block">

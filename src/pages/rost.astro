@@ -66,7 +66,7 @@ const faqs = processedDbData.biography?.faqs?.filter((f: any) => f.q_sv && f.q_s
   </div>
 
   <Footer client:visible simple={true} />
-  <CommentaryPlayer client:visible />
+  <CommentaryPlayer client:load />
   <CookieConsent client:idle />
   
   {faqs && faqs.length > 0 && (

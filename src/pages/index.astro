@@ -202,7 +202,7 @@ if (processedDbData?.biography?.review_quotes) {
   <Contact client:visible bioData={processedDbData?.biography} teaser={true} />
   
   <Footer client:visible bioData={processedDbData?.biography} />
-  <CommentaryPlayer client:visible />
+  <CommentaryPlayer client:load />
   <CookieConsent client:idle />
 
   <!-- Intersection observer script removed as Portfolio is on a separate page -->

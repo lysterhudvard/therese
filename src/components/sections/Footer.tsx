@@ -245,12 +245,12 @@ export function Footer({ bioData, simple = false }: { bioData?: any; simple?: bo
       {/* Bottom metadata row */}
       <div className={
         simple
-          ? "relative w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10 text-center"
-          : "relative w-full max-w-7xl mx-auto mt-16 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10 text-center"
+          ? "relative w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10 text-center"
+          : "relative w-full max-w-7xl mx-auto mt-10 md:mt-16 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-[9px] uppercase tracking-[0.35em] text-bone/60 z-10 text-center"
       }>
         <div className="md:w-1/3 md:text-left">© {new Date().getFullYear()} Therese Järvheden</div>
-        <div className="md:w-1/3 text-bone/40 leading-relaxed">
-          {lang === "sv" ? "Letar du efter min hudvårdsklinik?" : "Looking for my skincare clinic?"} <br className="md:hidden" />
+        <div className="md:w-1/3 text-bone/40 leading-relaxed whitespace-nowrap text-[8px] sm:text-[9px] tracking-normal sm:tracking-[0.35em]">
+          {lang === "sv" ? "Letar du efter min hudvårdsklinik?" : "Looking for my skincare clinic?"}
           <a href="https://www.lysterhudvard.se" target="_blank" rel="noopener noreferrer" className="hover:text-bone transition-colors underline underline-offset-4 ml-1">
             {lang === "sv" ? "Besök Lyster Hudvård" : "Visit Lyster Hudvård"}
           </a>

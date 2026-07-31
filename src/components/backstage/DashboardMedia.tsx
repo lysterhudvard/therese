@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ImageIcon, RefreshCw } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { extractFilePathFromUrl, parseCropAndDesc, serializeCropAndDesc } from "../../lib/utils";
 import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 import { StorageFile } from "./media/types";
 import { MediaUploadColumn } from "./media/MediaUploadColumn";
@@ -293,6 +294,53 @@ export function DashboardMedia() {
         }, { onConflict: "file_path" });
 
       if (error) throw error;
+
+      // Sync metadata to matching portfolio_images table entries
+      const { data: pImages } = await supabase.from("portfolio_images").select("*");
+      if (pImages && pImages.length > 0) {
+        const matching = pImages.filter((p) => {
+          const path1 = extractFilePathFromUrl(p.url);
+          const path2 = extractFilePathFromUrl(p.download_url);
+          return path1 === filePath || path2 === filePath;
+        });
+
+        if (matching.length > 0) {
+          const toUpdate = matching.map((p) => {
+            const { crop } = parseCropAndDesc(p.description);
+            return {
+              ...p,
+              alt: editMetaValues.alt,
+              title: editMetaValues.title,
+              caption: editMetaValues.caption,
+              description: serializeCropAndDesc(crop, editMetaValues.description),
+              filename: editMetaValues.filename,
+            };
+          });
+          await supabase.from("portfolio_images").upsert(toUpdate);
+        }
+      }
+
+      // Sync metadata to matching showreels table entries
+      const { data: pReels } = await supabase.from("showreels").select("*");
+      if (pReels && pReels.length > 0) {
+        const matchingReels = pReels.filter((r) => {
+          const path1 = extractFilePathFromUrl(r.poster);
+          return path1 === filePath;
+        });
+
+        if (matchingReels.length > 0) {
+          const reelsToUpdate = matchingReels.map((r) => ({
+            ...r,
+            poster_alt: editMetaValues.alt,
+            poster_title: editMetaValues.title,
+            poster_caption: editMetaValues.caption,
+            poster_description: editMetaValues.description,
+            poster_filename: editMetaValues.filename,
+          }));
+          await supabase.from("showreels").upsert(reelsToUpdate);
+        }
+      }
+
       toast.success("Metadata sparad för filen!");
       alert("Filinformationen har sparats framgångsrikt!");
       setEditingMetaPath(null);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Plus } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { extractFilePathFromUrl } from "../../lib/utils";
 import { MediaPickerModal } from "./MediaPickerModal";
 import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
 import { ShowreelItem } from "./showreels/types";
@@ -37,8 +38,8 @@ export function DashboardShowreels() {
   }, []);
 
   const handleReelChange = (id: string, field: keyof ShowreelItem, value: any) => {
-    setShowreels(
-      showreels.map((reel) => {
+    setShowreels((prevReels) =>
+      prevReels.map((reel) => {
         if (reel.id !== id) return reel;
 
         let updatedReel = { ...reel, [field]: value };
@@ -178,6 +179,9 @@ export function DashboardShowreels() {
 
       const { data: urlData } = supabase.storage.from("portfolio").getPublicUrl(filePath);
       handleReelChange(id, "poster", urlData.publicUrl);
+      handleReelChange(id, "poster_filename", fileName);
+      handleReelChange(id, "poster_alt", baseName.replace(/-/g, " "));
+      
       toast.success("Posterbild uppladdad!", { id: "poster-upload" });
     } catch (err: any) {
       console.error(err);
@@ -219,6 +223,29 @@ export function DashboardShowreels() {
 
       const { error } = await supabase.from("showreels").upsert(reelsToUpsert);
       if (error) throw error;
+
+      // Sync metadata to media_metadata table
+      const metaRows: any[] = [];
+      showreels.forEach((reel) => {
+        if (reel.poster) {
+          const fp = extractFilePathFromUrl(reel.poster);
+          if (fp && !metaRows.some((m) => m.file_path === fp)) {
+            metaRows.push({
+              file_path: fp,
+              alt: reel.poster_alt || "",
+              title: reel.poster_title || "",
+              caption: reel.poster_caption || "",
+              description: reel.poster_description || "",
+              filename: reel.poster_filename || "",
+              updated_at: new Date().toISOString(),
+            });
+          }
+        }
+      });
+
+      if (metaRows.length > 0) {
+        await supabase.from("media_metadata").upsert(metaRows, { onConflict: "file_path" });
+      }
 
       toast.success("Akt IV (Showreels) har sparats i Supabase!");
       alert("Akt IV (Showreels) har sparats framgångsrikt!");
@@ -304,14 +331,21 @@ export function DashboardShowreels() {
         onClose={() => setActivePickerId(null)}
         onSelect={(url, metadata) => {
           if (activePickerId) {
-            handleReelChange(activePickerId, "poster", url);
-            if (metadata) {
-              if (metadata.alt) handleReelChange(activePickerId, "poster_alt", metadata.alt);
-              if (metadata.title) handleReelChange(activePickerId, "poster_title", metadata.title);
-              if (metadata.caption) handleReelChange(activePickerId, "poster_caption", metadata.caption);
-              if (metadata.description) handleReelChange(activePickerId, "poster_description", metadata.description);
-              if (metadata.filename) handleReelChange(activePickerId, "poster_filename", metadata.filename);
-            }
+            setShowreels((prev) =>
+              prev.map((reel) =>
+                reel.id === activePickerId
+                  ? {
+                      ...reel,
+                      poster: url,
+                      poster_alt: metadata?.alt || reel.poster_alt || "",
+                      poster_title: metadata?.title || reel.poster_title || "",
+                      poster_caption: metadata?.caption || reel.poster_caption || "",
+                      poster_description: metadata?.description || reel.poster_description || "",
+                      poster_filename: metadata?.filename || reel.poster_filename || "",
+                    }
+                  : reel
+              )
+            );
           }
         }}
         typeFilter="image"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Image as ImageIcon, Plus, Upload } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { extractFilePathFromUrl, parseCropAndDesc } from "../../lib/utils";
 
 import { MediaPickerModal } from "./MediaPickerModal";
 import { ImageUploadOptimizer } from "./ImageUploadOptimizer";
@@ -237,6 +238,31 @@ export function DashboardPortfolio() {
 
       const { error: imgErr } = await supabase.from("portfolio_images").upsert(imagesToUpsert);
       if (imgErr) throw imgErr;
+
+      // Sync metadata to media_metadata table so Media Library reflects changes automatically
+      const metaRows: any[] = [];
+      images.forEach((img) => {
+        const path1 = extractFilePathFromUrl(img.url);
+        const path2 = extractFilePathFromUrl(img.download_url);
+
+        [path1, path2].forEach((fp) => {
+          if (fp && !metaRows.some((m) => m.file_path === fp)) {
+            metaRows.push({
+              file_path: fp,
+              alt: img.alt || "",
+              title: img.title || "",
+              caption: img.caption || "",
+              description: parseCropAndDesc(img.description).desc || "",
+              filename: img.filename || "",
+              updated_at: new Date().toISOString(),
+            });
+          }
+        });
+      });
+
+      if (metaRows.length > 0) {
+        await supabase.from("media_metadata").upsert(metaRows, { onConflict: "file_path" });
+      }
 
       await fetchImages();
 

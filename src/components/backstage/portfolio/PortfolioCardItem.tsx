@@ -1,28 +1,12 @@
 import React, { useRef, useState } from "react";
 import { ArrowUp, ArrowDown, Trash2, Upload } from "lucide-react";
 import { GalleryImage } from "./types";
+import { parseCropAndDesc, serializeCropAndDesc } from "../../../lib/utils";
 
 const ArrowUpIcon = ArrowUp as any;
 const ArrowDownIcon = ArrowDown as any;
 const Trash2Icon = Trash2 as any;
 const UploadIcon = Upload as any;
-
-// Helper to parse crop prefix and original description text
-const parseCropAndDesc = (descriptionStr: string | undefined | null) => {
-  if (!descriptionStr) return { crop: "50% 50%", desc: "" };
-  if (descriptionStr.startsWith("crop:")) {
-    const parts = descriptionStr.split(";desc:");
-    const crop = parts[0].replace("crop:", "");
-    const desc = parts[1] || "";
-    return { crop, desc };
-  }
-  return { crop: "50% 50%", desc: descriptionStr };
-};
-
-// Helper to serialize crop and original description text back to the database field
-const serializeCropAndDesc = (crop: string, desc: string) => {
-  return `crop:${crop};desc:${desc}`;
-};
 
 // Helper to translate various crop configurations (center, top, bottom, X% Y%) to numerical percentages
 const parseXY = (cropStr: string) => {
@@ -298,7 +282,7 @@ export function PortfolioCardItem({
           </div>
           <div>
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
-              Film / Projekt (t.ex. Från: Karatefylla)
+              Bildtext / Projekt (Caption)
             </label>
             <input
               type="text"

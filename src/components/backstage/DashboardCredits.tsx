@@ -96,8 +96,8 @@ export function DashboardCredits() {
   };
 
   const updateCredit = (id: string, field: keyof CreditRow, value: any) => {
-    setCredits(
-      credits.map((c) => {
+    setCredits((prevCredits) =>
+      prevCredits.map((c) => {
         if (c.id !== id) return c;
         
         // If setting this credit to is_current_production, disable all others
@@ -360,14 +360,21 @@ export function DashboardCredits() {
         if (activePickerId) {
           if (activePickerId.endsWith("-img")) {
             const actualId = activePickerId.substring(0, activePickerId.length - 4);
-            updateCredit(actualId, "img", url);
-            if (metadata) {
-              if (metadata.alt) updateCredit(actualId, "img_alt", metadata.alt);
-              if (metadata.title) updateCredit(actualId, "img_title", metadata.title);
-              if (metadata.caption) updateCredit(actualId, "img_caption", metadata.caption);
-              if (metadata.description) updateCredit(actualId, "img_description", metadata.description);
-              if (metadata.filename) updateCredit(actualId, "img_filename", metadata.filename);
-            }
+            setCredits((prev) =>
+              prev.map((c) =>
+                c.id === actualId
+                  ? {
+                      ...c,
+                      img: url,
+                      img_alt: metadata?.alt || c.img_alt || "",
+                      img_title: metadata?.title || c.img_title || "",
+                      img_caption: metadata?.caption || c.img_caption || "",
+                      img_description: metadata?.description || c.img_description || "",
+                      img_filename: metadata?.filename || c.img_filename || "",
+                    }
+                  : c
+              )
+            );
           } else {
             updateCredit(activePickerId, "commentary_url", url);
           }
