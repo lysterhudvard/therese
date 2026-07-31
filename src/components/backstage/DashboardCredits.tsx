@@ -124,7 +124,8 @@ export function DashboardCredits() {
 
     try {
       const fileExt = file.name.split(".").pop();
-      const fileName = `audio-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const baseName = file.name.substring(0, file.name.lastIndexOf(".")).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+      const fileName = `${baseName}-${Math.random().toString(36).substring(2, 6)}.${fileExt}`;
       const filePath = `audio/${fileName}`;
 
       const { error } = await supabase.storage
@@ -266,14 +267,27 @@ export function DashboardCredits() {
           </p>
         </div>
 
-        <button
-          type="button"
-          id="klick-credits-add"
-          onClick={addCredit}
-          className="px-4 py-2 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[10px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
-        >
-          + Lägg till merit
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            id="klick-credits-add"
+            onClick={addCredit}
+            className="px-4 py-2 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[10px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
+          >
+            + Lägg till merit
+          </button>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="flex items-center justify-center min-w-[80px] gap-2 px-4 py-2 bg-ember/90 hover:bg-ember text-ink font-semibold font-mono text-[10px] uppercase tracking-widest rounded-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-ember/15"
+          >
+            {isSaving ? (
+              <span className="w-3.5 h-3.5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+            ) : (
+              "Spara"
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs */}
@@ -314,7 +328,14 @@ export function DashboardCredits() {
         ))}
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-bone/10">
+      <div className="flex justify-between pt-4 border-t border-bone/10">
+        <button
+          type="button"
+          onClick={addCredit}
+          className="px-4 py-2 bg-bone/10 hover:bg-bone/20 text-bone font-mono text-[10px] uppercase tracking-widest rounded-sm transition-colors cursor-pointer"
+        >
+          + Lägg till merit
+        </button>
         <button
           type="submit"
           id="klick-credits-save"

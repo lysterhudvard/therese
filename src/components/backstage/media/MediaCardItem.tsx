@@ -29,6 +29,8 @@ interface MediaCardItemProps {
   handleSaveMetadata: (filePath: string) => void;
   handleMoveFile: (file: StorageFile, newFolder: string) => void;
   handleDeleteFile: (filePath: string) => void;
+  isSelected?: boolean;
+  onToggleSelect?: (filePath: string) => void;
 }
 
 export function MediaCardItem({
@@ -44,13 +46,28 @@ export function MediaCardItem({
   handleSaveMetadata,
   handleMoveFile,
   handleDeleteFile,
+  isSelected,
+  onToggleSelect,
 }: MediaCardItemProps) {
   return (
-    <div className="border border-bone/10 bg-stage/10 rounded-sm overflow-hidden flex flex-col justify-between">
+    <div className={`border ${isSelected ? 'border-ember ring-1 ring-ember/30' : 'border-bone/10'} bg-stage/10 rounded-sm overflow-hidden flex flex-col justify-between relative`}>
       {/* File preview box */}
       <div className="relative aspect-video bg-stage flex items-center justify-center overflow-hidden border-b border-bone/10 group">
+        
+        {/* Selection Checkbox */}
+        {onToggleSelect && (
+          <div className="absolute top-2 left-2 z-20" onClick={(e) => e.stopPropagation()}>
+            <input
+              type="checkbox"
+              checked={isSelected || false}
+              onChange={() => onToggleSelect(file.path)}
+              className="w-4 h-4 cursor-pointer accent-ember"
+            />
+          </div>
+        )}
+
         {file.folder && (
-          <div className="absolute top-2 left-2 bg-ember text-ink font-mono text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm z-10 shadow-sm">
+          <div className={`absolute top-2 ${onToggleSelect ? 'left-8' : 'left-2'} bg-ember text-ink font-mono text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm z-10 shadow-sm`}>
             {(folderLabels[file.folder] || file.folder).toUpperCase()}
           </div>
         )}

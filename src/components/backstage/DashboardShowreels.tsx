@@ -166,7 +166,8 @@ export function DashboardShowreels() {
 
     try {
       const fileExt = fileToUpload.name.split(".").pop();
-      const fileName = `poster-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const baseName = fileToUpload.name.substring(0, fileToUpload.name.lastIndexOf(".")).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+      const fileName = `poster-${baseName}-${Math.random().toString(36).substring(2, 6)}.${fileExt}`;
       const filePath = `posters/${fileName}`;
 
       const { error } = await supabase.storage

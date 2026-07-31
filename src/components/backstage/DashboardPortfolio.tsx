@@ -142,7 +142,8 @@ export function DashboardPortfolio() {
 
       // 1. Upload display image (optimized WebP or original raw file)
       const fileExt = fileToUpload.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const baseName = fileToUpload.name.substring(0, fileToUpload.name.lastIndexOf(".")).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+      const fileName = `${baseName}-${Math.random().toString(36).substring(2, 6)}.${fileExt}`;
       const filePath = `portfolio/${fileName}`;
 
       const { error } = await supabase.storage
@@ -163,7 +164,8 @@ export function DashboardPortfolio() {
       // 2. If uploadOriginal is true, also upload the original file for the high-res download
       if (uploadOriginal && originalFile) {
         const origExt = originalFile.name.split(".").pop();
-        const origFileName = `${Math.random().toString(36).substring(2)}-original.${origExt}`;
+        const origBaseName = originalFile.name.substring(0, originalFile.name.lastIndexOf(".")).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+        const origFileName = `${origBaseName}-${Math.random().toString(36).substring(2, 6)}-original.${origExt}`;
         const origFilePath = `portfolio/${origFileName}`;
 
         const { error: origErr } = await supabase.storage
@@ -185,7 +187,8 @@ export function DashboardPortfolio() {
         id: `temp-${Date.now()}`,
         url: optimizedUrl,
         download_url: originalUrl,
-        alt: fileToUpload.name.split("-optimized")[0].split(".")[0],
+        alt: fileToUpload.name.split("-optimized")[0].split(".")[0].replace(/-/g, " "),
+        filename: fileToUpload.name,
         allow_download: true,
         sort_order: images.length,
       };
@@ -399,12 +402,15 @@ export function DashboardPortfolio() {
         }}
         onSelect={(url, metadata) => {
           if (activePickingImageId) {
+            const isDownloadUrl = activePickingImageId.endsWith("-download");
+            const actualId = activePickingImageId.replace("-download", "").replace("-url", "");
+
             setImages(
               images.map((img) =>
-                img.id === activePickingImageId
+                img.id === actualId
                   ? {
                       ...img,
-                      url,
+                      ...(isDownloadUrl ? { download_url: url } : { url }),
                       alt: metadata?.alt || img.alt || "",
                       title: metadata?.title || img.title || "",
                       caption: metadata?.caption || img.caption || "",

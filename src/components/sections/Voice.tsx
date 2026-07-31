@@ -123,11 +123,16 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
   return (
     <section id="voice" ref={ref} className="relative overflow-hidden bg-ink">
       {liveVoice.sampleUrl && (
-        <audio
-          ref={audioRef}
-          src={liveVoice.sampleUrl}
-          onEnded={handleEnded}
-        />
+        <>
+          <div className="sr-only">Röstprov — svensk röstskådespelare Therese Järvheden.</div>
+          <audio
+            ref={audioRef}
+            src={liveVoice.sampleUrl}
+            onEnded={handleEnded}
+            title="Röstprov Therese Järvheden"
+            preload="metadata"
+          />
+        </>
       )}
       <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className={liveVoice.url ? "grid grid-cols-1 lg:grid-cols-2" : "max-w-4xl mx-auto flex flex-col items-center justify-center text-center px-6 py-20 md:py-48"}>

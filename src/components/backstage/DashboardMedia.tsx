@@ -16,6 +16,7 @@ export function DashboardMedia() {
   const [externalAlt, setExternalAlt] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [displayCount, setDisplayCount] = useState(20);
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
   useEffect(() => {
     setDisplayCount(20);
@@ -116,11 +117,13 @@ export function DashboardMedia() {
     fetchFiles();
   }, []);
 
-  const uploadSingleFileDirectly = async (fileToUpload: File, category: string) => {
+  const uploadSingleFileDirectly = async (fileToUpload: File, category: string, isOriginalFallback: boolean = false) => {
     const toastId = toast.loading(`Laddar upp ${fileToUpload.name}...`);
     try {
       const fileExt = fileToUpload.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const baseName = fileToUpload.name.substring(0, fileToUpload.name.lastIndexOf(".")).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+      const suffix = isOriginalFallback ? "-original" : "";
+      const fileName = `${baseName}-${Math.random().toString(36).substring(2, 6)}${suffix}.${fileExt}`;
       const fileFullPath = `${category}/${fileName}`;
       
       const { error } = await supabase.storage.from("portfolio").upload(fileFullPath, fileToUpload, { cacheControl: "public, max-age=31536000", upsert: true });
@@ -138,10 +141,8 @@ export function DashboardMedia() {
     const selectedFiles = e.target.files ? Array.from(e.target.files) as File[] : [];
     if (selectedFiles.length === 0) return;
 
-    // Reset file input value so same file can be selected again
     e.target.value = "";
 
-    // If single image upload, keep the existing crop / optimize wizard modal flow
     if (selectedFiles.length === 1 && selectedFiles[0].type.startsWith("image/")) {
       setPendingUploadFile(selectedFiles[0]);
       setIsOptimizerOpen(true);
@@ -152,11 +153,9 @@ export function DashboardMedia() {
     let successCount = 0;
     try {
       for (const file of selectedFiles) {
-        // Detect audio files (either by mime type or file extensions)
         const isAudio = file.type.startsWith("audio/") || 
           ["mp3", "wav", "ogg", "aac", "m4a", "flac"].includes(file.name.split(".").pop()?.toLowerCase() || "");
         
-        // Voice files go strictly to "voice" folder. Others go to "general".
         const category = isAudio ? "voice" : "general";
         
         await uploadSingleFileDirectly(file, category);
@@ -173,12 +172,20 @@ export function DashboardMedia() {
     }
   };
 
-  const proceedWithUpload = async (fileToUpload: File, category: string = "general") => {
+  const proceedWithUpload = async (fileToUpload: File, category: string = "general", uploadOriginal: boolean = false) => {
+    const originalFile = pendingUploadFile;
     setIsOptimizerOpen(false);
     setPendingUploadFile(null);
     setIsUploading(true);
     try {
+      // 1. Upload optimized image
       await uploadSingleFileDirectly(fileToUpload, category);
+      
+      // 2. Upload original if requested
+      if (uploadOriginal && originalFile) {
+        await uploadSingleFileDirectly(originalFile, category, true);
+      }
+
       fetchFiles();
     } catch (err: any) {
       console.error(err);
@@ -197,10 +204,38 @@ export function DashboardMedia() {
       if (error) throw error;
 
       toast.success("Filen har tagits bort.", { id: toastId });
+      setSelectedFiles(prev => prev.filter(p => p !== filePath));
       fetchFiles();
     } catch (err: any) {
       console.error(err);
       toast.error(`Kunde inte ta bort fil: ${err.message}`, { id: toastId });
+    }
+  };
+
+  const toggleFileSelection = (filePath: string) => {
+    setSelectedFiles(prev => 
+      prev.includes(filePath) 
+        ? prev.filter(p => p !== filePath)
+        : [...prev, filePath]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedFiles.length === 0) return;
+    const isConfirmed = window.confirm(`Är du säker på att du vill ta bort ${selectedFiles.length} filer permanent?`);
+    if (!isConfirmed) return;
+
+    const toastId = toast.loading(`Tar bort ${selectedFiles.length} filer...`);
+    try {
+      const { error } = await supabase.storage.from("portfolio").remove(selectedFiles);
+      if (error) throw error;
+
+      toast.success(`${selectedFiles.length} filer har tagits bort.`, { id: toastId });
+      setSelectedFiles([]);
+      fetchFiles();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Kunde inte ta bort filer: ${err.message}`, { id: toastId });
     }
   };
 
@@ -425,10 +460,29 @@ export function DashboardMedia() {
         {/* Media Grid Column */}
         <div className="lg:col-span-2 space-y-4">
           <div className="border-b border-bone/5 pb-3 space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5">
                 Filförteckning ({files.filter(f => selectedFilter === "all" || f.folder === selectedFilter).length} / {files.length})
               </h3>
+              {selectedFiles.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-ember">{selectedFiles.length} markerade</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFiles([])}
+                    className="px-2 py-1 text-[9px] border border-bone/10 hover:border-bone/30 text-bone/60 hover:text-bone rounded uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Avmarkera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkDelete}
+                    className="px-2 py-1 text-[9px] bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-ink border border-red-500/30 rounded uppercase tracking-wider transition-colors cursor-pointer font-bold"
+                  >
+                    Ta bort valda
+                  </button>
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
@@ -495,6 +549,8 @@ export function DashboardMedia() {
                       handleSaveMetadata={handleSaveMetadata}
                       handleMoveFile={handleMoveFile}
                       handleDeleteFile={handleDeleteFile}
+                      isSelected={selectedFiles.includes(file.path)}
+                      onToggleSelect={toggleFileSelection}
                     />
                   ))}
               </div>
@@ -522,8 +578,8 @@ export function DashboardMedia() {
           setIsOptimizerOpen(false);
           setPendingUploadFile(null);
         }}
-        onUpload={(finalFile, category) => {
-          proceedWithUpload(finalFile, category);
+        onUpload={(finalFile, category, uploadOriginal) => {
+          proceedWithUpload(finalFile, category, uploadOriginal);
         }}
       />
     </div>

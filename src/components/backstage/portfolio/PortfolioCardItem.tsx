@@ -191,7 +191,7 @@ export function PortfolioCardItem({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                setActivePickingImageId(img.id);
+                setActivePickingImageId(`${img.id}-url`);
                 setIsMediaPickerOpen(true);
               }}
               className="absolute top-1.5 right-1.5 p-1.5 bg-ink/80 hover:bg-ember border border-bone/10 hover:border-ember text-bone hover:text-ink rounded transition-all duration-300 shadow-md flex items-center justify-center cursor-pointer z-10 opacity-70 hover:opacity-100"
@@ -222,27 +222,53 @@ export function PortfolioCardItem({
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
               Bild-URL (Komprimerad visningsbild)
             </label>
-            <input
-              type="text"
-              value={img.url}
-              onChange={(e) =>
-                setImages(images.map((x) => (x.id === img.id ? { ...x, url: e.target.value } : x)))
-              }
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-            />
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={img.url}
+                onChange={(e) =>
+                  setImages(images.map((x) => (x.id === img.id ? { ...x, url: e.target.value } : x)))
+                }
+                className="flex-1 min-w-0 bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setActivePickingImageId(`${img.id}-url`);
+                  setIsMediaPickerOpen(true);
+                }}
+                className="shrink-0 flex items-center justify-center px-2.5 bg-bone/5 hover:bg-bone/20 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember transition-colors rounded-sm cursor-pointer"
+                title="Välj från Mediebibliotek"
+              >
+                <UploadIcon size={12} />
+              </button>
+            </div>
           </div>
           <div>
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">
               Nedladdnings-URL (Högupplöst original)
             </label>
-            <input
-              type="text"
-              value={img.download_url || img.url}
-              onChange={(e) =>
-                setImages(images.map((x) => (x.id === img.id ? { ...x, download_url: e.target.value } : x)))
-              }
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-            />
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={img.download_url || img.url}
+                onChange={(e) =>
+                  setImages(images.map((x) => (x.id === img.id ? { ...x, download_url: e.target.value } : x)))
+                }
+                className="flex-1 min-w-0 bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setActivePickingImageId(`${img.id}-download`);
+                  setIsMediaPickerOpen(true);
+                }}
+                className="shrink-0 flex items-center justify-center px-2.5 bg-bone/5 hover:bg-bone/20 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember transition-colors rounded-sm cursor-pointer"
+                title="Välj från Mediebibliotek"
+              >
+                <UploadIcon size={12} />
+              </button>
+            </div>
           </div>
           <div>
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">

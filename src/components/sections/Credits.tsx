@@ -7,6 +7,7 @@ import { type Credit, type FilterKey } from "../../types";
 
 const MotionDiv = motion.div as any;
 const MotionLi = motion.li as any;
+const MotionTr = motion.tr as any;
 
 export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -275,28 +276,35 @@ export function Credits({
             </div>
           </div>
 
-          <ul className="mt-14 border-t border-bone/20">
+          <table className="w-full mt-14 border-t border-bone/20 block">
+            <thead className="sr-only">
+              <tr>
+                <th>År</th>
+                <th>Titel</th>
+                <th>Kategori</th>
+                <th>Produktion</th>
+                <th>Länk</th>
+              </tr>
+            </thead>
+            <tbody className="block w-full">
             <AnimatePresence initial={false}>
               {visibleRows.map((c, i) => (
-                <MotionLi
+                <MotionTr
                   key={c.title}
                   layout
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.5, delay: i * 0.03 }}
-                  className="group relative border-b border-bone/20 transition-colors duration-300 hover:border-bone/45"
+                  className="group relative border-b border-bone/20 transition-colors duration-300 hover:border-bone/45 w-full grid grid-cols-12 items-center gap-4 py-7 px-4 sm:px-6 md:px-8 hover:bg-bone/[0.06]"
+                  onMouseEnter={() => setHoveredCredit(c)}
+                  onMouseLeave={() => setHoveredCredit(null)}
+                  onMouseMove={(e: any) => setMousePos({ x: e.clientX, y: e.clientY })}
                 >
-                  <div
-                    onMouseEnter={() => setHoveredCredit(c)}
-                    onMouseLeave={() => setHoveredCredit(null)}
-                    onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
-                    className="grid grid-cols-12 items-center gap-4 py-7 px-4 sm:px-6 md:px-8 transition-colors hover:bg-bone/[0.06] duration-300"
-                  >
-                    <div className="col-span-2 lg:col-span-1 font-mono text-xs text-ember/80 group-hover:text-ember transition-colors duration-300">
+                    <td className="col-span-2 lg:col-span-1 font-mono text-xs text-ember/80 group-hover:text-ember transition-colors duration-300 block">
                       {c.year}
-                    </div>
-                    <div className="col-span-7 lg:col-span-5">
+                    </td>
+                    <td className="col-span-7 lg:col-span-5 block">
                       <div className="font-display text-xl sm:text-2xl lg:text-3xl text-bone transition-all flex flex-wrap items-center gap-3">
                         {c.url ? (
                           <a
@@ -361,14 +369,14 @@ export function Credits({
                       <div className="mt-1 text-xs text-bone/65 group-hover:text-bone/85 transition-colors duration-300">
                         {c.role[lang]}
                       </div>
-                    </div>
-                    <div className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
+                    </td>
+                    <td className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.category[lang]}
-                    </div>
-                    <div className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
+                    </td>
+                    <td className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.network}
-                    </div>
-                    <div className="col-span-3 lg:col-span-2 flex justify-end">
+                    </td>
+                    <td className="col-span-3 lg:col-span-2 flex justify-end block">
                       {c.url ? (
                         <a
                           href={c.url}
@@ -381,15 +389,15 @@ export function Credits({
                           {lang === "sv" ? "Titta" : "Watch"}
                         </a>
                       ) : null}
-                    </div>
-                    <div className="col-span-12 text-xs text-bone/55 lg:hidden group-hover:text-bone/80 transition-colors duration-300">
+                    </td>
+                    <td className="col-span-12 text-xs text-bone/55 lg:hidden group-hover:text-bone/80 transition-colors duration-300 block">
                       {c.network} · {c.category[lang]}
-                    </div>
-                  </div>
-                </MotionLi>
+                    </td>
+                </MotionTr>
               ))}
             </AnimatePresence>
-          </ul>
+            </tbody>
+          </table>
 
           {rows.length > (isMobile ? 5 : 10) && (
             <div className="mt-8 flex justify-center">

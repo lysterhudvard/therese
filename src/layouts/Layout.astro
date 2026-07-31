@@ -85,6 +85,52 @@ const {
         }
       })();
     </script>
+
+    <!-- JSON-LD Schema (Person) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Therese Järvheden",
+        "jobTitle": "Skådespelerska, Röstskådespelare",
+        "description": "Svensk skådespelerska och röstskådespelare baserad i Malmö och Stockholm. Aktuell i SVT:s En våldsam kärlek. Skånsk dialekt.",
+        "url": "https://www.theresejarvheden.se",
+        "image": "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+        "knowsLanguage": ["sv", "en"],
+        "sameAs": [
+          "https://www.imdb.com/name/nm5098431/",
+          "https://commercialactors.com/en/therese-jarvheden",
+          "https://schultzbergagency.com/therese-jarvheden/",
+          "https://www.instagram.com/theresejarvheden/",
+          "https://www.facebook.com/therese.jarvhedenfdpersson",
+          "https://www.lysterhudvard.se"
+        ],
+        "worksFor": [
+          {
+            "@type": "Organization",
+            "name": "Schultzberg Agency",
+            "url": "https://schultzbergagency.com"
+          },
+          {
+            "@type": "Organization",
+            "name": "Commercial Actors",
+            "url": "https://commercialactors.com"
+          }
+        ],
+        "performerIn": [
+          {
+            "@type": "TVSeries",
+            "name": "En våldsam kärlek",
+            "url": "https://www.svtplay.se/en-valdsam-karlek"
+          },
+          { "@type": "TVSeries", "name": "Karatefylla" },
+          { "@type": "TVSeries", "name": "Jävla klåpare" },
+          { "@type": "Movie", "name": "Beck – Utan uppsåt" },
+          { "@type": "TVSeries", "name": "Kärlek & anarki" }
+        ]
+      }
+    </script>
+    <slot name="head" />
 	</head>
 	<body>
 		<slot />
