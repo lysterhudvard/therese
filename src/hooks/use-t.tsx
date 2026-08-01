@@ -32,7 +32,7 @@ export const I18N = {
       p1Pre: "Therese var senast aktuell i SVT:s dramadokumentär ",
       p1Link: "En våldsam kärlek",
       p1Post:
-        " där hon spelade en av de fyra kvinnor vi fick följa. Serien handlar om våld i nära relationer — en samhällsfråga vi måste prata mer om, belysa dess problematik och börja agera.",
+        " där hon spelade rollen som Victoria, en av de fyra kvinnor vars öden vi fick följa. Serien handlar om våld i nära relationer — en samhällsfråga vi måste prata mer om, belysa dess problematik och börja agera.",
       p2: [
         "Hon har spelat teater och musikal sedan hon var barn. I TV har hon mestadels medverkat i humorproduktioner som Kristallennominerade ",
         "Karatefylla",
@@ -134,7 +134,7 @@ export const I18N = {
       p1Pre: "Therese was most recently seen in SVT's documentary drama ",
       p1Link: "En våldsam kärlek",
       p1Post:
-        " where she played one of the four women we follow. The series is about intimate-partner violence — a societal issue we must talk about more, expose, and act on.",
+        " where she played the role of Victoria, one of the four women whose fates we follow. The series is about intimate-partner violence — a societal issue we must talk about more, expose, and act on.",
       p2: [
         "She has performed theatre and musicals since childhood. On television she has appeared mostly in comedy productions such as the Kristallen-nominated ",
         "Karatefylla",

@@ -32,9 +32,9 @@ setGlobalDbData(processedDbData);
     <Portfolio client:visible images={processedDbData.portfolioImages} />
     
     {processedDbData.showreels && processedDbData.showreels.length > 0 ? (
-      <Showreels client:visible videos={processedDbData.showreels} />
+      <Showreels client:visible videos={processedDbData.showreels} showreelSettings={processedDbData.biography?.showreel_settings} />
     ) : (
-      <Showreels client:visible />
+      <Showreels client:visible showreelSettings={processedDbData.biography?.showreel_settings} />
     )}
   </div>
 

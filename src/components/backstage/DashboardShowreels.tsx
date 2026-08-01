@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Plus } from "lucide-react";
+import { Save, Plus, AlertCircle } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { extractFilePathFromUrl } from "../../lib/utils";
 import { MediaPickerModal } from "./MediaPickerModal";
@@ -10,31 +10,53 @@ import { ShowreelCardItem } from "./showreels/ShowreelCardItem";
 
 export function DashboardShowreels() {
   const [showreels, setShowreels] = useState<ShowreelItem[]>([]);
+  const [showreelSettings, setShowreelSettings] = useState<{ notification_sv?: string; notification_en?: string }>({
+    notification_sv: "",
+    notification_en: ""
+  });
+  const [hasSettingsColumn, setHasSettingsColumn] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingPoster, setIsUploadingPoster] = useState<string | null>(null);
   const [activePickerId, setActivePickerId] = useState<string | null>(null);
+  const AlertCircleIcon = AlertCircle as any;
 
   // Optimizer Modal States
   const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
   const [isOptimizerOpen, setIsOptimizerOpen] = useState(false);
   const [targetReelId, setTargetReelId] = useState<string | null>(null);
 
-  // Fetch showreels on mount
+  // Fetch showreels and settings on mount
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
 
-    const fetchReels = async () => {
-      const { data } = await supabase
+    const fetchData = async () => {
+      // Fetch showreels
+      const { data: reelsData } = await supabase
         .from("showreels")
         .select("*")
         .order("sort_order", { ascending: true });
 
-      if (data) {
-        setShowreels(data as ShowreelItem[]);
+      if (reelsData) {
+        setShowreels(reelsData as ShowreelItem[]);
+      }
+
+      // Fetch showreel settings
+      const { data: bioData, error: bioError } = await supabase
+        .from("biography")
+        .select("showreel_settings")
+        .eq("id", "main")
+        .maybeSingle();
+
+      if (bioError) {
+        if (bioError.message.includes("column biography.showreel_settings does not exist") || bioError.message.includes("column \"showreel_settings\"")) {
+          setHasSettingsColumn(false);
+        }
+      } else if (bioData?.showreel_settings) {
+        setShowreelSettings(bioData.showreel_settings);
       }
     };
 
-    fetchReels();
+    fetchData();
   }, []);
 
   const handleReelChange = (id: string, field: keyof ShowreelItem, value: any) => {
@@ -224,6 +246,26 @@ export function DashboardShowreels() {
       const { error } = await supabase.from("showreels").upsert(reelsToUpsert);
       if (error) throw error;
 
+      // Save showreel settings if column exists
+      let settingsSaved = true;
+      if (hasSettingsColumn) {
+        const { error: bioError } = await supabase
+          .from("biography")
+          .update({ showreel_settings: showreelSettings })
+          .eq("id", "main");
+
+        if (bioError) {
+          if (bioError.message.includes("column biography.showreel_settings does not exist") || bioError.message.includes("column \"showreel_settings\"")) {
+            setHasSettingsColumn(false);
+            settingsSaved = false;
+          } else {
+            throw bioError;
+          }
+        }
+      } else {
+        settingsSaved = false;
+      }
+
       // Sync metadata to media_metadata table
       const metaRows: any[] = [];
       showreels.forEach((reel) => {
@@ -247,8 +289,13 @@ export function DashboardShowreels() {
         await supabase.from("media_metadata").upsert(metaRows, { onConflict: "file_path" });
       }
 
-      toast.success("Akt IV (Showreels) har sparats i Supabase!");
-      alert("Akt IV (Showreels) har sparats framgångsrikt!");
+      if (settingsSaved) {
+        toast.success("Akt IV (Showreels & inställningar) har sparats i Supabase!");
+        alert("Akt IV (Showreels & inställningar) har sparats framgångsrikt!");
+      } else {
+        toast.warning("Showreels sparades, men notifikationstexten kunde inte sparas då kolumnen saknas. Vänligen kör 'supabase_migration_9.sql' i din SQL-editor.");
+        alert("Showreels sparades framgångsrikt!\n\nObs: Notifikationstexten kunde inte sparas då kolumnen 'showreel_settings' saknas. Vänligen kör 'supabase_migration_9.sql' i din SQL-editor för att aktivera den.");
+      }
       
       const { data } = await supabase
         .from("showreels")
@@ -289,6 +336,54 @@ export function DashboardShowreels() {
             Lägg till video
           </button>
         </div>
+
+        {/* Global Showreel Settings */}
+        <div className="bg-bone/[0.02] border border-bone/10 p-6 rounded-sm space-y-4">
+          <h3 className="font-mono text-xs text-ember uppercase tracking-widest font-bold">
+            Globalt meddelande under videospelaren
+          </h3>
+          <p className="text-[10px] text-bone/50 uppercase tracking-wide leading-relaxed">
+            Här kan du ange en text som visas direkt under showreel-spelaren på hemsidan (t.ex. vid kommande uppdateringar). Lämna tomt för att dölja.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-wider text-bone/60 font-mono">
+                Svensk text
+              </label>
+              <input
+                type="text"
+                value={showreelSettings.notification_sv || ""}
+                onChange={(e) => setShowreelSettings({ ...showreelSettings, notification_sv: e.target.value })}
+                className="w-full bg-stage/50 border border-bone/15 px-3 py-2 text-xs text-bone focus:border-ember focus:outline-none rounded-sm"
+                placeholder="t.ex. NY Showreel är på gång..."
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-wider text-bone/60 font-mono">
+                Engelsk text
+              </label>
+              <input
+                type="text"
+                value={showreelSettings.notification_en || ""}
+                onChange={(e) => setShowreelSettings({ ...showreelSettings, notification_en: e.target.value })}
+                className="w-full bg-stage/50 border border-bone/15 px-3 py-2 text-xs text-bone focus:border-ember focus:outline-none rounded-sm"
+                placeholder="t.ex. New showreel in progress..."
+              />
+            </div>
+          </div>
+        </div>
+
+        {!hasSettingsColumn && (
+          <div className="border border-yellow-500/20 bg-yellow-500/5 p-4 rounded-sm">
+            <h4 className="text-xs font-semibold text-bone flex items-center gap-2 font-mono uppercase tracking-wider">
+              <AlertCircleIcon size={14} className="text-yellow-400" />
+              Databasuppdatering krävs
+            </h4>
+            <p className="text-[10px] text-bone/70 mt-1 leading-relaxed">
+              För att kunna spara notifikationstexten måste du köra <code className="text-ember">supabase_migration_9.sql</code> i din Supabase SQL Editor. Showreels-videor kan dock sparas som vanligt.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-6">
           {showreels.map((reel, index) => (

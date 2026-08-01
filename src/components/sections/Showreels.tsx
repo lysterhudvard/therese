@@ -11,28 +11,37 @@ import { useT } from "../../hooks/use-t";
 import { VIDEOS, type VideoItem } from "./ShowreelsData";
 import { TheaterPlayer } from "./showreels/TheaterPlayer";
 
-export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoItem[], teaser?: boolean }) {
+export function Showreels({ 
+  videos = VIDEOS, 
+  teaser = false,
+  showreelSettings
+}: { 
+  videos?: VideoItem[], 
+  teaser?: boolean,
+  showreelSettings?: { notification_sv?: string; notification_en?: string }
+}) {
   const { lang } = useT();
   const [liveVideos, setLiveVideos] = useState<VideoItem[]>(videos || VIDEOS);
   const [activeVideo, setActiveVideo] = useState<VideoItem>(liveVideos[0] || VIDEOS[0]);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
+  const [settings, setSettings] = useState<{ notification_sv?: string; notification_en?: string }>(showreelSettings || {});
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
     
     let active = true;
-    const fetchShowreels = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
-          .from("showreels")
-          .select("*")
-          .order("sort_order", { ascending: true });
+        const [reelsRes, bioRes] = await Promise.all([
+          supabase.from("showreels").select("*").order("sort_order", { ascending: true }),
+          supabase.from("biography").select("showreel_settings").eq("id", "main").maybeSingle()
+        ]);
 
-        if (error) throw error;
-        if (data && Array.isArray(data) && active) {
-          let fetched = data.map((item: any) => ({
+        if (reelsRes.error) throw reelsRes.error;
+        if (reelsRes.data && Array.isArray(reelsRes.data) && active) {
+          let fetched = reelsRes.data.map((item: any) => ({
             id: item.id || String(item.sort_order),
             title: { sv: item.title_sv || "", en: item.title_en || "" },
             sub: { sv: item.sub_sv || "", en: item.sub_en || "" },
@@ -47,12 +56,16 @@ export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoI
           setLiveVideos(fetched);
           if (fetched.length > 0) setActiveVideo(fetched[0]);
         }
+
+        if (bioRes.data?.showreel_settings && active) {
+          setSettings(bioRes.data.showreel_settings);
+        }
       } catch (e) {
         console.error("Failed to fetch showreels client-side:", e);
       }
     };
 
-    fetchShowreels();
+    fetchData();
     return () => { active = false; };
   }, []);
 
@@ -114,6 +127,13 @@ export function Showreels({ videos = VIDEOS, teaser = false }: { videos?: VideoI
           activeVideo={activeVideo}
           lang={lang}
         />
+
+        {/* Showreel Notification / Warning Text */}
+        {settings && (lang === "sv" ? settings.notification_sv : settings.notification_en) && (
+          <div className="mt-6 text-center text-xs text-ember/90 font-mono tracking-widest uppercase max-w-lg mx-auto bg-ember/5 border border-ember/25 px-4 py-2.5 rounded-sm">
+            {lang === "sv" ? settings.notification_sv : settings.notification_en}
+          </div>
+        )}
 
         {/* Thumbnails Selector Row */}
         {!teaser && displayedVideos.length > 0 && (

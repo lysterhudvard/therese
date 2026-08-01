@@ -492,3 +492,30 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Symptom:** The Supabase database log reported `column biography.voice_section does not exist` (PostgreSQL error 42703).
 - **Root Cause:** In `Voice.tsx`, the client-side `useEffect` query attempted to retrieve the `voice_section` column from the `biography` table instead of the correct `voice_settings` column.
 - **Resolution:** Modified the query in `src/components/sections/Voice.tsx` to retrieve `voice_settings` instead, parsing it safely as a JSON object, resolving the PostgreSQL undefined column exception.
+
+## 69. Commentary Player Failing to Hydrate due to Zero-Size Island
+- **Symptom:** Clicking the director's commentary play button did not launch the visual player overlay or start audio playback.
+- **Root Cause:** In Astro, the `<CommentaryPlayer />` was configured with `client:visible`. Because the player initially returned `null` or rendered with `0x0` dimensions, the browser's `IntersectionObserver` never detected it as visible. This blocked Astro from loading or executing its React/Preact hydration script, making the player deaf to event hooks.
+- **Resolution:**
+  1. Updated the player mounting tags in all `.astro` files to utilize `client:load` instead of `client:visible`.
+  2. Modified [CommentaryPlayer.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI Projects/Therese/jarvheden/src/components/ui/CommentaryPlayer.tsx) to always render the `<audio>` tag immediately and only wrap the visual interface elements in the conditional `active` state guard, avoiding empty layouts while maintaining DOM hydration hookups.
+
+## 70. Commentary Button Layout Wrapping & Dot Alignment
+- **Symptom:** The commentary button wrapped onto a separate line underneath the merit item title, cluttering the table layout, especially on mobile. Additionally, the blinking dot separator felt visually dated.
+- **Root Cause:** The button was positioned inline next to the title text block within a flex layout, forcing wraps when titles ran long.
+- **Resolution:**
+  1. Relocated the button markup in [Credits.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Credits.tsx) into the action table cell (far right), stacking it underneath the "Titta" button using `flex-col items-end gap-2`.
+  2. Configured the button to hide its text label on mobile screens (`hidden sm:inline`) and use a compact square size (`w-8 h-8`), preventing layout crowding.
+  3. Replaced the blinking dot with a play/pause SVG icon toggle and aligned the button style to match the squared Titta button borders.
+
+## 71. Footer Skincare Clinic Link Wrapping on Mobile
+- **Symptom:** The clinic link text in the footer wrapped onto multiple lines on mobile screens, looking messy.
+- **Root Cause:** A hardcoded `<br className="md:hidden" />` forced a line break on mobile viewports, and wide letter-tracking (`tracking-[0.35em]`) pushed characters past the screen margins.
+- **Resolution:** Removed the line break tag from [Footer.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Footer.tsx), restricted mobile styling to `tracking-normal text-[8px] whitespace-nowrap`, and decreased container spacing on mobile (`gap-3`) to guarantee it fits cleanly on a single line.
+
+## 72. Content Alignment & Role Counts for "En våldsam kärlek"
+- **Symptom:** The FAQ section previously claimed that Therese Järvheden played the "female lead" (singular) in SVT's *En våldsam kärlek*, which was inaccurate since there are four leads. Additionally, her character name ("Victoria") was missing from the main biography text.
+- **Resolution:**
+  1. Updated the FAQ answer database entry (ID `faq-1784097552235`) to specify that the series features four actresses playing the main roles, and that Therese played **Victoria**.
+  2. Modified the fallback and default state values in [use-t.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/hooks/use-t.tsx) and [DashboardBio.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/DashboardBio.tsx) to read: `...där hon spelade rollen som Victoria, en av de fyra kvinnor vars öden vi fick följa.` (en: `...where she played the role of Victoria, one of the four women whose fates we follow.`).
+  3. Ran a database migration script to immediately update the live database values on Supabase.
