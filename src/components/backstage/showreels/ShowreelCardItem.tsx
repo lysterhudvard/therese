@@ -66,7 +66,7 @@ export function ShowreelCardItem({
             type="text"
             id={index === 0 ? "klick-showreels-title-sv" : undefined}
             value={reel.title_sv}
-            onChange={(e) => handleReelChange(reel.id, "title_sv", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "title_sv", (e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -75,7 +75,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.title_en}
-            onChange={(e) => handleReelChange(reel.id, "title_en", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "title_en", (e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -84,7 +84,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.sub_sv}
-            onChange={(e) => handleReelChange(reel.id, "sub_sv", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "sub_sv", (e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -93,7 +93,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.sub_en}
-            onChange={(e) => handleReelChange(reel.id, "sub_en", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "sub_en", (e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -104,7 +104,7 @@ export function ShowreelCardItem({
             type="text"
             id={index === 0 ? "klick-showreels-vimeo" : undefined}
             value={reel.vimeo_id || ""}
-            onChange={(e) => handleReelChange(reel.id, "vimeo_id", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "vimeo_id", (e.target as any).value)}
             placeholder="T.ex: 1042732987"
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
           />
@@ -114,7 +114,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.url || ""}
-            onChange={(e) => handleReelChange(reel.id, "url", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "url", (e.target as any).value)}
             placeholder="https://uhdzswnawlqpsaajsjpo.supabase.co/storage/v1/..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
           />
@@ -125,7 +125,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.genre}
-            onChange={(e) => handleReelChange(reel.id, "genre", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "genre", (e.target as any).value)}
             placeholder="T.ex: FILM / TV-DRAMA"
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
@@ -135,7 +135,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.specs}
-            onChange={(e) => handleReelChange(reel.id, "specs", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "specs", (e.target as any).value)}
             placeholder="T.ex: 16:9 // HD"
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
           />
@@ -146,7 +146,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.glow}
-            onChange={(e) => handleReelChange(reel.id, "glow", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "glow", (e.target as any).value)}
             placeholder="T.ex: rgba(235, 94, 40, 0.15)"
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
           />
@@ -156,7 +156,7 @@ export function ShowreelCardItem({
           <input
             type="text"
             value={reel.youtube_id || ""}
-            onChange={(e) => handleReelChange(reel.id, "youtube_id", e.target.value)}
+            onChange={(e: any) => handleReelChange(reel.id, "youtube_id", (e.target as any).value)}
             placeholder="T.ex: dQw4w9WgXcQ"
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
           />
@@ -168,7 +168,7 @@ export function ShowreelCardItem({
             <input
               type="text"
               value={reel.poster}
-              onChange={(e) => handleReelChange(reel.id, "poster", e.target.value)}
+              onChange={(e: any) => handleReelChange(reel.id, "poster", (e.target as any).value)}
               className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
             <button
@@ -202,7 +202,7 @@ export function ShowreelCardItem({
               <input
                 type="text"
                 value={reel.poster_alt || ""}
-                onChange={(e) => handleReelChange(reel.id, "poster_alt", e.target.value)}
+                onChange={(e: any) => handleReelChange(reel.id, "poster_alt", (e.target as any).value)}
                 placeholder="Alt-text för Google..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -212,7 +212,7 @@ export function ShowreelCardItem({
               <input
                 type="text"
                 value={reel.poster_title || ""}
-                onChange={(e) => handleReelChange(reel.id, "poster_title", e.target.value)}
+                onChange={(e: any) => handleReelChange(reel.id, "poster_title", (e.target as any).value)}
                 placeholder="Titel..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -222,7 +222,7 @@ export function ShowreelCardItem({
               <input
                 type="text"
                 value={reel.poster_caption || ""}
-                onChange={(e) => handleReelChange(reel.id, "poster_caption", e.target.value)}
+                onChange={(e: any) => handleReelChange(reel.id, "poster_caption", (e.target as any).value)}
                 placeholder="Bildtext..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -232,7 +232,7 @@ export function ShowreelCardItem({
               <input
                 type="text"
                 value={reel.poster_filename || ""}
-                onChange={(e) => handleReelChange(reel.id, "poster_filename", e.target.value)}
+                onChange={(e: any) => handleReelChange(reel.id, "poster_filename", (e.target as any).value)}
                 placeholder="ex. therese-showreel.webp"
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
               />
@@ -241,7 +241,7 @@ export function ShowreelCardItem({
               <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-1">Beskrivning (Description - WordPress-stil)</label>
               <textarea
                 value={reel.poster_description || ""}
-                onChange={(e) => handleReelChange(reel.id, "poster_description", e.target.value)}
+                onChange={(e: any) => handleReelChange(reel.id, "poster_description", (e.target as any).value)}
                 placeholder="Längre beskrivning för mediabiblioteket/SEO..."
                 rows={2}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"

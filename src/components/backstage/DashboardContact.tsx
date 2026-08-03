@@ -140,7 +140,7 @@ export function DashboardContact() {
               id="klick-contact-agent-email"
               type="email"
               value={agentEmail}
-              onChange={(e) => setAgentEmail(e.target.value)}
+              onChange={(e) => setAgentEmail((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="T.ex: jonas@schultzbergagency.com"
             />
@@ -151,7 +151,7 @@ export function DashboardContact() {
               id="klick-contact-voice-email"
               type="email"
               value={voiceEmail}
-              onChange={(e) => setVoiceEmail(e.target.value)}
+              onChange={(e) => setVoiceEmail((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="T.ex: theresejarvheden@gmail.com"
             />
@@ -171,7 +171,7 @@ export function DashboardContact() {
               id="klick-contact-instagram"
               type="url"
               value={instagram}
-              onChange={(e) => setInstagram(e.target.value)}
+              onChange={(e) => setInstagram((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="Lämna tom för att dölja ikonen"
             />
@@ -181,7 +181,7 @@ export function DashboardContact() {
             <input
               type="url"
               value={facebook}
-              onChange={(e) => setFacebook(e.target.value)}
+              onChange={(e) => setFacebook((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="Lämna tom för att dölja ikonen"
             />
@@ -191,7 +191,7 @@ export function DashboardContact() {
             <input
               type="url"
               value={youtube}
-              onChange={(e) => setYoutube(e.target.value)}
+              onChange={(e) => setYoutube((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="T.ex: https://youtube.com/..."
             />
@@ -201,7 +201,7 @@ export function DashboardContact() {
             <input
               type="url"
               value={x}
-              onChange={(e) => setX(e.target.value)}
+              onChange={(e) => setX((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="T.ex: https://x.com/..."
             />
@@ -212,7 +212,7 @@ export function DashboardContact() {
               id="klick-contact-imdb"
               type="url"
               value={imdb}
-              onChange={(e) => setImdb(e.target.value)}
+              onChange={(e) => setImdb((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="T.ex: https://www.imdb.com/name/nm..."
             />
@@ -222,7 +222,7 @@ export function DashboardContact() {
             <input
               type="url"
               value={wikipedia}
-              onChange={(e) => setWikipedia(e.target.value)}
+              onChange={(e) => setWikipedia((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               placeholder="T.ex: https://sv.wikipedia.org/wiki/..."
             />
@@ -244,7 +244,7 @@ export function DashboardContact() {
               <input
                 type="text"
                 value={customLink1Label}
-                onChange={(e) => setCustomLink1Label(e.target.value)}
+                onChange={(e) => setCustomLink1Label((e.target as any).value)}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 placeholder="T.ex: Artistkatalogen"
               />
@@ -254,7 +254,7 @@ export function DashboardContact() {
               <input
                 type="url"
                 value={customLink1Url}
-                onChange={(e) => setCustomLink1Url(e.target.value)}
+                onChange={(e) => setCustomLink1Url((e.target as any).value)}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 placeholder="T.ex: https://example.com"
               />
@@ -263,7 +263,7 @@ export function DashboardContact() {
               <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono">Välj Ikon</label>
               <select
                 value={customLink1Icon}
-                onChange={(e) => setCustomLink1Icon(e.target.value)}
+                onChange={(e) => setCustomLink1Icon((e.target as any).value)}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               >
                 <option value="link" className="bg-stage">Länk (Standard)</option>
@@ -286,7 +286,7 @@ export function DashboardContact() {
               <input
                 type="text"
                 value={customLink2Label}
-                onChange={(e) => setCustomLink2Label(e.target.value)}
+                onChange={(e) => setCustomLink2Label((e.target as any).value)}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 placeholder="T.ex: Egen hemsida"
               />
@@ -296,7 +296,7 @@ export function DashboardContact() {
               <input
                 type="url"
                 value={customLink2Url}
-                onChange={(e) => setCustomLink2Url(e.target.value)}
+                onChange={(e) => setCustomLink2Url((e.target as any).value)}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 placeholder="T.ex: https://example.com"
               />
@@ -305,7 +305,7 @@ export function DashboardContact() {
               <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono">Välj Ikon</label>
               <select
                 value={customLink2Icon}
-                onChange={(e) => setCustomLink2Icon(e.target.value)}
+                onChange={(e) => setCustomLink2Icon((e.target as any).value)}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               >
                 <option value="link" className="bg-stage">Länk (Standard)</option>

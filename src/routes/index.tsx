@@ -64,12 +64,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
   }, [heroDone]);
   const [lang, setLangState] = useState<Lang>("sv");
   const [isInPortfolio, setIsInPortfolio] = useState(false);
-  const [activeCommentary, setActiveCommentary] = useState<{
-    title: string;
-    role: string;
-    url: string;
-    text: string;
-  } | null>(null);
 
   const dbData = initialDbData as {
     biography: any;
@@ -351,7 +345,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
     <LangContext.Provider value={ctx}>
       <main className="relative bg-stage text-bone selection:bg-ember selection:text-ink">
         <Spotlight />
-        <Nav heroDone={heroDone} />
+        <Nav />
 
         {/* Cinematic Anamorphic Scope Bars */}
         <div
@@ -381,8 +375,6 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
         <Credits
           credits={dbData?.credits}
           reviewQuotes={reviewQuotes}
-          activeCommentaryUrl={activeCommentary?.url}
-          onPlayCommentary={setActiveCommentary}
         />
         <Voice 
           imageUrl={voiceImageData.url} 
@@ -440,17 +432,7 @@ export default function Page({ initialDbData }: { initialDbData?: any }) {
           />
         )}
 
-        <AnimatePresence>
-          {activeCommentary && (
-            <CommentaryPlayer
-              title={activeCommentary.title}
-              role={activeCommentary.role}
-              url={activeCommentary.url}
-              text={activeCommentary.text}
-              onClose={() => setActiveCommentary(null)}
-            />
-          )}
-        </AnimatePresence>
+        <CommentaryPlayer />
       </main>
     </LangContext.Provider>
   );

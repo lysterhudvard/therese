@@ -42,7 +42,12 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const [heroDone, setHeroDone] = useState(false);
   const [logoSwapped, setLogoSwapped] = useState(false);
+  const [currentPath, setCurrentPath] = useState("");
   const { t } = useT();
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+  }, []);
 
   useEffect(() => {
     const isBypassed = document.documentElement.classList.contains("skip-intro");
@@ -80,13 +85,18 @@ export function Nav() {
   }, [scrolled]);
 
   const links = [
-    { id: "bio", label: "Start", href: "/" },
-    { id: "credits", label: "CV", href: "/cv" },
-    { id: "voice", label: "Röst & Voice Over", href: "/rost" },
-    { id: "portfolio", label: "Media & Foton", href: "/press" },
-    { id: "faq", label: "FAQ", href: "/faq" },
-    { id: "contact", label: "Kontakt", href: "/kontakt" },
+    { id: "bio", label: t.nav.bio, href: "/" },
+    { id: "credits", label: t.nav.credits, href: "/cv" },
+    { id: "voice", label: t.nav.voice, href: "/rost" },
+    { id: "portfolio", label: t.nav.portfolio, href: "/press" },
+    { id: "faq", label: t.nav.faq, href: "/faq" },
+    { id: "contact", label: t.nav.contact, href: "/kontakt" },
   ];
+
+  const isLinkActive = (href: string) => {
+    const norm = (p: string) => p.replace(/\/$/, "") || "/";
+    return norm(currentPath) === norm(href);
+  };
 
   return (
     <header
@@ -114,7 +124,7 @@ export function Nav() {
               <a
                 key={l.id}
                 href={l.href}
-                className={`hover:text-bone transition-colors px-3 py-1.5 rounded-sm ${typeof window !== 'undefined' && window.location.pathname === l.href ? 'text-bone font-semibold' : ''}`}
+                className={`hover:text-bone transition-colors px-3 py-1.5 rounded-sm ${isLinkActive(l.href) ? 'nav-active' : ''}`}
               >
                 {l.label}
               </a>
@@ -167,7 +177,7 @@ export function Nav() {
               key={l.id}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="text-left font-display text-2xl text-bone"
+              className={`text-left font-display text-2xl text-bone px-3 py-1.5 rounded-sm ${isLinkActive(l.href) ? 'nav-active' : ''}`}
             >
               {l.label}
             </a>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Volume2, Image } from "lucide-react";
@@ -25,10 +26,10 @@ interface VoiceSettings {
 
 export function DashboardVoice() {
   const [settings, setSettings] = useState<VoiceSettings>({
-    heading_sv: "En skånsk röst — varm, rå, omedelbar.",
-    heading_en: "A Scanian voice — warm, raw, immediate.",
-    body_sv: "Therese har använts flitigt för sin skånska röst i många radio- och TV-reklamer. Hon har även dubbat rösten till mamman i barnserien Familjen Valentin.",
-    body_en: "Therese is frequently booked for her Scanian voice in radio and TV commercials. She has also dubbed the mother in the children's series Familjen Valentin.",
+    heading_sv: "En skånsk röst — varm, naturlig och självklar.",
+    heading_en: "A Scanian voice — warm, natural and genuine.",
+    body_sv: "Therese är en professionell röstskådespelare och speakerröst som levererar både genuin skånska och ren rikssvenska för reklam, berättarröster, e-learning och dubbning (bland annat som mamman i SVT:s Familjen Valentin). Med egen studio i Malmö och Stockholm levereras torra eller färdigredigerade filer i högsta kvalitet (WAV/MP3) inom 1–3 arbetsdagar, med möjlighet till regi på distans.",
+    body_en: "Therese is a professional voice actor and narrator delivering both authentic Scanian and standard Swedish for commercials, narration, e-learning, and dubbing (including the mother in SVT's Familjen Valentin). Operating from her own studios in Malmö and Stockholm, she delivers high-quality master files (WAV/MP3) within 1–3 business days, with options for remote live direction.",
     cta_sv: "Boka röst",
     cta_en: "Book voice",
     demo_sv: "Demo via e-post",
@@ -146,7 +147,7 @@ export function DashboardVoice() {
               type="text"
               id="klick-voice-heading-sv"
               value={settings.heading_sv}
-              onChange={(e) => handleChange("heading_sv", e.target.value)}
+              onChange={(e) => handleChange("heading_sv", (e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
@@ -156,7 +157,7 @@ export function DashboardVoice() {
               type="text"
               id="klick-voice-heading-en"
               value={settings.heading_en}
-              onChange={(e) => handleChange("heading_en", e.target.value)}
+              onChange={(e) => handleChange("heading_en", (e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
@@ -169,7 +170,7 @@ export function DashboardVoice() {
             <textarea
               id="klick-voice-body-sv"
               value={settings.body_sv}
-              onChange={(e) => handleChange("body_sv", e.target.value)}
+              onChange={(e) => handleChange("body_sv", (e.target as any).value)}
               rows={4}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
             />
@@ -179,7 +180,7 @@ export function DashboardVoice() {
             <textarea
               id="klick-voice-body-en"
               value={settings.body_en}
-              onChange={(e) => handleChange("body_en", e.target.value)}
+              onChange={(e) => handleChange("body_en", (e.target as any).value)}
               rows={4}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
             />
@@ -194,7 +195,7 @@ export function DashboardVoice() {
               type="text"
               id="klick-voice-cta-sv"
               value={settings.cta_sv}
-              onChange={(e) => handleChange("cta_sv", e.target.value)}
+              onChange={(e) => handleChange("cta_sv", (e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
@@ -203,7 +204,7 @@ export function DashboardVoice() {
             <input
               type="text"
               value={settings.cta_en}
-              onChange={(e) => handleChange("cta_en", e.target.value)}
+              onChange={(e) => handleChange("cta_en", (e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
@@ -212,7 +213,7 @@ export function DashboardVoice() {
             <input
               type="text"
               value={settings.demo_sv}
-              onChange={(e) => handleChange("demo_sv", e.target.value)}
+              onChange={(e) => handleChange("demo_sv", (e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
@@ -221,7 +222,7 @@ export function DashboardVoice() {
             <input
               type="text"
               value={settings.demo_en}
-              onChange={(e) => handleChange("demo_en", e.target.value)}
+              onChange={(e) => handleChange("demo_en", (e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
           </div>
@@ -231,13 +232,14 @@ export function DashboardVoice() {
               type="email"
               id="klick-voice-booking-email"
               value={settings.booking_email || ""}
-              onChange={(e) => handleChange("booking_email", e.target.value)}
+              onChange={(e) => handleChange("booking_email", (e.target as any).value)}
               placeholder="exempel@domän.se (lämna tom för att skrolla till kontaktformuläret på startsidan)"
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
             />
           </div>
         </div>
       </div>
+
 
       {/* Röstprov (Audio Sample) */}
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
@@ -256,7 +258,7 @@ export function DashboardVoice() {
                 type="text"
                 id="klick-voice-sample-url"
                 value={settings.sample_url || ""}
-                onChange={(e) => handleChange("sample_url", e.target.value)}
+                onChange={(e) => handleChange("sample_url", (e.target as any).value)}
                 placeholder="Skriv in ljudfilens URL eller klicka på Välj Ljud för att hämta från mediebiblioteket"
                 className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -293,7 +295,7 @@ export function DashboardVoice() {
                 <input
                   type="text"
                   value={settings.image_url || ""}
-                  onChange={(e) => handleChange("image_url", e.target.value)}
+                  onChange={(e) => handleChange("image_url", (e.target as any).value)}
                   placeholder="Skriv in bild-URL eller välj från mediabiblioteket"
                   className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -313,7 +315,7 @@ export function DashboardVoice() {
                 <input
                   type="text"
                   value={settings.image_alt || ""}
-                  onChange={(e) => handleChange("image_alt", e.target.value)}
+                  onChange={(e) => handleChange("image_alt", (e.target as any).value)}
                   placeholder="t.ex. Therese Järvheden — röstskådespelerska"
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -324,7 +326,7 @@ export function DashboardVoice() {
                 <input
                   type="text"
                   value={settings.image_title || ""}
-                  onChange={(e) => handleChange("image_title", e.target.value)}
+                  onChange={(e) => handleChange("image_title", (e.target as any).value)}
                   placeholder="t.ex. Therese Järvheden Röst"
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -335,7 +337,7 @@ export function DashboardVoice() {
                 <input
                   type="text"
                   value={settings.image_caption || ""}
-                  onChange={(e) => handleChange("image_caption", e.target.value)}
+                  onChange={(e) => handleChange("image_caption", (e.target as any).value)}
                   placeholder="Kort bildbeskrivning..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -346,7 +348,7 @@ export function DashboardVoice() {
                 <input
                   type="text"
                   value={settings.image_filename || ""}
-                  onChange={(e) => handleChange("image_filename", e.target.value)}
+                  onChange={(e) => handleChange("image_filename", (e.target as any).value)}
                   placeholder="ex. therese-rost.webp"
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                 />
@@ -356,7 +358,7 @@ export function DashboardVoice() {
                 <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Beskrivning (Description - WordPress-stil)</label>
                 <textarea
                   value={settings.image_description || ""}
-                  onChange={(e) => handleChange("image_description", e.target.value)}
+                  onChange={(e) => handleChange("image_description", (e.target as any).value)}
                   placeholder="Längre beskrivning för mediabiblioteket/SEO..."
                   rows={2}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"

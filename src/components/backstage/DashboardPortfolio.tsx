@@ -354,7 +354,7 @@ export function DashboardPortfolio() {
                     type="text"
                     placeholder="https://exempel.se/bild.jpg"
                     value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    onChange={(e) => setNewImageUrl((e.target as any).value)}
                     className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                   />
                 </div>
@@ -366,7 +366,7 @@ export function DashboardPortfolio() {
                     type="text"
                     placeholder="Therese Järvheden porträtt..."
                     value={newImageAlt}
-                    onChange={(e) => setNewImageAlt(e.target.value)}
+                    onChange={(e) => setNewImageAlt((e.target as any).value)}
                     className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                   />
                 </div>

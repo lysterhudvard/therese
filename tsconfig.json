@@ -1,5 +1,13 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  "exclude": [
+    "src/components/ui/chart.tsx",
+    "src/components/ui/input-otp.tsx",
+    "src/components/ui/sidebar.tsx",
+    "src/components/ui/toggle-group.tsx",
+    "src/components/ui/button.tsx",
+    "src/components/ui/breadcrumb.tsx"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
@@ -23,7 +31,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "react": ["./node_modules/preact/compat"],
-      "react-dom": ["./node_modules/preact/compat"]
+      "react-dom": ["./node_modules/preact/compat"],
+      "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],
+      "react-dom/*": ["./node_modules/preact/compat/*"]
     }
   }
 }

@@ -117,11 +117,13 @@ export function Credits({
   reviewQuotes,
   activeCommentaryUrl: propActiveCommentaryUrl,
   onPlayCommentary,
+  isSubpage = false,
 }: {
   credits?: Credit[];
   reviewQuotes?: any[];
   activeCommentaryUrl?: string;
   onPlayCommentary?: (c: { title: string; role: string; url: string; text: string } | null) => void;
+  isSubpage?: boolean;
 }) {
   const { lang, t } = useT();
   const { active } = useCommentaryStore();
@@ -241,7 +243,7 @@ export function Credits({
 
   const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
   return (
-    <section id="credits" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
+    <section id="credits" ref={ref} className={`relative px-6 pb-20 md:px-12 md:pb-48 ${isSubpage ? "pt-6 md:pt-12" : "pt-20 md:pt-48"}`}>
       <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <ParallaxQuotes quotes={activeQuotes} />
 

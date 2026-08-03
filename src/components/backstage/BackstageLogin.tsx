@@ -74,7 +74,7 @@ export function BackstageLogin({ onLoginSuccess }: BackstageLoginProps) {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword((e.target as any).value)}
                 placeholder="Skriv lösenord..."
                 disabled={isLoading}
                 className={`w-full bg-stage/40 border ${

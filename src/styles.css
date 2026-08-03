@@ -302,11 +302,18 @@ footer {
 @media (min-width: 768px) {
   section#bio,
   section#showreels,
+  section#credits:not(.subpage-section),
+  section#voice:not(.subpage-section),
+  section#contact:not(.subpage-section),
+  footer {
+    padding-top: 12rem !important;    /* 192px on tablet & desktop (30% increase) */
+  }
+  section#bio,
+  section#showreels,
   section#credits,
   section#voice,
   section#contact,
   footer {
-    padding-top: 12rem !important;    /* 192px on tablet & desktop (30% increase) */
     padding-bottom: 12rem !important; /* 192px on tablet & desktop (30% increase) */
   }
 }
@@ -344,5 +351,12 @@ section#portfolio .lg\:hidden {
 .formatted-text i {
   font-style: italic;
   font-family: var(--font-display);
+}
+
+/* Active Nav Link Styling */
+.nav-active {
+  background-color: color-mix(in oklch, var(--color-ember) 12%, transparent);
+  box-shadow: 0 0 20px color-mix(in oklch, var(--color-ember) 12%, transparent);
+  color: var(--color-bone) !important;
 }
 

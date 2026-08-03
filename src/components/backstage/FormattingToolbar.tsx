@@ -1,5 +1,25 @@
 import React from "react";
-import { Bold, Italic, Link } from "lucide-react";
+
+const BoldIcon = (props: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />
+  </svg>
+);
+
+const ItalicIcon = (props: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="19" x2="10" y1="4" y2="4" />
+    <line x1="14" x2="5" y1="20" y2="20" />
+    <line x1="15" x2="9" y1="4" y2="20" />
+  </svg>
+);
+
+const LinkIcon = (props: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
 
 interface FormattingToolbarProps {
   textareaId: string;
@@ -38,10 +58,6 @@ export function FormattingToolbar({ textareaId, value, onValueChange }: Formatti
     if (url === null) return;
     applyFormat(`<a href="${url}">`, "</a>");
   };
-
-  const BoldIcon = Bold as any;
-  const ItalicIcon = Italic as any;
-  const LinkIcon = Link as any;
 
   return (
     <div className="flex items-center gap-1.5 p-1 bg-ink/40 border-b-0 border border-bone/10 rounded-t-sm w-fit">

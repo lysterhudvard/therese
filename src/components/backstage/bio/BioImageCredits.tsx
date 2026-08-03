@@ -29,7 +29,7 @@ export function BioImageCredits({
           </label>
           <textarea
             value={imageCreditsSv}
-            onChange={(e) => setImageCreditsSv(e.target.value)}
+            onChange={(e) => setImageCreditsSv((e.target as any).value)}
             rows={2}
             placeholder="Foto: Robert Eldrim..."
             className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -41,7 +41,7 @@ export function BioImageCredits({
           </label>
           <textarea
             value={imageCreditsEn}
-            onChange={(e) => setImageCreditsEn(e.target.value)}
+            onChange={(e) => setImageCreditsEn((e.target as any).value)}
             rows={2}
             placeholder="Photo: Robert Eldrim..."
             className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-xs focus:outline-none focus:border-ember resize-none font-sans"

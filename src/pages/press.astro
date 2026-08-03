@@ -4,6 +4,9 @@ import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Portfolio } from '../components/sections/Portfolio';
 import { Showreels } from '../components/sections/Showreels';
+import { PageHeader } from '../components/ui/PageHeader';
+import { PageIntro } from '../components/ui/PageIntro';
+import { PressContent } from '../components/sections/PressContent';
 import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
@@ -17,6 +20,15 @@ const seoTitle = "Pressbilder, Foton & Showreels | Therese Järvheden";
 const seoDesc = processedDbData.seo?.description_sv || "Ladda ner pressbilder och foton. Titta på showreels för skådespelerskan Therese Järvheden.";
 const seoImage = processedDbData.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
 
+let pressContentData = {};
+if (processedDbData.biography?.press_page_content) {
+  try {
+    pressContentData = typeof processedDbData.biography.press_page_content === "string" 
+      ? JSON.parse(processedDbData.biography.press_page_content) 
+      : processedDbData.biography.press_page_content;
+  } catch (e) {}
+}
+
 setGlobalDbData(processedDbData);
 ---
 
@@ -28,7 +40,13 @@ setGlobalDbData(processedDbData);
   <Spotlight client:media="(min-width: 1024px)" />
   <Nav client:idle />
   
-  <div class="pt-20 md:pt-32 min-h-screen">
+  <div class="min-h-screen">
+    <PageHeader client:visible titleKey="press" />
+    
+    {pressContentData.ingress && (
+      <PageIntro client:visible text={pressContentData.ingress} />
+    )}
+    
     <Portfolio client:visible images={processedDbData.portfolioImages} />
     
     {processedDbData.showreels && processedDbData.showreels.length > 0 ? (
@@ -36,6 +54,8 @@ setGlobalDbData(processedDbData);
     ) : (
       <Showreels client:visible showreelSettings={processedDbData.biography?.showreel_settings} />
     )}
+
+    {Object.keys(pressContentData).length > 0 && <PressContent client:visible content={pressContentData} showIngress={false} />}
   </div>
 
   <Footer client:visible simple={true} />

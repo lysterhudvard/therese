@@ -215,7 +215,7 @@ export function DashboardCurtain() {
                   id="klick-curtain-image"
                   type="text"
                   value={footerImage}
-                  onChange={(e) => setFooterImage(e.target.value)}
+                  onChange={(e) => setFooterImage((e.target as any).value)}
                   className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                 />
                 <button
@@ -236,7 +236,7 @@ export function DashboardCurtain() {
                   id="klick-curtain-image-alt"
                   type="text"
                   value={footerImageAlt}
-                  onChange={(e) => setFooterImageAlt(e.target.value)}
+                  onChange={(e) => setFooterImageAlt((e.target as any).value)}
                   placeholder="Alt-text..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -246,7 +246,7 @@ export function DashboardCurtain() {
                 <input
                   type="text"
                   value={footerImageTitle}
-                  onChange={(e) => setFooterImageTitle(e.target.value)}
+                  onChange={(e) => setFooterImageTitle((e.target as any).value)}
                   placeholder="Titel..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -256,7 +256,7 @@ export function DashboardCurtain() {
                 <input
                   type="text"
                   value={footerImageCaption}
-                  onChange={(e) => setFooterImageCaption(e.target.value)}
+                  onChange={(e) => setFooterImageCaption((e.target as any).value)}
                   placeholder="Bildtext..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
@@ -266,7 +266,7 @@ export function DashboardCurtain() {
                 <input
                   type="text"
                   value={footerImageFilename}
-                  onChange={(e) => setFooterImageFilename(e.target.value)}
+                  onChange={(e) => setFooterImageFilename((e.target as any).value)}
                   placeholder="ex. therese-slutsida.webp"
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                 />
@@ -275,7 +275,7 @@ export function DashboardCurtain() {
                 <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Beskrivning (Description)</label>
                 <textarea
                   value={footerImageDescription}
-                  onChange={(e) => setFooterImageDescription(e.target.value)}
+                  onChange={(e) => setFooterImageDescription((e.target as any).value)}
                   placeholder="Längre beskrivning..."
                   rows={2}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -295,7 +295,7 @@ export function DashboardCurtain() {
                 id="klick-curtain-end-sv"
                 type="text"
                 value={footerEndSv}
-                onChange={(e) => setFooterEndSv(e.target.value)}
+                onChange={(e) => setFooterEndSv((e.target as any).value)}
                 placeholder="SLUT"
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -305,7 +305,7 @@ export function DashboardCurtain() {
               <input
                 type="text"
                 value={footerEndEn}
-                onChange={(e) => setFooterEndEn(e.target.value)}
+                onChange={(e) => setFooterEndEn((e.target as any).value)}
                 placeholder="END"
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -351,7 +351,7 @@ export function DashboardCurtain() {
                       <input
                         type="text"
                         value={credit.label_sv}
-                        onChange={(e) => updateFooterCredit(credit.id, "label_sv", e.target.value)}
+                        onChange={(e) => updateFooterCredit(credit.id, "label_sv", (e.target as any).value)}
                         placeholder="t.ex. INSTAGRAM"
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-[11px] focus:outline-none focus:border-ember"
                       />
@@ -361,7 +361,7 @@ export function DashboardCurtain() {
                       <input
                         type="text"
                         value={credit.label_en}
-                        onChange={(e) => updateFooterCredit(credit.id, "label_en", e.target.value)}
+                        onChange={(e) => updateFooterCredit(credit.id, "label_en", (e.target as any).value)}
                         placeholder="e.g. INSTAGRAM"
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-[11px] focus:outline-none focus:border-ember"
                       />
@@ -376,7 +376,7 @@ export function DashboardCurtain() {
                       <input
                         type="text"
                         value={credit.value_sv}
-                        onChange={(e) => updateFooterCredit(credit.id, "value_sv", e.target.value)}
+                        onChange={(e) => updateFooterCredit(credit.id, "value_sv", (e.target as any).value)}
                         placeholder="t.ex. @theresejarvheden"
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-[11px] focus:outline-none focus:border-ember"
                       />
@@ -386,7 +386,7 @@ export function DashboardCurtain() {
                       <input
                         type="text"
                         value={credit.value_en}
-                        onChange={(e) => updateFooterCredit(credit.id, "value_en", e.target.value)}
+                        onChange={(e) => updateFooterCredit(credit.id, "value_en", (e.target as any).value)}
                         placeholder="e.g. @theresejarvheden"
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-[11px] focus:outline-none focus:border-ember"
                       />
@@ -400,7 +400,7 @@ export function DashboardCurtain() {
                 <input
                   type="text"
                   value={credit.href}
-                  onChange={(e) => updateFooterCredit(credit.id, "href", e.target.value)}
+                  onChange={(e) => updateFooterCredit(credit.id, "href", (e.target as any).value)}
                   placeholder="https://instagram.com/..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-[11px] focus:outline-none focus:border-ember"
                 />

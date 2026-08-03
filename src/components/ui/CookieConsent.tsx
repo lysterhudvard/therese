@@ -269,7 +269,7 @@ export function CookieConsent() {
                       <input
                         type="checkbox"
                         checked={preferences.analytics}
-                        onChange={(e) => setPreferences({ ...preferences, analytics: e.target.checked })}
+                        onChange={(e) => setPreferences({ ...preferences, analytics: (e.target as HTMLInputElement).checked })}
                         className="w-4 h-4 bg-ink border border-bone/30 rounded accent-ember cursor-pointer"
                       />
                     </div>
@@ -285,7 +285,7 @@ export function CookieConsent() {
                       <input
                         type="checkbox"
                         checked={preferences.marketing}
-                        onChange={(e) => setPreferences({ ...preferences, marketing: e.target.checked })}
+                        onChange={(e) => setPreferences({ ...preferences, marketing: (e.target as HTMLInputElement).checked })}
                         className="w-4 h-4 bg-ink border border-bone/30 rounded accent-ember cursor-pointer"
                       />
                     </div>

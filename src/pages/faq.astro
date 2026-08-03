@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { FAQ } from '../components/sections/FAQ';
+import { PageHeader } from '../components/ui/PageHeader';
 import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
@@ -57,8 +58,9 @@ if (processedDbData?.faqs && Array.isArray(processedDbData.faqs) && processedDbD
   <Spotlight client:media="(min-width: 1024px)" />
   <Nav client:idle />
   
-  <div class="pt-20 md:pt-32 min-h-screen">
-    <FAQ client:visible faqs={processedDbData?.faqs} />
+  <div class="min-h-screen pb-20">
+    <PageHeader client:idle titleKey="faq" />
+    <FAQ client:visible isSubpage={true} faqs={processedDbData?.faqs} />
   </div>
   
   <Footer client:visible simple={true} />

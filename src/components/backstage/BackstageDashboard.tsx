@@ -10,7 +10,8 @@ import { DashboardMedia } from "./DashboardMedia";
 import { DashboardContact } from "./DashboardContact";
 import { DashboardCurtain } from "./DashboardCurtain";
 import { DashboardFaq } from "./DashboardFaq";
-import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2, Mail, Film, MessageCircleQuestion } from "lucide-react";
+import { DashboardPress } from "./DashboardPress";
+import { LogOut, Home, Star, User, Image, Video, List, Settings, Database, RefreshCw, AlertCircle, FolderOpen, Volume2, Mail, Film, MessageCircleQuestion, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { KlickGuideWidget } from "./KlickGuideWidget";
@@ -19,7 +20,7 @@ interface BackstageDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "contact" | "curtain" | "faq" | "seo" | "media";
+type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" | "contact" | "curtain" | "faq" | "seo" | "media" | "press";
 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
@@ -43,6 +44,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
     { id: "contact", label: "Akt VII: Kontaktinfo", icon: Mail },
     { id: "curtain", label: "Akt VIII: Ridåfall", icon: Film },
     { id: "faq", label: "Vanliga Frågor (FAQ)", icon: MessageCircleQuestion },
+    { id: "press", label: "Press & Media", icon: FileText },
     { id: "seo", label: "SEO & Inställningar", icon: Settings },
     { id: "media", label: "Mediebibliotek", icon: FolderOpen },
   ];
@@ -75,6 +77,8 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
         return <DashboardCurtain />;
       case "faq":
         return <DashboardFaq />;
+      case "press":
+        return <DashboardPress />;
       case "seo":
         return <DashboardSeo />;
       case "media":

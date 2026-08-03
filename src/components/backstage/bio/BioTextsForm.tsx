@@ -55,7 +55,7 @@ export function BioTextsForm({
             type="text"
             id="klick-bio-heading-sv"
             value={headingSv}
-            onChange={(e) => setHeadingSv(e.target.value)}
+            onChange={(e) => setHeadingSv((e.target as any).value)}
             placeholder="En skådespelerska med bredd..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
@@ -68,7 +68,7 @@ export function BioTextsForm({
             type="text"
             id="klick-bio-heading-en"
             value={headingEn}
-            onChange={(e) => setHeadingEn(e.target.value)}
+            onChange={(e) => setHeadingEn((e.target as any).value)}
             placeholder="An actress with range..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
@@ -91,7 +91,7 @@ export function BioTextsForm({
           <textarea
             id="klick-bio-p1-sv"
             value={paragraph1Sv}
-            onChange={(e) => setParagraph1Sv(e.target.value)}
+            onChange={(e) => setParagraph1Sv((e.target as any).value)}
             rows={4}
             placeholder="Therese var senast aktuell i..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -111,7 +111,7 @@ export function BioTextsForm({
           <textarea
             id="klick-bio-p1-en"
             value={paragraph1En}
-            onChange={(e) => setParagraph1En(e.target.value)}
+            onChange={(e) => setParagraph1En((e.target as any).value)}
             rows={4}
             placeholder="Therese was most recently seen in..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -135,7 +135,7 @@ export function BioTextsForm({
           <textarea
             id="klick-bio-p2-sv"
             value={paragraph2Sv}
-            onChange={(e) => setParagraph2Sv(e.target.value)}
+            onChange={(e) => setParagraph2Sv((e.target as any).value)}
             rows={4}
             placeholder="Hon har spelat teater och musikal sedan..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -155,7 +155,7 @@ export function BioTextsForm({
           <textarea
             id="klick-bio-p2-en"
             value={paragraph2En}
-            onChange={(e) => setParagraph2En(e.target.value)}
+            onChange={(e) => setParagraph2En((e.target as any).value)}
             rows={4}
             placeholder="She has performed theatre and musicals since..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -179,7 +179,7 @@ export function BioTextsForm({
           <textarea
             id="klick-bio-p3-sv"
             value={paragraph3Sv}
-            onChange={(e) => setParagraph3Sv(e.target.value)}
+            onChange={(e) => setParagraph3Sv((e.target as any).value)}
             rows={3}
             placeholder="Drama är något som Therese känner..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -199,7 +199,7 @@ export function BioTextsForm({
           <textarea
             id="klick-bio-p3-en"
             value={paragraph3En}
-            onChange={(e) => setParagraph3En(e.target.value)}
+            onChange={(e) => setParagraph3En((e.target as any).value)}
             rows={3}
             placeholder="Drama is something Therese feels..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"

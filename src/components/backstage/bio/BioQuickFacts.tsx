@@ -35,7 +35,7 @@ export function BioQuickFacts({
             type="text"
             id="klick-bio-dialects-sv"
             value={dialectsSv}
-            onChange={(e) => setDialectsSv(e.target.value)}
+            onChange={(e) => setDialectsSv((e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -47,7 +47,7 @@ export function BioQuickFacts({
             type="text"
             id="klick-bio-dialects-en"
             value={dialectsEn}
-            onChange={(e) => setDialectsEn(e.target.value)}
+            onChange={(e) => setDialectsEn((e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -59,7 +59,7 @@ export function BioQuickFacts({
             type="text"
             id="klick-bio-languages-sv"
             value={languagesSv}
-            onChange={(e) => setLanguagesSv(e.target.value)}
+            onChange={(e) => setLanguagesSv((e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>
@@ -71,7 +71,7 @@ export function BioQuickFacts({
             type="text"
             id="klick-bio-languages-en"
             value={languagesEn}
-            onChange={(e) => setLanguagesEn(e.target.value)}
+            onChange={(e) => setLanguagesEn((e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
         </div>

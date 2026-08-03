@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Voice } from '../components/sections/Voice';
+import { PageHeader } from '../components/ui/PageHeader';
 import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
@@ -42,6 +43,23 @@ if (processedDbData.biography?.voice_settings) {
   } catch (e) {}
 }
 
+let voiceContentData = {};
+if (processedDbData.biography?.voice_settings) {
+  try {
+    const vs = typeof processedDbData.biography.voice_settings === "string" 
+      ? JSON.parse(processedDbData.biography.voice_settings) 
+      : processedDbData.biography.voice_settings;
+    voiceContentData = {
+      ingress: vs.ingress,
+      rostprov_text: vs.rostprov_text,
+      vad_therese_gor: vs.vad_therese_gor,
+      varfor_skanska: vs.varfor_skanska,
+      sa_gar_det_till: vs.sa_gar_det_till,
+      teknik_leverans: vs.teknik_leverans
+    };
+  } catch (e) {}
+}
+
 const faqs = processedDbData.biography?.faqs?.filter((f: any) => f.q_sv && f.q_sv.toLowerCase().includes('röst'));
 ---
 
@@ -53,9 +71,11 @@ const faqs = processedDbData.biography?.faqs?.filter((f: any) => f.q_sv && f.q_s
   <Spotlight client:media="(min-width: 1024px)" />
   <Nav client:idle />
   
-  <div class="pt-20 md:pt-32 min-h-screen">
+  <div class="min-h-screen">
+    <PageHeader client:visible titleKey="voice" />
     <Voice 
       client:visible
+      isSubpage={true}
       imageUrl={voiceImageData.url} 
       imageAlt={voiceImageData.alt} 
       imageTitle={voiceImageData.title}

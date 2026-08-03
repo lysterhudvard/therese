@@ -65,7 +65,7 @@ export function BioSectionsList({
                   <input
                     type="text"
                     value={section.title_sv}
-                    onChange={(e) => updateBioSection(section.id, { title_sv: e.target.value })}
+                    onChange={(e) => updateBioSection(section.id, { title_sv: (e.target as any).value })}
                     placeholder="t.ex. Dramatisk"
                     className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                   />
@@ -77,7 +77,7 @@ export function BioSectionsList({
                   <input
                     type="text"
                     value={section.title_en}
-                    onChange={(e) => updateBioSection(section.id, { title_en: e.target.value })}
+                    onChange={(e) => updateBioSection(section.id, { title_en: (e.target as any).value })}
                     placeholder="t.ex. Dramatic"
                     className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                   />
@@ -99,7 +99,7 @@ export function BioSectionsList({
                   <textarea
                     id={`klick-bio-section-quote-sv-${section.id}`}
                     value={section.quote_sv}
-                    onChange={(e) => updateBioSection(section.id, { quote_sv: e.target.value })}
+                    onChange={(e) => updateBioSection(section.id, { quote_sv: (e.target as any).value })}
                     rows={2}
                     placeholder="Drama är något jag..."
                     className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -119,7 +119,7 @@ export function BioSectionsList({
                   <textarea
                     id={`klick-bio-section-quote-en-${section.id}`}
                     value={section.quote_en}
-                    onChange={(e) => updateBioSection(section.id, { quote_en: e.target.value })}
+                    onChange={(e) => updateBioSection(section.id, { quote_en: (e.target as any).value })}
                     rows={2}
                     placeholder="Drama is something..."
                     className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
@@ -138,7 +138,7 @@ export function BioSectionsList({
                         id={idx === 0 ? "klick-bio-image" : undefined}
                         type="text"
                         value={section.image}
-                        onChange={(e) => updateBioSection(section.id, { image: e.target.value })}
+                        onChange={(e) => updateBioSection(section.id, { image: (e.target as any).value })}
                         placeholder="https://..."
                         className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
                       />
@@ -162,7 +162,7 @@ export function BioSectionsList({
                         id={idx === 0 ? "klick-bio-image-alt" : undefined}
                         type="text"
                         value={section.image_alt || ""}
-                        onChange={(e) => updateBioSection(section.id, { image_alt: e.target.value })}
+                        onChange={(e) => updateBioSection(section.id, { image_alt: (e.target as any).value })}
                         placeholder="Alt-text för Google..."
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                       />
@@ -174,7 +174,7 @@ export function BioSectionsList({
                       <input
                         type="text"
                         value={section.image_title || ""}
-                        onChange={(e) => updateBioSection(section.id, { image_title: e.target.value })}
+                        onChange={(e) => updateBioSection(section.id, { image_title: (e.target as any).value })}
                         placeholder="Titel..."
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                       />
@@ -186,7 +186,7 @@ export function BioSectionsList({
                       <input
                         type="text"
                         value={section.image_caption || ""}
-                        onChange={(e) => updateBioSection(section.id, { image_caption: e.target.value })}
+                        onChange={(e) => updateBioSection(section.id, { image_caption: (e.target as any).value })}
                         placeholder="Bildtext..."
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                       />
@@ -198,7 +198,7 @@ export function BioSectionsList({
                       <input
                         type="text"
                         value={section.image_filename || ""}
-                        onChange={(e) => updateBioSection(section.id, { image_filename: e.target.value })}
+                        onChange={(e) => updateBioSection(section.id, { image_filename: (e.target as any).value })}
                         placeholder="ex. therese-comedic.webp"
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                       />
@@ -209,7 +209,7 @@ export function BioSectionsList({
                       </label>
                       <textarea
                         value={section.description || ""}
-                        onChange={(e) => updateBioSection(section.id, { description: e.target.value })}
+                        onChange={(e) => updateBioSection(section.id, { description: (e.target as any).value })}
                         placeholder="Längre beskrivning..."
                         rows={2}
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -242,7 +242,7 @@ export function BioSectionsList({
                 <input
                   type="number"
                   value={section.weight || 300}
-                  onChange={(e) => updateBioSection(section.id, { weight: parseInt(e.target.value) || 300 })}
+                  onChange={(e) => updateBioSection(section.id, { weight: parseInt((e.target as any).value) || 300 })}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
                 />
               </div>

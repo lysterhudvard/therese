@@ -80,7 +80,7 @@ export function CreditItemCard({
           <input
             type="text"
             value={c.year}
-            onChange={(e) => updateCredit(c.id, "year", e.target.value)}
+            onChange={(e) => updateCredit(c.id, "year", (e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
           />
         </div>
@@ -93,7 +93,7 @@ export function CreditItemCard({
           <input
             type="text"
             value={c.title}
-            onChange={(e) => updateCredit(c.id, "title", e.target.value)}
+            onChange={(e) => updateCredit(c.id, "title", (e.target as any).value)}
             placeholder="Titel..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-semibold"
           />
@@ -106,7 +106,7 @@ export function CreditItemCard({
           </label>
           <select
             value={c.type}
-            onChange={(e) => updateCredit(c.id, "type", e.target.value)}
+            onChange={(e) => updateCredit(c.id, "type", (e.target as any).value)}
             className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           >
             <option value="Film">Film</option>
@@ -124,7 +124,7 @@ export function CreditItemCard({
           <input
             type="text"
             value={c.network}
-            onChange={(e) => updateCredit(c.id, "network", e.target.value)}
+            onChange={(e) => updateCredit(c.id, "network", (e.target as any).value)}
             placeholder="SVT, Dramaten..."
             className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
           />
@@ -158,7 +158,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.role_sv}
-                onChange={(e) => updateCredit(c.id, "role_sv", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "role_sv", (e.target as any).value)}
                 placeholder="Huvudroll..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
               />
@@ -170,7 +170,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.category_sv}
-                onChange={(e) => updateCredit(c.id, "category_sv", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "category_sv", (e.target as any).value)}
                 placeholder="Humorserie..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
               />
@@ -187,7 +187,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.role_en}
-                onChange={(e) => updateCredit(c.id, "role_en", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "role_en", (e.target as any).value)}
                 placeholder="Lead role..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
               />
@@ -199,7 +199,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.category_en}
-                onChange={(e) => updateCredit(c.id, "category_en", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "category_en", (e.target as any).value)}
                 placeholder="Comedy series..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
               />
@@ -219,7 +219,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.img || ""}
-                onChange={(e) => updateCredit(c.id, "img", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "img", (e.target as any).value)}
                 placeholder="Skriv in bild-URL eller välj från mediabiblioteket"
                 className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
               />
@@ -241,7 +241,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.img_alt || ""}
-                onChange={(e) => updateCredit(c.id, "img_alt", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "img_alt", (e.target as any).value)}
                 placeholder="Alt-text för Google..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -253,7 +253,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.img_title || ""}
-                onChange={(e) => updateCredit(c.id, "img_title", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "img_title", (e.target as any).value)}
                 placeholder="Titel..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -265,7 +265,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.img_caption || ""}
-                onChange={(e) => updateCredit(c.id, "img_caption", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "img_caption", (e.target as any).value)}
                 placeholder="Bildtext..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
@@ -277,7 +277,7 @@ export function CreditItemCard({
               <input
                 type="text"
                 value={c.img_filename || ""}
-                onChange={(e) => updateCredit(c.id, "img_filename", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "img_filename", (e.target as any).value)}
                 placeholder="ex. therese-merit.webp"
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
               />
@@ -288,7 +288,7 @@ export function CreditItemCard({
               </label>
               <textarea
                 value={c.img_description || ""}
-                onChange={(e) => updateCredit(c.id, "img_description", e.target.value)}
+                onChange={(e) => updateCredit(c.id, "img_description", (e.target as any).value)}
                 placeholder="Längre beskrivning för mediabiblioteket/SEO..."
                 rows={2}
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -362,7 +362,7 @@ export function CreditItemCard({
                     <input
                       type="text"
                       value={c.commentary_url || ""}
-                      onChange={(e) => updateCredit(c.id, "commentary_url", e.target.value)}
+                      onChange={(e) => updateCredit(c.id, "commentary_url", (e.target as any).value)}
                       placeholder="https://exempel.se/ljud.mp3"
                       className="flex-1 bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                     />
@@ -406,7 +406,7 @@ export function CreditItemCard({
                 <input
                   type="text"
                   value={c.commentary_duration || ""}
-                  onChange={(e) => updateCredit(c.id, "commentary_duration", e.target.value)}
+                  onChange={(e) => updateCredit(c.id, "commentary_duration", (e.target as any).value)}
                   placeholder="0:10"
                   className="w-32 bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                 />
@@ -419,7 +419,7 @@ export function CreditItemCard({
                   </label>
                   <textarea
                     value={c.commentary_sv || ""}
-                    onChange={(e) => updateCredit(c.id, "commentary_sv", e.target.value)}
+                    onChange={(e) => updateCredit(c.id, "commentary_sv", (e.target as any).value)}
                     placeholder="Therese berättar om rollen..."
                     rows={3}
                     className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -431,7 +431,7 @@ export function CreditItemCard({
                   </label>
                   <textarea
                     value={c.commentary_en || ""}
-                    onChange={(e) => updateCredit(c.id, "commentary_en", e.target.value)}
+                    onChange={(e) => updateCredit(c.id, "commentary_en", (e.target as any).value)}
                     placeholder="Therese talks about the role..."
                     rows={3}
                     className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -454,7 +454,7 @@ export function CreditItemCard({
                   <input
                     type="text"
                     value={c.script_scene || ""}
-                    onChange={(e) => updateCredit(c.id, "script_scene", e.target.value)}
+                    onChange={(e) => updateCredit(c.id, "script_scene", (e.target as any).value)}
                     placeholder="SCEN 12 — Teater"
                     className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                   />
@@ -466,7 +466,7 @@ export function CreditItemCard({
                   <input
                     type="text"
                     value={c.script_char || ""}
-                    onChange={(e) => updateCredit(c.id, "script_char", e.target.value)}
+                    onChange={(e) => updateCredit(c.id, "script_char", (e.target as any).value)}
                     placeholder="Nora"
                     className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-semibold"
                   />
@@ -480,7 +480,7 @@ export function CreditItemCard({
                   </label>
                   <textarea
                     value={c.script_line_sv || ""}
-                    onChange={(e) => updateCredit(c.id, "script_line_sv", e.target.value)}
+                    onChange={(e) => updateCredit(c.id, "script_line_sv", (e.target as any).value)}
                     placeholder="Det fanns ingen återvändo..."
                     rows={3}
                     className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -492,7 +492,7 @@ export function CreditItemCard({
                   </label>
                   <textarea
                     value={c.script_line_en || ""}
-                    onChange={(e) => updateCredit(c.id, "script_line_en", e.target.value)}
+                    onChange={(e) => updateCredit(c.id, "script_line_en", (e.target as any).value)}
                     placeholder="There was no turning back..."
                     rows={3}
                     className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"

@@ -50,7 +50,7 @@ type Status =
   | "flying"
   | "sent";
 
-export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: boolean }) {
+export function Contact({ bioData, teaser = false, isSubpage = false }: { bioData?: any, teaser?: boolean, isSubpage?: boolean }) {
   const { t, lang } = useT();
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", msg: "" });
@@ -123,6 +123,16 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
       setStatus("sent");
     } catch (err) {
       console.error("Failed to send email:", err);
+      
+      // If we are on localhost, mock success so the user can see the full animation!
+      if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+        console.log("Mocking contact form success on localhost");
+        setStatus("flying");
+        await new Promise((r) => setTimeout(r, 900));
+        setStatus("sent");
+        return;
+      }
+      
       setStatus("idle");
       toast.error(
         lang === "sv" 
@@ -161,7 +171,7 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
   }, []);
 
   return (
-    <section id="contact" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48">
+    <section id="contact" ref={ref} className={`relative px-6 pb-20 md:px-12 md:pb-48 ${isSubpage ? "pt-6 md:pt-12" : "pt-20 md:pt-48"}`}>
       <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-14">
 
@@ -342,13 +352,11 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
               {/* Envelope Animation Layer */}
               <EnvelopeAnimation status={status} form={form} t={t} />
 
-              <AnimatePresence mode="wait">
                 {status === "sent" ? (
                   <MotionDiv
                     key="ok"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="flex flex-col items-center justify-center text-center relative z-30 w-full max-w-[300px]"
                   >
@@ -435,7 +443,6 @@ export function Contact({ bioData, teaser = false }: { bioData?: any, teaser?: b
                 ) : (
                   <MotionDiv key="placeholder" className="w-full h-[400px]" />
                 )}
-              </AnimatePresence>
             </div>
             )}
           </div>

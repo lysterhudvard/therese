@@ -142,7 +142,7 @@ export function DashboardMedia() {
     const selectedFiles = e.target.files ? Array.from(e.target.files) as File[] : [];
     if (selectedFiles.length === 0) return;
 
-    e.target.value = "";
+    (e.target as any).value = "";
 
     if (selectedFiles.length === 1 && selectedFiles[0].type.startsWith("image/")) {
       setPendingUploadFile(selectedFiles[0]);

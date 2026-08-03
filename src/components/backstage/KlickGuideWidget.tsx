@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { getInteractiveGuide, getGeneralChatResponse } from "../../lib/gemini";

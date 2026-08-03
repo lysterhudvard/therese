@@ -211,7 +211,7 @@ export function PortfolioCardItem({
                 type="text"
                 value={img.url}
                 onChange={(e) =>
-                  setImages(images.map((x) => (x.id === img.id ? { ...x, url: e.target.value } : x)))
+                  setImages(images.map((x) => (x.id === img.id ? { ...x, url: (e.target as HTMLInputElement).value } : x)))
                 }
                 className="flex-1 min-w-0 bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
               />
@@ -237,7 +237,7 @@ export function PortfolioCardItem({
                 type="text"
                 value={img.download_url || img.url}
                 onChange={(e) =>
-                  setImages(images.map((x) => (x.id === img.id ? { ...x, download_url: e.target.value } : x)))
+                  setImages(images.map((x) => (x.id === img.id ? { ...x, download_url: (e.target as HTMLInputElement).value } : x)))
                 }
                 className="flex-1 min-w-0 bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
               />
@@ -261,7 +261,7 @@ export function PortfolioCardItem({
             <input
               type="text"
               value={img.alt}
-              onChange={(e) => handleAltChange(img.id, e.target.value)}
+              onChange={(e) => handleAltChange(img.id, (e.target as HTMLInputElement).value)}
               placeholder="Beskriv bilden för Google..."
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
             />
@@ -274,7 +274,7 @@ export function PortfolioCardItem({
               type="text"
               value={img.title || ""}
               onChange={(e) =>
-                setImages(images.map((x) => (x.id === img.id ? { ...x, title: e.target.value } : x)))
+                setImages(images.map((x) => (x.id === img.id ? { ...x, title: (e.target as HTMLInputElement).value } : x)))
               }
               placeholder="Titel..."
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
@@ -288,7 +288,7 @@ export function PortfolioCardItem({
               type="text"
               value={img.caption || ""}
               onChange={(e) =>
-                setImages(images.map((x) => (x.id === img.id ? { ...x, caption: e.target.value } : x)))
+                setImages(images.map((x) => (x.id === img.id ? { ...x, caption: (e.target as HTMLInputElement).value } : x)))
               }
               placeholder="t.ex. Från: Karatefylla..."
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
@@ -300,7 +300,7 @@ export function PortfolioCardItem({
             </label>
             <textarea
               value={desc}
-              onChange={(e) => handleDescChange(e.target.value)}
+              onChange={(e) => handleDescChange((e.target as HTMLTextAreaElement).value)}
               placeholder="Längre beskrivning, anteckningar, licens eller historia om bilden..."
               rows={2}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
@@ -314,7 +314,7 @@ export function PortfolioCardItem({
               type="text"
               value={img.filename || ""}
               onChange={(e) =>
-                setImages(images.map((x) => (x.id === img.id ? { ...x, filename: e.target.value } : x)))
+                setImages(images.map((x) => (x.id === img.id ? { ...x, filename: (e.target as HTMLInputElement).value } : x)))
               }
               placeholder="Sökordsoptimerat filnamn..."
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"

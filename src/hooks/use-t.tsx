@@ -5,11 +5,12 @@ export type Lang = "sv" | "en";
 export const I18N = {
   sv: {
     nav: {
-      bio: "Biografi",
+      bio: "Start",
       portfolio: "Portfolio",
       showreels: "Showreels",
       credits: "Meriter",
-      voice: "Röst",
+      voice: "Röst & Dubbning",
+      faq: "Vanliga frågor",
       contact: "Kontakt",
     },
     hero: {
@@ -72,11 +73,11 @@ export const I18N = {
     },
     voice: {
       act: "Akt VI — Röst",
-      heading: ["En ", "skånsk", " röst — varm, rå, omedelbar."],
+      heading: ["En ", "skånsk", " röst — varm, naturlig och självklar."],
       body: [
-        "Therese har använts flitigt för sin skånska röst i många radio- och TV-reklamer. Hon har även dubbat rösten till mamman i barnserien ",
+        "Therese är en professionell röstskådespelare och speakerröst som levererar både genuin skånska och ren rikssvenska för reklam, berättarröster, e-learning och dubbning (bland annat som mamman i SVT:s ",
         "Familjen Valentin",
-        ".",
+        "). Med egen studio i Malmö och Stockholm levereras torra eller färdigredigerade filer i högsta kvalitet (WAV/MP3) inom 1–3 arbetsdagar, med möjlighet till regi på distans.",
       ],
       cta: "Boka röst",
       demo: "Demo via e-post",
@@ -107,11 +108,12 @@ export const I18N = {
   },
   en: {
     nav: {
-      bio: "Biography",
+      bio: "Home",
       portfolio: "Portfolio",
       showreels: "Showreels",
       credits: "Credits",
-      voice: "Voice",
+      voice: "Voice & Dubbing",
+      faq: "FAQ",
       contact: "Contact",
     },
     hero: {
@@ -173,11 +175,11 @@ export const I18N = {
     },
     voice: {
       act: "Act VI — Voice",
-      heading: ["A ", "Scanian", " voice — warm, raw, immediate."],
+      heading: ["A ", "Scanian", " voice — warm, natural and genuine."],
       body: [
-        "Therese is frequently booked for her Scanian voice in radio and TV commercials. She has also dubbed the mother in the children's series ",
+        "Therese is a professional voice actor and narrator delivering both authentic Scanian and standard Swedish for commercials, narration, e-learning, and dubbing (including the mother in SVT's ",
         "Familjen Valentin",
-        ".",
+        "). Operating from her own studios in Malmö and Stockholm, she delivers high-quality master files (WAV/MP3) within 1–3 business days, with options for remote live direction.",
       ],
       cta: "Book voice",
       demo: "Demo via email",

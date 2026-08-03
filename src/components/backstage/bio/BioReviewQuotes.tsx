@@ -41,14 +41,14 @@ export function BioReviewQuotes({
               <input
                 type="text"
                 value={qItem.sv}
-                onChange={(e) => updateReviewQuote(qItem.id, "sv", e.target.value)}
+                onChange={(e) => updateReviewQuote(qItem.id, "sv", (e.target as any).value)}
                 placeholder="Citat på svenska..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
               />
               <input
                 type="text"
                 value={qItem.en}
-                onChange={(e) => updateReviewQuote(qItem.id, "en", e.target.value)}
+                onChange={(e) => updateReviewQuote(qItem.id, "en", (e.target as any).value)}
                 placeholder="Quote in English..."
                 className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
               />

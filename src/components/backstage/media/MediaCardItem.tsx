@@ -143,7 +143,7 @@ export function MediaCardItem({
                 <input
                   type="text"
                   value={editMetaValues.alt}
-                  onChange={(e) => setEditMetaValues({ ...editMetaValues, alt: e.target.value })}
+                  onChange={(e) => setEditMetaValues({ ...editMetaValues, alt: (e.target as any).value })}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
                 />
               </div>
@@ -154,7 +154,7 @@ export function MediaCardItem({
                 <input
                   type="text"
                   value={editMetaValues.title}
-                  onChange={(e) => setEditMetaValues({ ...editMetaValues, title: e.target.value })}
+                  onChange={(e) => setEditMetaValues({ ...editMetaValues, title: (e.target as HTMLInputElement).value })}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
                 />
               </div>
@@ -165,7 +165,7 @@ export function MediaCardItem({
                 <input
                   type="text"
                   value={editMetaValues.caption}
-                  onChange={(e) => setEditMetaValues({ ...editMetaValues, caption: e.target.value })}
+                  onChange={(e) => setEditMetaValues({ ...editMetaValues, caption: (e.target as HTMLInputElement).value })}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
                 />
               </div>
@@ -175,7 +175,7 @@ export function MediaCardItem({
                 </label>
                 <textarea
                   value={editMetaValues.description}
-                  onChange={(e) => setEditMetaValues({ ...editMetaValues, description: e.target.value })}
+                  onChange={(e) => setEditMetaValues({ ...editMetaValues, description: (e.target as HTMLTextAreaElement).value })}
                   rows={2}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember resize-none"
                 />
@@ -187,7 +187,7 @@ export function MediaCardItem({
                 <input
                   type="text"
                   value={editMetaValues.filename}
-                  onChange={(e) => setEditMetaValues({ ...editMetaValues, filename: e.target.value })}
+                  onChange={(e) => setEditMetaValues({ ...editMetaValues, filename: (e.target as HTMLInputElement).value })}
                   className="w-full bg-stage/35 border border-bone/10 text-bone px-1.5 py-0.5 rounded-sm text-[9px] focus:outline-none focus:border-ember"
                 />
               </div>
@@ -239,7 +239,7 @@ export function MediaCardItem({
           </span>
           <select
             value={file.folder || ""}
-            onChange={(e) => handleMoveFile(file, e.target.value)}
+            onChange={(e) => handleMoveFile(file, (e.target as HTMLSelectElement).value)}
             className="bg-stage/35 border border-bone/10 text-bone text-[9px] font-mono rounded px-1.5 py-0.5 focus:outline-none focus:border-ember cursor-pointer"
           >
             <option value="">Roten</option>

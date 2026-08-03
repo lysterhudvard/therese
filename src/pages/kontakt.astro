@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { Nav } from '../components/Nav';
 import { Spotlight } from '../components/ui/Spotlight';
 import { Contact } from '../components/sections/Contact';
+import { PageHeader } from '../components/ui/PageHeader';
 import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
@@ -27,8 +28,9 @@ setGlobalDbData(processedDbData);
   <Spotlight client:media="(min-width: 1024px)" />
   <Nav client:idle />
   
-  <div class="pt-20 md:pt-32 min-h-screen flex flex-col justify-center">
-    <Contact client:visible bioData={processedDbData.biography} />
+  <div class="min-h-screen flex flex-col justify-center">
+    <PageHeader client:visible titleKey="contact" />
+    <Contact client:visible isSubpage={true} bioData={processedDbData.biography} />
   </div>
 
   <Footer client:visible simple={true} />

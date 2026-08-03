@@ -194,7 +194,7 @@ export function DashboardHero() {
               id="klick-hero-sv"
               value={currentTextSv}
               onChange={(e) => {
-                setCurrentTextSv(e.target.value);
+                setCurrentTextSv((e.target as any).value);
                 setIsAutomated(false);
               }}
               disabled={isAutomated}
@@ -231,7 +231,7 @@ export function DashboardHero() {
               id="klick-hero-en"
               value={currentTextEn}
               onChange={(e) => {
-                setCurrentTextEn(e.target.value);
+                setCurrentTextEn((e.target as any).value);
                 setIsAutomated(false);
               }}
               disabled={isAutomated}
@@ -257,7 +257,7 @@ export function DashboardHero() {
                   id="klick-hero-image"
                   type="text"
                   value={heroImage}
-                  onChange={(e) => setHeroImage(e.target.value)}
+                  onChange={(e) => setHeroImage((e.target as any).value)}
                   placeholder="https://..."
                   className="flex-1 bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
                 />
@@ -281,7 +281,7 @@ export function DashboardHero() {
                   id="klick-hero-image-alt"
                   type="text"
                   value={heroImageAlt}
-                  onChange={(e) => setHeroImageAlt(e.target.value)}
+                  onChange={(e) => setHeroImageAlt((e.target as any).value)}
                   placeholder="t.ex. Therese Järvheden skådespelare porträtt"
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300"
                 />
@@ -294,7 +294,7 @@ export function DashboardHero() {
                 <input
                   type="text"
                   value={heroImageTitle}
-                  onChange={(e) => setHeroImageTitle(e.target.value)}
+                  onChange={(e) => setHeroImageTitle((e.target as any).value)}
                   placeholder="t.ex. Therese Järvheden Hero"
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300"
                 />
@@ -307,7 +307,7 @@ export function DashboardHero() {
                 <input
                   type="text"
                   value={heroImageCaption}
-                  onChange={(e) => setHeroImageCaption(e.target.value)}
+                  onChange={(e) => setHeroImageCaption((e.target as any).value)}
                   placeholder="Kort bildbeskrivning..."
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300"
                 />
@@ -319,7 +319,7 @@ export function DashboardHero() {
                 </label>
                 <textarea
                   value={heroImageDescription}
-                  onChange={(e) => setHeroImageDescription(e.target.value)}
+                  onChange={(e) => setHeroImageDescription((e.target as any).value)}
                   placeholder="Längre beskrivning för mediabiblioteket/SEO..."
                   rows={2}
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300 resize-none"
@@ -333,7 +333,7 @@ export function DashboardHero() {
                 <input
                   type="text"
                   value={heroImageFilename}
-                  onChange={(e) => setHeroImageFilename(e.target.value)}
+                  onChange={(e) => setHeroImageFilename((e.target as any).value)}
                   placeholder="t.ex. therese-jarvheden-skadespelerska.webp"
                   className="w-full bg-stage/35 border border-bone/10 text-bone p-2.5 rounded-sm text-xs focus:outline-none focus:border-ember transition-colors duration-300 font-mono"
                 />
@@ -373,7 +373,7 @@ export function DashboardHero() {
               <input
                 type="text"
                 value={heroRoleSv}
-                onChange={(e) => setHeroRoleSv(e.target.value)}
+                onChange={(e) => setHeroRoleSv((e.target as any).value)}
                 placeholder="Skådespelerska"
                 className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
               />
@@ -385,7 +385,7 @@ export function DashboardHero() {
               <input
                 type="text"
                 value={heroRoleEn}
-                onChange={(e) => setHeroRoleEn(e.target.value)}
+                onChange={(e) => setHeroRoleEn((e.target as any).value)}
                 placeholder="Actress"
                 className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
               />
@@ -401,7 +401,7 @@ export function DashboardHero() {
               <input
                 type="text"
                 value={heroBaseSv}
-                onChange={(e) => setHeroBaseSv(e.target.value)}
+                onChange={(e) => setHeroBaseSv((e.target as any).value)}
                 placeholder="Malmö · Stockholm"
                 className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
               />
@@ -413,7 +413,7 @@ export function DashboardHero() {
               <input
                 type="text"
                 value={heroBaseEn}
-                onChange={(e) => setHeroBaseEn(e.target.value)}
+                onChange={(e) => setHeroBaseEn((e.target as any).value)}
                 placeholder="Malmö · Stockholm"
                 className="w-full bg-stage/35 border border-bone/10 text-bone p-3 rounded-sm text-sm focus:outline-none focus:border-ember transition-colors duration-300"
               />

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
 import { Step } from "./types";

@@ -18,9 +18,10 @@ interface VoiceProps {
   sampleUrl?: string;
   bookingEmail?: string;
   teaser?: boolean;
+  isSubpage?: boolean;
 }
 
-export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl, bookingEmail, teaser = false }: VoiceProps) {
+export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl, bookingEmail, teaser = false, isSubpage = false }: VoiceProps) {
   const { t } = useT();
   const { stopCommentary } = useCommentaryStore();
   const ref = useRef<HTMLDivElement>(null);
@@ -121,7 +122,7 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
   const exitScale = useTransform(scrollYProgress, [0.3, 0.95], [1, 1.03]);
 
   return (
-    <section id="voice" ref={ref} className="relative overflow-hidden bg-ink">
+    <section id="voice" ref={ref} className={`relative overflow-hidden bg-ink ${isSubpage ? "subpage-section" : ""}`}>
       {liveVoice.sampleUrl && (
         <>
           <div className="sr-only">Röstprov — svensk röstskådespelare Therese Järvheden.</div>
@@ -136,7 +137,11 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
       )}
       <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className={liveVoice.url ? "grid grid-cols-1 lg:grid-cols-2" : "max-w-4xl mx-auto flex flex-col items-center justify-center text-center px-6 py-20 md:py-48"}>
-          <div className={`flex flex-col justify-center ${liveVoice.url ? "px-6 py-20 md:py-48 lg:px-16" : "items-center max-w-2xl"}`}>
+          <div className={`flex flex-col justify-center ${
+            liveVoice.url 
+              ? `px-6 lg:px-16 ${isSubpage ? "pt-6 pb-20 md:pt-12 md:pb-48" : "py-20 md:py-48"}` 
+              : "items-center max-w-2xl"
+          }`}>
             <div className="text-[10px] uppercase tracking-[0.5em] text-ember">{t.voice.act}</div>
 
             <h2 className="mt-4 font-display text-4xl sm:text-5xl lg:text-6xl text-bone leading-[0.95]">

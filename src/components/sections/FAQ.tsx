@@ -12,7 +12,7 @@ export interface FAQItem {
   a: { sv: string; en: string };
 }
 
-export function FAQ({ faqs: initialFaqs = [] }: { faqs?: FAQItem[] }) {
+export function FAQ({ faqs: initialFaqs = [], isSubpage = false }: { faqs?: FAQItem[], isSubpage?: boolean }) {
   const { lang } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const [faqs, setFaqs] = useState<FAQItem[]>(initialFaqs);
@@ -61,17 +61,10 @@ export function FAQ({ faqs: initialFaqs = [] }: { faqs?: FAQItem[] }) {
   if (activeFaqs.length === 0) return null;
 
   return (
-    <section id="faq" ref={ref} className="relative px-6 py-20 md:px-12 md:py-48 bg-ink">
+    <section id="faq" ref={ref} className={`relative px-6 pb-12 md:px-12 md:pb-24 bg-ink ${isSubpage ? "pt-6 md:pt-12" : "pt-12 md:pt-24"}`}>
       <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
         <div className="mx-auto max-w-3xl">
-          <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-6 font-mono text-center">
-            {lang === "sv" ? "Vanliga Frågor" : "Frequently Asked Questions"}
-          </div>
-          <h1 className="font-display text-4xl md:text-5xl lg:text-7xl text-bone text-center mb-10 uppercase tracking-widest leading-none">
-            FAQ
-          </h1>
-          
-          <div className="space-y-2 mt-16 lg:mt-24">
+          <div className="space-y-2">
             {activeFaqs.map((faq) => {
               const question = (lang === "sv" ? faq.q?.sv : faq.q?.en) || faq.q?.sv || faq.q?.en;
               const answer = (lang === "sv" ? faq.a?.sv : faq.a?.en) || faq.a?.sv || faq.a?.en;

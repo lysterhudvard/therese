@@ -519,3 +519,19 @@ This document details critical bugs, layout errors, and interaction blocks found
   1. Updated the FAQ answer database entry (ID `faq-1784097552235`) to specify that the series features four actresses playing the main roles, and that Therese played **Victoria**.
   2. Modified the fallback and default state values in [use-t.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/hooks/use-t.tsx) and [DashboardBio.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/DashboardBio.tsx) to read: `...där hon spelade rollen som Victoria, en av de fyra kvinnor vars öden vi fick följa.` (en: `...where she played the role of Victoria, one of the four women whose fates we follow.`).
   3. Ran a database migration script to immediately update the live database values on Supabase.
+
+## 73. Persistent Spacing Override in Global Stylesheet
+- **Symptom:** Modifying paddings dynamically in the Tailwind class lists for `<Voice />` or `<Credits />` subpage renders did not alter the vertical gaps on tablet or desktop screens.
+- **Root Cause:** A global `@media (min-width: 768px)` media query override in [styles.css](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/styles.css) forced a `12rem !important` (192px) padding-top value on all elements matches `section#voice`, `section#credits`, and `section#contact`, overriding any Tailwind utility rules.
+- **Resolution:** 
+  1. Attached a specific `.subpage-section` helper class to all components loading on dedicated subpages.
+  2. Restructured the CSS stylesheet selectors to use `:not(.subpage-section)`, disabling the `!important` padding-top rule specifically for subpages while retaining the consistent `padding-bottom` spacing.
+
+## 74. Inactive Navbar Links After Pre-rendering / Hydration Mismatch
+- **Symptom:** Navigating to a page did not trigger the glassmorphic highlight background or soft hover glow on the active navigation link.
+- **Root Cause:** Evaluating `window.location.pathname` inside the initial JSX render function caused the pre-rendered static Astro HTML to compile with false states (since `window` does not exist on the server). During browser hydration, Preact didn't trigger a DOM update for class lists because no React state changed.
+- **Resolution:**
+  1. Added a `currentPath` state variable in [Nav.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/Nav.tsx) and updated it on mount inside a client-side `useEffect` hook.
+  2. Implemented a slash-normalized comparator `isLinkActive` to trigger state-based CSS updates.
+  3. Defined the `.nav-active` rule in [styles.css](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/styles.css) to draw the background highlight.
+

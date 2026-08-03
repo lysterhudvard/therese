@@ -44,7 +44,7 @@ export function Field({
             setFocus(false);
             onBlur?.();
           }}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange((e.target as HTMLTextAreaElement).value)}
           className="mt-6 w-full resize-none border-b border-bone/40 bg-transparent pb-2 pt-1 text-bone outline-none focus:border-ember transition-colors"
         />
       ) : (
@@ -60,7 +60,7 @@ export function Field({
             setFocus(false);
             onBlur?.();
           }}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange((e.target as HTMLInputElement).value)}
           className="mt-6 w-full border-b border-bone/40 bg-transparent pb-2 pt-1 text-bone outline-none focus:border-ember transition-colors"
         />
       )}
