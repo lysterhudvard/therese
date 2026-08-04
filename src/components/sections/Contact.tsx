@@ -93,8 +93,11 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
     e.preventDefault();
     setStatus("shrinking");
     
-    // Trigger Netlify serverless function concurrently
-    const sendPromise = fetch("/.netlify/functions/contact", {
+    // Choose endpoint based on environment: use Netlify function on Netlify/Lovable, PHP on Hostinger
+    const isNetlify = typeof window !== "undefined" && (window.location.hostname.includes("netlify") || window.location.hostname.includes("lovable"));
+    const endpoint = isNetlify ? "/.netlify/functions/contact" : "/contact.php";
+
+    const sendPromise = fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +118,7 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
     try {
       const response = await sendPromise;
       if (!response.ok) {
-        throw new Error("Failed to send message via Netlify Function");
+        throw new Error(`Failed to send message via endpoint ${endpoint}`);
       }
       
       setStatus("flying");
