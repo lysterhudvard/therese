@@ -336,3 +336,23 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Dashboard Press Form Refactoring**: Removed deprecated settings fields (`pressbilder_text` and `showreels_text`) from [DashboardPress.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/DashboardPress.tsx) layout inputs, interface schema, and Supabase update queries.
 - **Text Summary Defaults**: Updated the state default strings inside the editors to match the newly consolidated, concise texts shown on the public subpages.
 
+### 66. Hostinger-Compatible PHP Contact Form Handler
+- **PHP Email Dispatcher Creation**: Created a production-grade, secure [contact.php](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/public/contact.php) mail dispatcher in the public directory to handle form submissions on Hostinger (or generic Apache/PHP servers).
+- **Environment Key Security**: Configured the script to fetch `RESEND_API_KEY` from server variables, `.htaccess`, or local `.env` files, keeping all API credentials secure.
+- **Format Integrity**: Explicitly formatted a plain text fallback string (`\n` linebreaks) alongside the HTML payload, ensuring emails display correctly on smartwatches and minimal clients instead of bunching text together.
+- **Bilingual and Sandbox Testing**: Temporarily changed the default recipient to `sirin@post.com` for local/sandbox configuration validation.
+
+### 67. Dynamic Contact Endpoint Dispatcher & Fallback
+- **Dynamic Endpoint Routing**: Modified [Contact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Contact.tsx) to automatically resolve the submission URL based on hostname (pointing to `/.netlify/functions/contact` on Netlify/Lovable domains and `/contact.php` on Hostinger deployments).
+- **Local Dev Mocking**: Introduced localhost mocking that resolves submissions with a simulated network delay and success screen, so developers can preview the entire envelope animation pipeline without mail server configurations.
+- **Scroll-to-Center Focal Lock**: Attached a smooth-scroll container focus hook on submission, scrolling the form card to viewport center to ensure the envelope animation isn't clipped off-screen on mobile.
+
+### 68. iOS/Safari 3D Rendering & Mobile Envelope Fixes
+- **Webkit CSS Pre-fixes**: Added `-webkit-backface-visibility` and `-webkit-transform-style` inline styles to resolve transparency bugs in Safari (where the envelope appeared invisible or inner letters showed through mirrored).
+- **Responsive Size Redesigns**: Adjusted the envelope's fixed width from `380px` to a responsive `300px` on mobile/tablet viewports, ensuring full layout scaling on small display screens.
+- **iOS Static Text Fallback**: Introduced user-agent detection to disable the `clip-path` text handwriting animation specifically on iOS (displaying pre-filled text on flip instead), avoiding rendering crashes caused by Safari's poor handling of clip-paths on 3D elements.
+
+### 69. Multilingual Envelope Recipient Translation
+- **Dynamic Language Bindings**: Configured the envelope recipient address text in [EnvelopeAnimation.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/contact/EnvelopeAnimation.tsx) to dynamically render as `"To Therese Järvheden"` or `"Till Therese Järvheden"` based on the state variable passed down from the header's language selector.
+
+

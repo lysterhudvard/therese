@@ -535,3 +535,32 @@ This document details critical bugs, layout errors, and interaction blocks found
   2. Implemented a slash-normalized comparator `isLinkActive` to trigger state-based CSS updates.
   3. Defined the `.nav-active` rule in [styles.css](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/styles.css) to draw the background highlight.
 
+## 75. Hostinger Deployments Contact Form 404 Error
+- **Symptom:** Submitting the contact form on the live site returned a `404 Not Found` error.
+- **Root Cause:** The form was hardcoded to call `/.netlify/functions/contact` which is a Netlify serverless function. Since the site is hosted on Hostinger (a standard Apache/PHP server), this endpoint did not exist.
+- **Resolution:** Created a secure PHP email handler [contact.php](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/public/contact.php) inside the public folder. Modified [Contact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Contact.tsx) to dynamically choose the correct endpoint based on the domain (using Netlify functions on Netlify/Lovable, and `/contact.php` on Hostinger/standard hosts). Added a local mockup fallback for localhost testing.
+
+## 76. Contact Form Instant Reset and Abrupt Animation on API Error
+- **Symptom:** When a submission failed (such as a 500 error from a missing API key), the form snapped back instantly, clearing the envelope and restoring input fields, which looked broken.
+- **Root Cause:** The submission catch block immediately set the state back to `idle` upon API rejection, interrupting the animation sequence mid-way.
+- **Resolution:** Updated the submit handler to let the envelope finish its folding and fly away transitions even on error, displaying the error toast message afterward so the visual experience remains smooth.
+
+## 77. Mobile Contact Envelope Layout and Handwriting Cutoff
+- **Symptom:** On mobile devices, the envelope animation was cut off at the top when submitting, and the handwriting animation was partially hidden.
+- **Root Cause:** Because the "Skicka" button is located at the bottom of the form, users scrolled down on mobile to click it. When the envelope mounted in the center of the large container, the top of the container was scrolled off-screen.
+- **Resolution:** Added a `.scrollIntoView({ behavior: 'smooth', block: 'center' })` trigger on the form card when submitted, automatically centering the screen on the envelope and keeping the entire animation visible.
+
+## 78. iOS Safari Envelope Transparency and Missing Text Rendering
+- **Symptom:** On iPhones, the back of the envelope appeared transparent, allowing the inside letter to bleed through backwards (mirrored). In addition, the handwriting text did not draw on the back at all.
+- **Root Cause:** iOS Safari does not calculate 3D z-indexing or backface-visibility correctly when rotating elements in a 3D space (`rotateY(180deg)`), unless Webkit prefixes are explicitly set. Furthermore, Safari struggles with animating `clip-path` wipe elements on a 3D rotated face, hiding the text.
+- **Resolution:**
+  1. Added `-webkit-backface-visibility: hidden` and `-webkit-transform-style: preserve-3d` to the envelope element container styles.
+  2. Implemented user-agent checking inside [EnvelopeAnimation.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/contact/EnvelopeAnimation.tsx) to detect iOS devices.
+  3. Swapped the handwriting animation for static, pre-filled text on iOS, resolving both the transparent paper glitch and the missing text drawing.
+
+## 79. Squashed Plain Text Email Fallback
+- **Symptom:** Fallback text in email logs was completely squashed together without spaces or linebreaks (e.g. `HEMSIDANNamn: Test`).
+- **Root Cause:** The PHP dispatcher only provided the HTML email payload. Resend's automatic HTML-to-text converter stripped the tags but did not preserve block spacing.
+- **Resolution:** Explicitly added a clean, formatted `"text"` field to the Resend API payload inside `contact.php`, using explicit `\n` linebreaks to ensure the fallback plaintext reads perfectly.
+
+
