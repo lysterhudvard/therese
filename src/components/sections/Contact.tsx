@@ -118,7 +118,15 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
     try {
       const response = await sendPromise;
       if (!response.ok) {
-        throw new Error(`Failed to send message via endpoint ${endpoint}`);
+        let errorMsg = `Failed to send message via endpoint ${endpoint}`;
+        try {
+          const errData = await response.json();
+          if (errData.error) errorMsg += `: ${errData.error}`;
+          if (errData.details) console.error("Error details:", errData.details);
+        } catch (e) {
+          // not json
+        }
+        throw new Error(errorMsg);
       }
       
       setStatus("flying");
@@ -136,7 +144,11 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
         return;
       }
       
+      // Let the envelope fly away even on error so it doesn't abruptly snap back
+      setStatus("flying");
+      await new Promise((r) => setTimeout(r, 900));
       setStatus("idle");
+      
       toast.error(
         lang === "sv" 
           ? "Kunde inte skicka meddelandet. Kontrollera din anslutning eller skicka direkt via e-post." 
