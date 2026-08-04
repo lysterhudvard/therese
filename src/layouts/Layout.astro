@@ -131,9 +131,47 @@ const {
         ]
       }
     </script>
+    <!-- Google Tag Manager (Lazy loaded for maximum page speed & Core Web Vitals) -->
+    <script is:inline>
+      (function() {
+        var gtmLoaded = false;
+        function loadGTM() {
+          if (gtmLoaded) return;
+          gtmLoaded = true;
+          
+          // Remove event listeners
+          window.removeEventListener('scroll', loadGTM);
+          window.removeEventListener('mousemove', loadGTM);
+          window.removeEventListener('touchstart', loadGTM);
+          window.removeEventListener('click', loadGTM);
+          
+          // Inject Google Tag Manager script
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-5JKZVPML');
+        }
+        
+        // Listen to user interaction events (scroll, move, touch, click)
+        window.addEventListener('scroll', loadGTM, { passive: true });
+        window.addEventListener('mousemove', loadGTM, { passive: true });
+        window.addEventListener('touchstart', loadGTM, { passive: true });
+        window.addEventListener('click', loadGTM, { passive: true });
+        
+        // Fallback: load GTM 4 seconds after page load if no interaction occurred
+        window.addEventListener('load', function() {
+          setTimeout(loadGTM, 4000);
+        });
+      })();
+    </script>
     <slot name="head" />
 	</head>
 	<body>
+		<!-- Google Tag Manager (noscript) -->
+		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JKZVPML"
+		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+		<!-- End Google Tag Manager (noscript) -->
 		<slot />
 	</body>
 </html>
