@@ -80,7 +80,7 @@ if (empty($resendApiKey)) {
 }
 
 // Get receiver & sender emails (with defaults matching Netlify configuration)
-$receiverEmail = getenv("RECEIVER_EMAIL") ?: (isset($_SERVER["RECEIVER_EMAIL"]) ? $_SERVER["RECEIVER_EMAIL"] : "sirin@post.com");
+$receiverEmail = getenv("RECEIVER_EMAIL") ?: (isset($_SERVER["RECEIVER_EMAIL"]) ? $_SERVER["RECEIVER_EMAIL"] : "theresejarvheden@gmail.com");
 $senderEmail = getenv("SENDER_EMAIL") ?: (isset($_SERVER["SENDER_EMAIL"]) ? $_SERVER["SENDER_EMAIL"] : "info@theresejarvheden.se");
 
 // Prepare Resend API request payload
