@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /backstage
+
+Sitemap: https://theresejarvheden.se/sitemap.xml

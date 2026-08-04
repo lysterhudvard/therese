@@ -17,7 +17,7 @@ const dbData = await getPageData();
 let processedDbData = dbData || { biography: {}, credits: [], showreels: [], seo: null, portfolioImages: [] };
 
 const seoTitle = "Pressbilder, Foton & Showreels | Therese Järvheden";
-const seoDesc = processedDbData.seo?.description_sv || "Ladda ner pressbilder och foton. Titta på showreels för skådespelerskan Therese Järvheden.";
+const seoDesc = "Ladda ner pressbilder och foton i hög upplösning för Therese Järvheden. Se showreels och rörligt material.";
 const seoImage = processedDbData.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
 
 let pressContentData = {};

@@ -43,11 +43,112 @@ export function Nav() {
   const [heroDone, setHeroDone] = useState(false);
   const [logoSwapped, setLogoSwapped] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
-  const { t } = useT();
+  const { t, lang } = useT();
 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
   }, []);
+
+  // Sync SEO Title and Meta Description tags dynamically on the client side on language change
+  useEffect(() => {
+    if (typeof window === "undefined" || !currentPath) return;
+
+    const norm = (p: string) => p.replace(/\/$/, "") || "/";
+    const pathKey = norm(currentPath);
+
+    // Skip admin panel
+    if (pathKey.startsWith("/backstage")) return;
+
+    const dbData = window.__INITIAL_DB_DATA__;
+
+    const titles = {
+      "/": {
+        sv: dbData?.seo?.title_sv || "Therese Järvheden — Skådespelerska",
+        en: dbData?.seo?.title_en || "Therese Järvheden — Actress"
+      },
+      "/cv": {
+        sv: "CV & Filmografi – Therese Järvheden | Roller i urval",
+        en: "CV & Filmography – Therese Järvheden | Selected Roles"
+      },
+      "/rost": {
+        sv: "Röstskådespelare & Voice Over (Skånska/Svenska) | Therese Järvheden",
+        en: "Voice Actor & Voice Over (Scanian/Swedish) | Therese Järvheden"
+      },
+      "/press": {
+        sv: "Pressbilder, Foton & Showreels | Therese Järvheden",
+        en: "Press Photos, Gallery & Showreels | Therese Järvheden"
+      },
+      "/faq": {
+        sv: "Vanliga Frågor (FAQ) | Therese Järvheden",
+        en: "Frequently Asked Questions (FAQ) | Therese Järvheden"
+      },
+      "/kontakt": {
+        sv: "Kontakt & Agentur | Therese Järvheden",
+        en: "Contact & Agency Representation | Therese Järvheden"
+      }
+    };
+
+    const descs = {
+      "/": {
+        sv: dbData?.seo?.description_sv || "Swedish actress Therese Järvheden. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'.",
+        en: dbData?.seo?.description_en || "Swedish actress Therese Järvheden. Drama, comedy, voice. Featured in SVT's 'En våldsam kärlek', 'Karatefylla', Beck — 'Utan uppsåt'."
+      },
+      "/cv": {
+        sv: "CV, meriter och filmografi för skådespelerskan Therese Järvheden. Se roller inom TV, film, teater och röst med röstkommentarer.",
+        en: "CV and performance credits for Swedish actor Therese Järvheden. Browse roles across TV, film, theatre, and voice acting."
+      },
+      "/rost": {
+        sv: "Boka röstskådespelaren Therese Järvheden för voice over, dubbning och reklam. Lyssna på röstprov med skånsk dialekt.",
+        en: "Book Swedish voice actress Therese Järvheden for voice overs, dubbing, and commercials. Listen to Scanian voice samples."
+      },
+      "/press": {
+        sv: "Ladda ner högupplösta pressbilder och foton för Therese Järvheden. Se showreels och rörligt material.",
+        en: "Download high-resolution press photos. Watch showreels and video reels for Swedish actress Therese Järvheden."
+      },
+      "/faq": {
+        sv: "Vanliga frågor och svar om skådespelerskan Therese Järvheden. Läs om dialekt, roller, och kontakt.",
+        en: "Frequently asked questions and answers about the Swedish actress Therese Järvheden."
+      },
+      "/kontakt": {
+        sv: "Kontakta skådespelerskan Therese Järvheden direkt för röst och dubbning, eller via Schultzberg Agency för skådespeleri.",
+        en: "Get in touch with Swedish actress Therese Järvheden directly, or contact Schultzberg Agency for acting representation."
+      }
+    };
+
+    const tMap = titles[pathKey as keyof typeof titles] || titles["/"];
+    const dMap = descs[pathKey as keyof typeof descs] || descs["/"];
+
+    const title = lang === "sv" ? tMap.sv : tMap.en;
+    const desc = lang === "sv" ? dMap.sv : dMap.en;
+
+    document.title = title;
+
+    const updateMeta = (selector: string, attr: string, value: string) => {
+      let el = document.querySelector(selector);
+      if (!el) {
+        el = document.createElement("meta");
+        if (selector.startsWith("meta[property=")) {
+          const propName = selector.slice(15, -2);
+          el.setAttribute("property", propName);
+        } else {
+          const nameName = selector.slice(11, -2);
+          el.setAttribute("name", nameName);
+        }
+        document.head.appendChild(el);
+      }
+      el.setAttribute(attr, value);
+    };
+
+    updateMeta("meta[name=\"description\"]", "content", desc);
+    updateMeta("meta[property=\"og:title\"]", "content", title);
+    updateMeta("meta[property=\"og:description\"]", "content", desc);
+    updateMeta("meta[name=\"twitter:title\"]", "content", title);
+    updateMeta("meta[name=\"twitter:description\"]", "content", desc);
+
+    const shareImage = dbData?.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+    updateMeta("meta[property=\"og:image\"]", "content", shareImage);
+    updateMeta("meta[name=\"twitter:image\"]", "content", shareImage);
+  }, [lang, currentPath]);
 
   useEffect(() => {
     const isBypassed = document.documentElement.classList.contains("skip-intro");

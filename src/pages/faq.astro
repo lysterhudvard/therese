@@ -8,32 +8,29 @@ import { Footer } from '../components/sections/Footer';
 import { CommentaryPlayer } from '../components/ui/CommentaryPlayer';
 import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
-import { supabase } from '../lib/supabase';
+import { getPageData } from '../lib/supabase-server';
 
 // Fetch the data on the server for instant SSR and SEO injection
-const { data, error } = await supabase
-  .from('biography')
-  .select('*')
-  .eq('id', 'main')
-  .maybeSingle();
+const dbData = await getPageData();
+let processedDbData = dbData || { biography: {}, credits: [], showreels: [], seo: null, portfolioImages: [] };
 
-const processedDbData = data || null;
 setGlobalDbData(processedDbData);
 
 // Basic SEO
 const seoTitle = "Vanliga Frågor (FAQ) | Therese Järvheden";
 const seoDesc = "Vanliga frågor och svar om skådespelerskan och röstskådespelerskan Therese Järvheden.";
-const seoImage = "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+const seoImage = processedDbData.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
 
 // Google FAQ JSON-LD Schema
 let faqSchema = null;
-if (processedDbData?.faqs && Array.isArray(processedDbData.faqs) && processedDbData.faqs.length > 0) {
-  const faqItems = processedDbData.faqs.filter(faq => faq.q?.sv && faq.a?.sv).map(faq => ({
+const faqsList = processedDbData.biography?.faqs;
+if (faqsList && Array.isArray(faqsList) && faqsList.length > 0) {
+  const faqItems = faqsList.filter(faq => (faq.q?.sv || faq.q?.en) && (faq.a?.sv || faq.a?.en)).map(faq => ({
     "@type": "Question",
-    "name": faq.q.sv,
+    "name": faq.q?.sv || faq.q?.en,
     "acceptedAnswer": {
       "@type": "Answer",
-      "text": faq.a.sv
+      "text": faq.a?.sv || faq.a?.en
     }
   }));
 
@@ -60,7 +57,7 @@ if (processedDbData?.faqs && Array.isArray(processedDbData.faqs) && processedDbD
   
   <div class="min-h-screen pb-20">
     <PageHeader client:idle titleKey="faq" />
-    <FAQ client:visible isSubpage={true} faqs={processedDbData?.faqs} />
+    <FAQ client:visible isSubpage={true} faqs={processedDbData?.biography?.faqs} />
   </div>
   
   <Footer client:visible simple={true} />

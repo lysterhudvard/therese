@@ -14,7 +14,7 @@ const dbData = await getPageData();
 let processedDbData = dbData || { biography: {}, credits: [], showreels: [], seo: null, portfolioImages: [] };
 
 const seoTitle = "CV & Filmografi – Therese Järvheden | Roller i urval";
-const seoDesc = processedDbData.seo?.description_sv || "Svensk skådespelerska Therese Järvhedens CV och filmografi.";
+const seoDesc = "CV, meriter och filmografi för skådespelerskan Therese Järvheden. Se roller inom TV, film, teater och röst med röstkommentarer.";
 const seoImage = processedDbData.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
 
 setGlobalDbData(processedDbData);

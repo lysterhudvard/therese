@@ -197,11 +197,11 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
           <div className="text-[10px] uppercase tracking-[0.5em] text-ember mb-1.5">
             {t.portfolio.act}
           </div>
-          <div className="font-display text-5xl md:text-6xl text-bone leading-none">
+          <h2 className="font-display text-5xl md:text-6xl text-bone leading-none">
             {t.portfolio.title[0]}
             <br />
             {t.portfolio.title[1]}
-          </div>
+          </h2>
           {liveImages.length > 0 && (
             <div className="mt-4 text-xs text-bone/70 max-w-[180px]">{t.portfolio.hint}</div>
           )}
@@ -278,9 +278,9 @@ export function Portfolio({ images = [], teaser = false }: { images?: (string | 
 
               {t.portfolio.act}
             </div>
-            <h3 className="mt-2 font-display text-4xl text-bone leading-none">
+            <h2 className="mt-2 font-display text-4xl text-bone leading-none">
               {t.portfolio.title[0]} {t.portfolio.title[1]}
-            </h3>
+            </h2>
           </div>
           
           {liveImages.length === 0 ? (

@@ -9,10 +9,42 @@ export function DashboardFaq() {
   const [faqs, setFaqs] = useState<FAQItem[]>([
     {
       id: "faq-1",
+      q: { sv: "Vem är Therese Järvheden?", en: "Who is Therese Järvheden?" },
+      a: {
+        sv: "Therese Järvheden är en svensk skådespelerska och röstskådespelare verksam inom drama, komedi och röst. Hon har medverkat i produktioner som SVT:s dramadokumentär En våldsam kärlek, Beck – Utan uppsåt och humorprogrammet Karatefylla.",
+        en: "Therese Järvheden is a Swedish actress and voice actress active in drama, comedy, and voice acting. She has appeared in productions such as SVT's documentary drama En våldsam kärlek, Beck – Utan uppsåt, and the comedy show Karatefylla.",
+      },
+    },
+    {
+      id: "faq-2",
       q: { sv: "Vilka serier har Therese medverkat i?", en: "What series has Therese appeared in?" },
       a: {
-        sv: "Therese har medverkat i Karatefylla (SVT), Jävla klåpare (SVT), Anna Blomberg show och Beck — Utan uppsåt.",
-        en: "Therese has appeared in Karatefylla (SVT), Jävla klåpare (SVT), Anna Blomberg show, and Beck — Utan uppsåt.",
+        sv: "Therese har medverkat i SVT:s dramadokumentär En våldsam kärlek, humorproduktionerna Karatefylla och Jävla klåpare, samt gästspelat i Anna Blomberg show, Jobbtjuven och Beck — Utan uppsåt.",
+        en: "Therese has appeared in SVT's documentary drama En våldsam kärlek, comedy productions Karatefylla and Jävla klåpare, and guest-starred in Anna Blomberg show, Jobbtjuven, and Beck — Utan uppsåt.",
+      },
+    },
+    {
+      id: "faq-3",
+      q: { sv: "Är Therese Järvheden gift med Thomas Järvheden?", en: "Is Therese Järvheden married to Thomas Järvheden?" },
+      a: {
+        sv: "Ja, Therese Järvheden är gift med den svenska komikern och artisten Thomas Järvheden. Tillsammans har de tre barn.",
+        en: "Yes, Therese Järvheden is married to the Swedish comedian and artist Thomas Järvheden. They have three children together.",
+      },
+    },
+    {
+      id: "faq-4",
+      q: { sv: "Vilken dialekt talar Therese Järvheden?", en: "What dialect does Therese Järvheden speak?" },
+      a: {
+        sv: "Therese Järvheden talar skånska som modersmål. I sitt arbete som röstskådespelare och skådespelerska växlar hon även obehindrat till rikssvenska (neutral standardsvenska) och engelska.",
+        en: "Therese Järvheden speaks Scanian (skånska) as her native dialect. In her work as a voice actress and actress, she also switches fluently to standard Swedish and English.",
+      },
+    },
+    {
+      id: "faq-5",
+      q: { sv: "Är Therese Järvheden röstskådespelare?", en: "Is Therese Järvheden a voice actor?" },
+      a: {
+        sv: "Ja, Therese är en professionell röstskådespelerska och speakerröst med egen studio. Hon levererar reklamröster, berättarröster och dubbning (bland annat som mamman Alice i SVT-barnserien Familjen Valentin) på både skånska och rikssvenska.",
+        en: "Yes, Therese is a professional voice actress and narrator with her own studio. She records commercials, voice overs, and dubbing (including the mother Alice in the SVT series Familjen Valentin) in both Scanian and standard Swedish.",
       },
     },
   ]);
