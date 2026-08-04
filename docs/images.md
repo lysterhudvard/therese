@@ -39,7 +39,7 @@ moderna webbformat innan de laddas upp i **Mediebiblioteket**.
   70–80%).
 - **PNG (`.png`)** — Använd **endast** för bilder med transparent bakgrund
   (t.ex. logotyper). PNG-filer är betydligt tyngre än WebP/JPEG och sänker
-  sajtens prestanda om de används för vanliga foton.
+  sajtens prestanda om de används för vanliga foton...
 
 ### 2. Verktyg för komprimering 
 
