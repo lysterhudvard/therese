@@ -80,7 +80,7 @@ if (empty($resendApiKey)) {
 }
 
 // Get receiver & sender emails (with defaults matching Netlify configuration)
-$receiverEmail = getenv("RECEIVER_EMAIL") ?: (isset($_SERVER["RECEIVER_EMAIL"]) ? $_SERVER["RECEIVER_EMAIL"] : "theresejarvheden@gmail.com");
+$receiverEmail = getenv("RECEIVER_EMAIL") ?: (isset($_SERVER["RECEIVER_EMAIL"]) ? $_SERVER["RECEIVER_EMAIL"] : "sirin@post.com");
 $senderEmail = getenv("SENDER_EMAIL") ?: (isset($_SERVER["SENDER_EMAIL"]) ? $_SERVER["SENDER_EMAIL"] : "info@theresejarvheden.se");
 
 // Prepare Resend API request payload
@@ -89,6 +89,7 @@ $postData = [
     "to" => [$receiverEmail],
     "reply_to" => $email,
     "subject" => "Meddelande från " . $name . " via theresejarvheden.se",
+    "text" => "NYTT MEDDELANDE FRÅN HEMSIDAN\n\nNamn: " . $name . "\nE-post: " . $email . "\n\n\"" . $msg . "\"\n\n----------------------------------------\nDetta mejl skickades från kontaktformuläret på theresejarvheden.se.",
     "html" => '
       <div style="font-family: sans-serif; padding: 25px; color: #1c1c1c; max-width: 600px; border: 1px solid #e0dcd1; border-radius: 4px; background-color: #fdfcf7;">
         <h2 style="color: #D88C5A; font-weight: 500; border-bottom: 1px solid #e0dcd1; padding-bottom: 12px; margin-top: 0; font-size: 20px; letter-spacing: 0.05em; text-transform: uppercase;">Nytt meddelande från hemsidan</h2>
