@@ -35,7 +35,7 @@ The JSON object must follow this structure:
 
 Available element targets (IDs) in the DOM:
 - Sidebar tabs:
-  * "klick-nav-hero" (Akt I: Nu aktuell / Hero)
+  * "klick-nav-hero" (Akt I: Ridåuppgång / Hero)
   * "klick-nav-bio" (Akt II: Biografi)
   * "klick-nav-portfolio" (Akt III: Portfolio)
   * "klick-nav-showreels" (Akt IV: Showreels)
@@ -46,7 +46,7 @@ Available element targets (IDs) in the DOM:
   * "klick-nav-seo" (SEO & Inställningar)
   * "klick-nav-media" (Mediebibliotek)
 
-- Akt I: Nu aktuell (Hero) targets:
+- Akt I: Ridåuppgång (Hero) targets:
   * "klick-hero-sync" (Synk-knapp för automatisk hämtning)
   * "klick-hero-sv" (Svensk textruta)
   * "klick-hero-en" (Engelsk textruta)
@@ -166,7 +166,7 @@ function localFallbackSimulate(prompt: string): GuideResponse {
     return {
       message: "Så här byter du den stora huvudbilden (bakgrundsbilden) på startsidan under Akt I:",
       steps: [
-        { target: "klick-nav-hero", instruction: "Klicka på 'Akt I: Nu aktuell' i sidomenyn." },
+        { target: "klick-nav-hero", instruction: "Klicka på 'Akt I: Ridåuppgång' i sidomenyn." },
         { target: "klick-hero-image", instruction: "Här kan du ange en bild-URL direkt, eller..." },
         { target: "klick-hero-image-media", instruction: "Klicka på 'Media'-knappen för att välja en bild från ditt mediebibliotek." },
         { target: "klick-hero-save", instruction: "Glöm inte att spara dina ändringar längst ner." }
@@ -218,7 +218,7 @@ function localFallbackSimulate(prompt: string): GuideResponse {
       return {
         message: "Så här slår du på automatisk hämtning av nuvarande produktion till Hero-rubriken:",
         steps: [
-          { target: "klick-nav-hero", instruction: "Klicka på 'Akt I: Nu aktuell' i sidomenyn." },
+          { target: "klick-nav-hero", instruction: "Klicka på 'Akt I: Ridåuppgång' i sidomenyn." },
           { target: "klick-hero-sync", instruction: "Slå på switch-knappen för 'Automatisk synkronisering med meriter'." },
           { target: "klick-hero-save", instruction: "Klicka på 'Spara ändringar' för att spara din inställning." }
         ]
@@ -227,7 +227,7 @@ function localFallbackSimulate(prompt: string): GuideResponse {
     return {
       message: "Så här ändrar du din aktuella status (Hero-rubrik) manuellt på hemsidan:",
       steps: [
-        { target: "klick-nav-hero", instruction: "Klicka på 'Akt I: Nu aktuell' i sidomenyn." },
+        { target: "klick-nav-hero", instruction: "Klicka på 'Akt I: Ridåuppgång' i sidomenyn." },
         { target: "klick-hero-sv", instruction: "Skriv den text du vill visa på svenska för dina besökare." },
         { target: "klick-hero-save", instruction: "Klicka på 'Spara ändringar' för att spara." }
       ]
@@ -507,7 +507,7 @@ Inkludera ALDRIG JSON-kod eller målobjekt (target IDs) i dina svar.
 
 Här är en översikt av hur webbplatsens CMS och dess sektioner fungerar:
 - **Inloggning**: Sker på '/backstage' med ditt konfigurerade lösenord.
-- **Akt I: Nu aktuell (Hero)**: Styr den rullande/framhävda texten i toppen (nu aktuell produktion) samt den stora bakgrundsbilden. Kan synkas automatiskt med aktuella meriter.
+- **Akt I: Ridåuppgång (Hero)**: Styr den rullande/framhävda texten i toppen (nu aktuell produktion) samt den stora bakgrundsbilden. Kan synkas automatiskt med aktuella meriter.
 - **Akt II: Biografi**: Ändrar biografitexter, egenskaper, dialekter, rullande citat, samt vanliga frågor (FAQ) för sökmotoroptimering (AEO/GEO).
 - **Akt III: Portfolio**: Hanterar bildgalleriet. Du kan ladda upp bilder från din dator, ange externa URL-länkar eller välja från Mediebiblioteket.
 - **Akt IV: Showreels**: Hanterar Vimeo/YouTube/direkta videor med posterbilder, undertexter och glödfärger.
@@ -534,7 +534,7 @@ export async function getGeneralChatResponse(prompt: string, apiKey: string): Pr
     
     // 2. Bakgrundsbild / Huvudbild (Hero)
     if (p.includes("huvudbild") || p.includes("startsidesbild") || p.includes("bakgrundsbild") || p.includes("hero-bild") || p.includes("herobild") || (p.includes("hero") && p.includes("bild"))) {
-      return "För att byta sajtens huvudbild (bakgrundsbild i Akt I), klicka på 'Akt I: Nu aktuell' i sidomenyn. Där hittar du fältet 'Bakgrundsbild' där du kan skriva en URL eller välja en bild från ditt Mediebibliotek.";
+      return "För att byta sajtens huvudbild (bakgrundsbild i Akt I), klicka på 'Akt I: Ridåuppgång' i sidomenyn. Där hittar du fältet 'Bakgrundsbild' där du kan skriva en URL eller välja en bild från ditt Mediebibliotek.";
     }
     
     // 3. Biografibilder

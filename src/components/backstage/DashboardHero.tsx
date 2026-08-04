@@ -106,10 +106,10 @@ export function DashboardHero() {
     setIsSaving(false);
     if (error) {
       toast.error(`Kunde inte spara i databasen: ${error.message}`);
-      alert(`Misslyckades med att spara Akt I (Nu aktuell): ${error.message}`);
+      alert(`Misslyckades med att spara Akt I (Ridåuppgång): ${error.message}`);
     } else {
-      toast.success("Akt I (Nu aktuell) har sparats framgångsrikt i Supabase!");
-      alert("Akt I (Nu aktuell) har sparats framgångsrikt!");
+      toast.success("Akt I (Ridåuppgång) har sparats framgångsrikt i Supabase!");
+      alert("Akt I (Ridåuppgång) har sparats framgångsrikt!");
     }
   };
 
@@ -140,7 +140,7 @@ export function DashboardHero() {
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
       <div className="border-b border-bone/10 pb-4 mb-6">
         <h2 className="font-display text-2xl text-bone uppercase tracking-wider">
-          Akt I — <span className="italic text-ember">Nu aktuell (Hero)</span>
+          Akt I — <span className="italic text-ember">Ridåuppgång (Hero)</span>
         </h2>
         <p className="text-[10px] text-bone/40 mt-1 font-mono uppercase tracking-wider">
           Redigera den framhävda texten som visas på webbplatsens startsida.

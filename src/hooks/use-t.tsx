@@ -14,7 +14,7 @@ export const I18N = {
       contact: "Kontakt",
     },
     hero: {
-      act: "Akt I — Nu aktuell",
+      act: "Akt I — Ridåuppgång",
       line: '"En våldsam kärlek" — SVT dramadokumentär.',
       role: "Skådespelerska",
       base: "Malmö · Stockholm",
@@ -28,27 +28,27 @@ export const I18N = {
       lines: {
         Dramatic: "Drama är något jag känner extra starkt för.",
         Comedic: "Komedi kräver samma precision som tragedi — bara snabbare.",
-        Classical: "Scenen lärde mig allt jag vet om timing och tystnad.",
+        Classical: "Scenen har lärt mig allt jag kan om tajming och tystnad.",
       },
-      p1Pre: "Therese var senast aktuell i SVT:s dramadokumentär ",
+      p1Pre: "Therese sågs senast i SVT:s uppmärksammade dramadokumentär ",
       p1Link: "En våldsam kärlek",
       p1Post:
-        " där hon spelade rollen som Victoria, en av de fyra kvinnor vars öden vi fick följa. Serien handlar om våld i nära relationer — en samhällsfråga vi måste prata mer om, belysa dess problematik och börja agera.",
+        " i regi av Åsa Sandzén. Där gestaltar hon Victoria, en av de fyra kvinnor vars öden vi får följa. Serien handlar om våld i nära relationer — ett ämne som vi måste prata mer om, synliggöra och agera mot.",
       p2: [
-        "Hon har spelat teater och musikal sedan hon var barn. I TV har hon mestadels medverkat i humorproduktioner som Kristallennominerade ",
+        "Hon har spelat teater och musikal sedan barndomen. På TV har hon mest synts i humorproduktioner som Kristallennominerade ",
         "Karatefylla",
-        ", humorserien ",
+        ", komediserien ",
         "Jävla klåpare",
-        " samt andra humorprojekt — bl.a. ",
+        " och andra humorprojekt — bland annat ",
         "Anna Blomberg show",
         " och ",
         "Jobbtjuven",
         ".",
       ],
       p3: [
-        "Drama är något som Therese känner extra starkt för. Vi har sett henne bland annat i Beck-filmen ",
+        "Inom drama har vi även sett henne i Beck-filmen ",
         "Utan uppsåt",
-        ", där hon gästspelade rollen som läraren ",
+        ", där hon gästspelade som läraren ",
         "Nora",
         ".",
       ],
@@ -58,22 +58,21 @@ export const I18N = {
         ["Språk", "Svenska · Engelska"],
       ] as [string, string][],
     },
-    portfolio: {
-      act: "Akt III — Portfolio",
-      title: ["Portfolio", "Bilder"],
-      hint: "Scrolla för att se bilder.",
-    },
+    portfolio: { act: "Akt III — Portfolio", title: ["Portfolio", "Bilder"], hint: "Scrolla för att se bilder." },
     credits: {
       act: "Akt V — Meriter",
-      heading: ["Roller & ", "Meriter"],
-      filters: { Alla: "Alla", Film: "Film", TV: "TV", Theater: "Teater", Voice: "Röst" } as Record<
-        string,
-        string
-      >,
+      heading: ["Roller i ", "urval"],
+      filters: {
+        Alla: "Alla",
+        Film: "Film",
+        TV: "TV",
+        Theater: "Teater",
+        Voice: "Röst & Dubbning",
+      } as Record<string, string>,
     },
     voice: {
       act: "Akt VI — Röst",
-      heading: ["En ", "skånsk", " röst — varm, naturlig och självklar."],
+      heading: ["En ", "skånsk", " röst — warm, naturlig och självklar."],
       body: [
         "Therese är en professionell röstskådespelare och speakerröst som levererar både genuin skånska och ren rikssvenska för reklam, berättarröster, e-learning och dubbning (bland annat som mamman i SVT:s ",
         "Familjen Valentin",
@@ -117,7 +116,7 @@ export const I18N = {
       contact: "Contact",
     },
     hero: {
-      act: "Act I — Now Playing",
+      act: "Act I — Rising Curtain",
       line: '"En våldsam kärlek" — SVT documentary drama.',
       role: "Actress",
       base: "Malmö · Stockholm",

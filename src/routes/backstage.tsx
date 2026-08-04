@@ -1,11 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { BackstageLogin } from "../components/backstage/BackstageLogin";
 import { BackstageDashboard } from "../components/backstage/BackstageDashboard";
-
-export const Route = createFileRoute("/backstage")({
-  component: BackstagePage,
-});
 
 export default function BackstagePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

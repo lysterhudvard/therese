@@ -68,7 +68,7 @@ export function KlickGuideChat({
 
   const suggestions = [
     "Hur ändrar jag biografi och FAQ?",
-    "Uppdatera status under Nu Aktuellt",
+    "Uppdatera status under Ridåuppgång",
     "Ladda upp röstinspelning till merit",
     "Ändra min agent-epost / sociala länkar",
     "Uppdatera eftertexter eller slutbild",

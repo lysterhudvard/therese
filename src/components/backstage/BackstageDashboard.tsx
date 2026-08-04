@@ -35,7 +35,7 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   }, []);
 
   const navigationItems = [
-    { id: "hero", label: "Akt I: Nu aktuell", icon: Star },
+    { id: "hero", label: "Akt I: Ridåuppgång", icon: Star },
     { id: "bio", label: "Akt II: Biografi", icon: User },
     { id: "portfolio", label: "Akt III: Portfolio", icon: Image },
     { id: "showreels", label: "Akt IV: Showreels", icon: Video },
