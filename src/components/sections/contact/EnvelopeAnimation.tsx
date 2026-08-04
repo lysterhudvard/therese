@@ -131,14 +131,20 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
           <div className="absolute bottom-8 md:bottom-12 left-6 right-6 md:left-10 md:right-10 border-b border-ink/10" />
           <div className="absolute bottom-14 md:bottom-20 left-6 right-6 md:left-10 md:right-10 border-b border-ink/10" />
 
-          <div className="w-full mt-6 md:mt-8 rotate-[-4deg] pl-2 flex overflow-hidden">
+          <div className="w-full mt-6 md:mt-8 rotate-[-4deg] pl-2">
             {status === "writing" || status === "flying" ? (
               <MotionDiv
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
+                initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
+                animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
                 transition={{ duration: 1.5, ease: "linear" }}
-                className="text-ink/90 text-2xl md:text-4xl whitespace-nowrap overflow-hidden block"
-                style={{ fontFamily: "'Caveat', cursive" }}
+                className="text-ink/90 text-2xl md:text-4xl block"
+                style={{ fontFamily: "'Caveat', cursive", WebkitClipPath: "inset(0% 0% 0% 0%)" }}
+                onUpdate={(latest: any) => {
+                  // Ensure webkit clip path stays in sync
+                  if (latest.clipPath) {
+                    return { WebkitClipPath: latest.clipPath };
+                  }
+                }}
               >
                 Till Therese Järvheden
               </MotionDiv>

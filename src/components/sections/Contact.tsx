@@ -91,6 +91,12 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
 
   const submit = async (e: any) => {
     e.preventDefault();
+    
+    // Scroll the form container to the center of the screen so the envelope animation is fully visible on mobile
+    if (formCardRef.current) {
+      formCardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
     setStatus("shrinking");
     
     // Choose endpoint based on environment: use Netlify function on Netlify/Lovable, PHP on Hostinger
