@@ -145,7 +145,29 @@ export function Nav() {
     updateMeta("meta[name=\"twitter:title\"]", "content", title);
     updateMeta("meta[name=\"twitter:description\"]", "content", desc);
 
-    const shareImage = dbData?.seo?.og_image || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+    let shareImage = dbData?.seo?.og_image;
+    
+    if (!shareImage) {
+      if (pathKey === "/press" && dbData?.portfolioImages?.[0]?.url) {
+        shareImage = dbData.portfolioImages[0].url;
+      } else if (pathKey === "/rost") {
+        try {
+          const vs = typeof dbData?.biography?.voice_settings === "string"
+            ? JSON.parse(dbData.biography.voice_settings)
+            : dbData?.biography?.voice_settings;
+          if (vs?.image_url) {
+            shareImage = vs.image_url;
+          }
+        } catch (e) {}
+      } else if (pathKey === "/cv" || pathKey === "/") {
+        shareImage = dbData?.biography?.hero_image;
+      }
+    }
+
+    if (!shareImage) {
+      shareImage = "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650";
+    }
+
     updateMeta("meta[property=\"og:image\"]", "content", shareImage);
     updateMeta("meta[name=\"twitter:image\"]", "content", shareImage);
   }, [lang, currentPath]);
