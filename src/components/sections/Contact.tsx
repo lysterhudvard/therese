@@ -371,7 +371,7 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
               />
 
               {/* Envelope Animation Layer */}
-              <EnvelopeAnimation status={status} form={form} t={t} />
+              <EnvelopeAnimation status={status} form={form} t={t} lang={lang} />
 
                 {status === "sent" ? (
                   <MotionDiv

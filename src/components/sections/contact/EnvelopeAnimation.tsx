@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 const MotionDiv = motion.div as any;
 
@@ -6,10 +6,26 @@ interface EnvelopeAnimationProps {
   status: string;
   form: { name: string; email: string; msg: string };
   t: any;
+  lang?: string;
 }
 
-export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
+export function EnvelopeAnimation({ status, form, t, lang = "sv" }: EnvelopeAnimationProps) {
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    // Detect iOS devices (iPhone, iPad, iPod) and Mac touch devices (iPad disguised as Mac)
+    const checkIsIOS = () => {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      const isIPhoneOrIPad = /iphone|ipad|ipod/.test(userAgent);
+      const isMacTouch = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      return isIPhoneOrIPad || isMacTouch;
+    };
+    setIsIOS(checkIsIOS());
+  }, []);
+
   if (status === "idle" || status === "sent") return null;
+
+  const receiverName = lang === "en" ? "To Therese Järvheden" : "Till Therese Järvheden";
 
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
@@ -132,7 +148,16 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
           <div className="absolute bottom-14 md:bottom-20 left-6 right-6 md:left-10 md:right-10 border-b border-ink/10" />
 
           <div className="w-full mt-6 md:mt-8 rotate-[-4deg] pl-2">
-            {status === "writing" || status === "flying" ? (
+            {isIOS ? (
+              // iOS Fallback: Pre-filled static text instead of animation to bypass Safari 3D rendering bugs
+              <div
+                className="text-ink/90 text-2xl md:text-4xl block"
+                style={{ fontFamily: "'Caveat', cursive" }}
+              >
+                {receiverName}
+              </div>
+            ) : status === "writing" || status === "flying" ? (
+              // Standard Handwriting Animation for other platforms
               <MotionDiv
                 initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
                 animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
@@ -146,7 +171,7 @@ export function EnvelopeAnimation({ status, form, t }: EnvelopeAnimationProps) {
                   }
                 }}
               >
-                Till Therese Järvheden
+                {receiverName}
               </MotionDiv>
             ) : null}
           </div>
