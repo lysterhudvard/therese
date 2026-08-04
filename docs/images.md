@@ -41,7 +41,7 @@ moderna webbformat innan de laddas upp i **Mediebiblioteket**.
   (t.ex. logotyper). PNG-filer är betydligt tyngre än WebP/JPEG och sänker
   sajtens prestanda om de används för vanliga foton.
 
-### 2. Verktyg för komprimering
+### 2. Verktyg för komprimering 
 
 Innan du laddar upp en bild i CMS, kör den genom något av följande gratisverktyg
 för att reducera filstorleken utan att förlora synbar kvalitet:

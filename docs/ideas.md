@@ -72,7 +72,7 @@ Instead of a static footer, lean into the literal end of a show.
   tiny, looping "Post-Credits Scene" video snippet in the corner to reward users
   who scroll all the way to the bottom.
 
----
+--- 
 
 ### A Note on Performance
 

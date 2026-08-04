@@ -170,7 +170,7 @@ This document details critical bugs, layout errors, and interaction blocks found
 ## 28. Portfolio Bilder flaggade som "Oversized" i Google PageSpeed
 - **Symptom:** PageSpeed-analysen klagade på att bilderna i det horisontella rullningsgalleriet var mycket större än nödvändigt för visningsytan (filstorlekar på runt `899x1200` men visades på endast `417x557` i CSS-layouten).
 - **Root Cause:** I `src/pages/index.astro` var Astros inbyggda bildoptimerare inställd på att skala ner alla portföljbilder till en fast bredd på `1000px`. På grund av bildernas stående porträttformat resulterade detta i onödigt stora och tunga bildfiler för mobila enheter.
-- **Resolution:** Ändrade målupplösningsparametern i `index.astro` från `1000` till `600`. Astros byggprocess skalar nu ner visningsversionerna perfekt till galleriboxens storlek, vilket dramatiskt krymper filvikten och eliminerar PageSpeed-varningarna.
+- **Resolution:** Ändrade målupplösningsparametern i `index.astro` från `1000` till `600`. Astros byggprocess skalar nu ner visningsversionerna perfekt till galleriboxens storlek, vilket dramatiskt krymper filvikten och eliminerar PageSpeed-varningarna. 
 
 ## 29. Lågupplösta pressbilder vid nedladdning för castare
 - **Symptom:** Castare och agenter som laddade ner pressbilder via nedladdningsknappen fick de webb-optimerade, lågupplösta WebP-filerna istället för tryckfärdiga originalbilder.
