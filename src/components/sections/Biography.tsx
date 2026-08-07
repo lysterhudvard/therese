@@ -18,9 +18,11 @@ export interface BioSection {
   image_caption?: string;
   image_title?: string;
   image_filename?: string;
-  description?: string;
+  description_title_sv?: string;
+  description_title_en?: string;
   description_sv?: string;
   description_en?: string;
+  description?: string;
   weight?: number;
 }
 
@@ -42,15 +44,6 @@ const DEFAULT_SECTIONS: BioSection[] = [
     quote_en: "Comedy demands the same precision as tragedy — just faster.",
     image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
     weight: 500
-  },
-  {
-    id: "Classical",
-    title_sv: "Klassisk",
-    title_en: "Classical",
-    quote_sv: "Scenen lärde mig allt jag vet om timing och tystnad.",
-    quote_en: "The stage taught me everything I know about timing and silence.",
-    image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
-    weight: 400
   }
 ];
 
@@ -64,8 +57,8 @@ export function Biography({
   const { t, lang } = useT();
 
   const activeSections = useMemo(() => {
-    if (sections && sections.length > 0) return sections;
-    return DEFAULT_SECTIONS;
+    const rawSections = (sections && sections.length > 0) ? sections : DEFAULT_SECTIONS;
+    return rawSections.filter(s => s.id !== "Classical" && s.title_sv?.toLowerCase() !== "klassisk");
   }, [sections]);
 
   const [activeId, setActiveId] = useState(() => {
@@ -189,68 +182,79 @@ export function Biography({
             </div>
 
             <div className={`mt-14 space-y-7 text-bone/75 leading-relaxed ${data.image ? "max-w-xl text-left" : "max-w-2xl text-center mx-auto"}`}>
-              {(lang === "sv" ? (data.description_sv || data.description) : (data.description_en || data.description)) ? (
+              {/* Description title if set */}
+              {(lang === "sv" ? data.description_title_sv : data.description_title_en) && (
+                <h3 className="text-base font-mono uppercase tracking-widest text-bone">
+                  {lang === "sv" ? data.description_title_sv : data.description_title_en}
+                </h3>
+              )}
+
+              {/* Description text or mapped fallback paragraph */}
+              {(lang === "sv" ? data.description_sv : data.description_en) ? (
                 <div 
-                  className="formatted-text prose prose-invert max-w-none text-bone/75"
+                  className="formatted-text prose prose-invert max-w-none text-bone/75 text-sm md:text-base leading-relaxed whitespace-pre-line"
                   dangerouslySetInnerHTML={{ 
-                    __html: lang === "sv" 
-                      ? (data.description_sv || data.description || "") 
-                      : (data.description_en || data.description || "") 
-                  }} 
+                    __html: lang === "sv" ? data.description_sv || "" : data.description_en || "" 
+                  }}
                 />
               ) : (
-                <>
-                  <p className="formatted-text">
-                    {t.bio.p1Pre ? (
-                      <>
-                        {t.bio.p1Pre}
-                        {t.bio.p1Link && (
-                          <a
-                            href="https://www.svtplay.se/en-valdsam-karlek"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-ember underline-offset-4 hover:underline"
-                          >
-                            {t.bio.p1Link}
-                          </a>
+                <div className="space-y-6">
+                  {(activeId.toLowerCase().includes("drama") || activeId === "Dramatic") ? (
+                    <>
+                      <p className="formatted-text">
+                        {t.bio.p1Pre ? (
+                          <>
+                            {t.bio.p1Pre}
+                            {t.bio.p1Link && (
+                              <a
+                                href="https://www.svtplay.se/en-valdsam-karlek"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-ember underline-offset-4 hover:underline"
+                              >
+                                {t.bio.p1Link}
+                              </a>
+                            )}
+                            <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
+                          </>
+                        ) : (
+                          <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
                         )}
-                        <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
-                      </>
-                    ) : (
-                      <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
-                    )}
-                  </p>
-                  <p className="formatted-text">
-                    {t.bio.p2[1] ? (
-                      <>
-                        {t.bio.p2[0]}
-                        <em className="text-bone">{t.bio.p2[1]}</em>
-                        {t.bio.p2[2]}
-                        <em className="text-bone">{t.bio.p2[3]}</em>
-                        {t.bio.p2[4]}
-                        <em className="text-bone">{t.bio.p2[5]}</em>
-                        {t.bio.p2[6]}
-                        <em className="text-bone">{t.bio.p2[7]}</em>
-                        {t.bio.p2[8]}
-                      </>
-                    ) : (
-                      <span dangerouslySetInnerHTML={{ __html: t.bio.p2[0] }} />
-                    )}
-                  </p>
-                  <p className="formatted-text">
-                    {t.bio.p3[1] ? (
-                      <>
-                        {t.bio.p3[0]}
-                        <em className="text-bone">{t.bio.p3[1]}</em>
-                        {t.bio.p3[2]}
-                        <span className="text-ember">{t.bio.p3[3]}</span>
-                        {t.bio.p3[4]}
-                      </>
-                    ) : (
-                      <span dangerouslySetInnerHTML={{ __html: t.bio.p3[0] }} />
-                    )}
-                  </p>
-                </>
+                      </p>
+                      <p className="formatted-text">
+                        {t.bio.p3[1] ? (
+                          <>
+                            {t.bio.p3[0]}
+                            <em className="text-bone">{t.bio.p3[1]}</em>
+                            {t.bio.p3[2]}
+                            <span className="text-ember">{t.bio.p3[3]}</span>
+                            {t.bio.p3[4]}
+                          </>
+                        ) : (
+                          <span dangerouslySetInnerHTML={{ __html: t.bio.p3[0] }} />
+                        )}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="formatted-text">
+                      {t.bio.p2[1] ? (
+                        <>
+                          {t.bio.p2[0]}
+                          <em className="text-bone">{t.bio.p2[1]}</em>
+                          {t.bio.p2[2]}
+                          <em className="text-bone">{t.bio.p2[3]}</em>
+                          {t.bio.p2[4]}
+                          <em className="text-bone">{t.bio.p2[5]}</em>
+                          {t.bio.p2[6]}
+                          <em className="text-bone">{t.bio.p2[7]}</em>
+                          {t.bio.p2[8]}
+                        </>
+                      ) : (
+                        <span dangerouslySetInnerHTML={{ __html: t.bio.p2[0] }} />
+                      )}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
  

@@ -359,10 +359,5 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Boilerplate File Removal**: Removed unused UI boilerplate files (`chart.tsx`, `input-otp.tsx`, `sidebar.tsx`, `toggle-group.tsx`, `breadcrumb.tsx`, `select.tsx`) which had Preact type compatibility errors.
 - **TypeScript Configuration Optimization**: Cleaned up the `exclude` configuration in `tsconfig.json`, restoring normal typechecking and path mapping resolution for all active components.
 
-### 71. Localized Biography Section Descriptions in CMS & Frontend
-- **Enhanced Types and Schema**: Added optional localized `description_sv` and `description_en` properties to the `BioSection` type interface to allow custom multi-paragraph biography texts for each mood/section (Dramatisk, Komisk, Klassisk).
-- **CMS Interface Upgrades**: Replaced the single non-localized description textarea in the CMS Biography Section list (`BioSectionsList.tsx`) with two dedicated `Beskrivning (Svenska)` and `Description (English)` textareas, each integrated with formatting toolbars.
-- **Dynamic Frontend Switching**: Updated the `Biography.tsx` component to check for the active section's custom description (`description_sv` / `description_en` or the legacy `description` fallback). If present, the custom description is rendered with HTML formatting, otherwise it falls back to the global biography paragraphs, allowing editors to seamlessly customize texts per section.
-
 
 

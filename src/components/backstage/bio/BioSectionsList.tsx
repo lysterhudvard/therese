@@ -203,45 +203,71 @@ export function BioSectionsList({
                         className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
                       />
                     </div>
-                    <div>
-                      <div className="flex justify-between items-end mb-1">
+                    <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-bone/5 pt-3 mt-3">
+                      <div className="space-y-1">
                         <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
-                          Beskrivning (Svenska)
+                          Beskrivning Rubrik (Svenska)
                         </label>
-                        <FormattingToolbar
-                          textareaId={`klick-bio-section-desc-sv-${section.id}`}
+                        <input
+                          type="text"
+                          value={section.description_title_sv || ""}
+                          onChange={(e) => updateBioSection(section.id, { description_title_sv: (e.target as any).value })}
+                          placeholder="t.ex. Drama"
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                          Beskrivning Rubrik (Engelska)
+                        </label>
+                        <input
+                          type="text"
+                          value={section.description_title_en || ""}
+                          onChange={(e) => updateBioSection(section.id, { description_title_en: (e.target as any).value })}
+                          placeholder="t.ex. Drama"
+                          className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-end">
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                            Beskrivningstext (Svenska)
+                          </label>
+                          <FormattingToolbar
+                            textareaId={`klick-bio-section-desc-sv-${section.id}`}
+                            value={section.description_sv || ""}
+                            onValueChange={(val) => updateBioSection(section.id, { description_sv: val })}
+                          />
+                        </div>
+                        <textarea
+                          id={`klick-bio-section-desc-sv-${section.id}`}
                           value={section.description_sv || ""}
-                          onValueChange={(val) => updateBioSection(section.id, { description_sv: val })}
+                          onChange={(e) => updateBioSection(section.id, { description_sv: (e.target as any).value })}
+                          placeholder="Beskrivning på svenska..."
+                          rows={4}
+                          className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
                         />
                       </div>
-                      <textarea
-                        id={`klick-bio-section-desc-sv-${section.id}`}
-                        value={section.description_sv || ""}
-                        onChange={(e) => updateBioSection(section.id, { description_sv: (e.target as any).value })}
-                        placeholder="Längre beskrivning på svenska..."
-                        rows={3}
-                        className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex justify-between items-end mb-1">
-                        <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
-                          Description (English)
-                        </label>
-                        <FormattingToolbar
-                          textareaId={`klick-bio-section-desc-en-${section.id}`}
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-end">
+                          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">
+                            Beskrivningstext (Engelska)
+                          </label>
+                          <FormattingToolbar
+                            textareaId={`klick-bio-section-desc-en-${section.id}`}
+                            value={section.description_en || ""}
+                            onValueChange={(val) => updateBioSection(section.id, { description_en: val })}
+                          />
+                        </div>
+                        <textarea
+                          id={`klick-bio-section-desc-en-${section.id}`}
                           value={section.description_en || ""}
-                          onValueChange={(val) => updateBioSection(section.id, { description_en: val })}
+                          onChange={(e) => updateBioSection(section.id, { description_en: (e.target as any).value })}
+                          placeholder="Description in English..."
+                          rows={4}
+                          className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
                         />
                       </div>
-                      <textarea
-                        id={`klick-bio-section-desc-en-${section.id}`}
-                        value={section.description_en || ""}
-                        onChange={(e) => updateBioSection(section.id, { description_en: (e.target as any).value })}
-                        placeholder="Longer description in English..."
-                        rows={3}
-                        className="w-full bg-stage/35 border border-bone/10 text-bone p-2 rounded-b-sm rounded-t-none border-t-0 text-xs focus:outline-none focus:border-ember resize-none font-sans"
-                      />
                     </div>
                   </div>
                 </div>

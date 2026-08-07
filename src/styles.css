@@ -1,3 +1,10 @@
+/* Override slanted Cormorant Garamond hyphens/dashes with standard flat sans-serif ones */
+@font-face {
+  font-family: 'FlatDash';
+  src: local('Arial'), local('Helvetica'), local('system-ui'), local('sans-serif');
+  unicode-range: U+002D, U+2010, U+2013, U+2014, U+2212;
+}
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -30,7 +37,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-display: "FlatDash", "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-sm: 2px;

@@ -9,9 +9,11 @@ export interface BioSection {
   image_caption?: string;
   image_title?: string;
   image_filename?: string;
-  description?: string;
+  description_title_sv?: string;
+  description_title_en?: string;
   description_sv?: string;
   description_en?: string;
+  description?: string;
   weight?: number;
 }
 

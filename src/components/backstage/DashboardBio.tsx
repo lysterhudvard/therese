@@ -47,15 +47,6 @@ export function DashboardBio() {
       quote_en: "Comedy demands the same precision as tragedy — just faster.",
       image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
       weight: 500
-    },
-    {
-      id: "Classical",
-      title_sv: "Klassisk",
-      title_en: "Classical",
-      quote_sv: "Scenen lärde mig allt jag vet om timing och tystnad.",
-      quote_en: "The stage taught me everything I know about timing and silence.",
-      image: "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
-      weight: 400
     }
   ]);
 
@@ -148,7 +139,52 @@ export function DashboardBio() {
               ? JSON.parse(data.bio_sections)
               : data.bio_sections;
             if (Array.isArray(parsed) && parsed.length > 0) {
-              setBioSections(parsed);
+              // Find the Classical section if it exists, to merge its text into Dramatic
+              const classicalSec = parsed.find(s => s.id === "Classical" || s.title_sv.toLowerCase() === "klassisk");
+              
+              // Filter out Classical from the active sections list
+              const withoutClassical = parsed.filter(s => s.id !== "Classical" && s.title_sv.toLowerCase() !== "klassisk");
+
+              const migrated = withoutClassical.map((s, idx) => {
+                const isDramatic = s.id.toLowerCase().includes("drama") || idx === 0;
+                const isComedic = s.id.toLowerCase().includes("comed") || idx === 1;
+
+                let descTitleSv = s.description_title_sv || "";
+                let descTitleEn = s.description_title_en || "";
+                let descSv = s.description_sv || "";
+                let descEn = s.description_en || "";
+
+                if (isDramatic) {
+                  descTitleSv = descTitleSv || "Drama";
+                  descTitleEn = descTitleEn || "Drama";
+                  
+                  // If s.description_sv is empty, load from paragraph1_sv + paragraph3_sv
+                  if (!descSv) {
+                    descSv = (data.paragraph1_sv || "") + "\n\n" + (data.paragraph3_sv || "");
+                    descEn = (data.paragraph1_en || "") + "\n\n" + (data.paragraph3_en || "");
+                  } else if (classicalSec && classicalSec.description_sv && !descSv.includes(classicalSec.description_sv)) {
+                    // If Classical text exists and is not already merged, merge it now!
+                    descSv = descSv.trim() + "\n\n" + classicalSec.description_sv.trim();
+                    descEn = descEn.trim() + "\n\n" + (classicalSec.description_en || "").trim();
+                  }
+                } else if (isComedic) {
+                  descTitleSv = descTitleSv || "Komedi";
+                  descTitleEn = descTitleEn || "Comedy";
+                  if (!descSv) {
+                    descSv = data.paragraph2_sv || "";
+                    descEn = data.paragraph2_en || "";
+                  }
+                }
+
+                return {
+                  ...s,
+                  description_title_sv: descTitleSv.trim(),
+                  description_title_en: descTitleEn.trim(),
+                  description_sv: descSv.trim(),
+                  description_en: descEn.trim(),
+                };
+              });
+              setBioSections(migrated);
             }
           } catch (e) {
             console.error("Failed to parse bio sections:", e);
@@ -164,6 +200,10 @@ export function DashboardBio() {
                 quote_sv: data.quote_sv || "Drama är något jag känner extra starkt för.",
                 quote_en: data.quote_en || "Drama is something I feel especially strongly about.",
                 image: moodImgs.dramatic || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000000-339e8339ea/Thess1114_lowres.jpg?ph=a6c2528650",
+                description_title_sv: "Drama",
+                description_title_en: "Drama",
+                description_sv: ((data.paragraph1_sv || "") + "\n\n" + (data.paragraph3_sv || "")).trim(),
+                description_en: ((data.paragraph1_en || "") + "\n\n" + (data.paragraph3_en || "")).trim(),
                 weight: 300
               },
               {
@@ -173,16 +213,11 @@ export function DashboardBio() {
                 quote_sv: data.quote_comedic_sv || "Komedi kräver samma precision som tragedi — bara snabbare.",
                 quote_en: data.quote_comedic_en || "Comedy demands the same precision as tragedy — just faster.",
                 image: moodImgs.comedic || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000017-971e0971e2/Thess1079_highres.jpg?ph=a6c2528650",
+                description_title_sv: "Komedi",
+                description_title_en: "Comedy",
+                description_sv: (data.paragraph2_sv || "").trim(),
+                description_en: (data.paragraph2_en || "").trim(),
                 weight: 500
-              },
-              {
-                id: "Classical",
-                title_sv: "Klassisk",
-                title_en: "Classical",
-                quote_sv: data.quote_classical_sv || "Scenen lärde mig allt jag vet om timing och tystnad.",
-                quote_en: data.quote_classical_en || "The stage taught me everything I know about timing and silence.",
-                image: moodImgs.classical || "https://a6c2528650.clvaw-cdnwnd.com/a1d4e2b76c0723db65512f7305fc0d9c/200000043-e152ee1530/Thess0477_highres-5.jpg?ph=a6c2528650",
-                weight: 400
               }
             ];
             setBioSections(updated);
@@ -289,6 +324,13 @@ export function DashboardBio() {
       classical: bioSections[2]?.image || "",
     };
 
+    const p1_sv = bioSections[0]?.description_sv || "";
+    const p1_en = bioSections[0]?.description_en || "";
+    const p2_sv = bioSections[1]?.description_sv || "";
+    const p2_en = bioSections[1]?.description_en || "";
+    const p3_sv = bioSections[2]?.description_sv || "";
+    const p3_en = bioSections[2]?.description_en || "";
+
     const { error } = await supabase.from("biography").update({
       quote_sv,
       quote_en,
@@ -298,12 +340,12 @@ export function DashboardBio() {
       quote_classical_en,
       heading_sv: headingSv,
       heading_en: headingEn,
-      paragraph1_sv: paragraph1Sv,
-      paragraph1_en: paragraph1En,
-      paragraph2_sv: paragraph2Sv,
-      paragraph2_en: paragraph2En,
-      paragraph3_sv: paragraph3Sv,
-      paragraph3_en: paragraph3En,
+      paragraph1_sv: p1_sv,
+      paragraph1_en: p1_en,
+      paragraph2_sv: p2_sv,
+      paragraph2_en: p2_en,
+      paragraph3_sv: p3_sv,
+      paragraph3_en: p3_en,
       dialects_sv: dialectsSv,
       dialects_en: dialectsEn,
       languages_sv: languagesSv,
@@ -382,18 +424,6 @@ export function DashboardBio() {
         setHeadingSv={setHeadingSv}
         headingEn={headingEn}
         setHeadingEn={setHeadingEn}
-        paragraph1Sv={paragraph1Sv}
-        setParagraph1Sv={setParagraph1Sv}
-        paragraph1En={paragraph1En}
-        setParagraph1En={setParagraph1En}
-        paragraph2Sv={paragraph2Sv}
-        setParagraph2Sv={setParagraph2Sv}
-        paragraph2En={paragraph2En}
-        setParagraph2En={setParagraph2En}
-        paragraph3Sv={paragraph3Sv}
-        setParagraph3Sv={setParagraph3Sv}
-        paragraph3En={paragraph3En}
-        setParagraph3En={setParagraph3En}
       />
 
       <BioQuickFacts

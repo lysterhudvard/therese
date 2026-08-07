@@ -567,14 +567,9 @@ This document details critical bugs, layout errors, and interaction blocks found
 - **Symptom:** Opening unused Shadcn UI components (`breadcrumb.tsx`, `chart.tsx`, `input-otp.tsx`, `sidebar.tsx`, `toggle-group.tsx`, `select.tsx`) in the IDE displayed massive Red TypeScript/JSX path resolution and Preact type-mismatch errors.
 - **Root Cause:** These files were excluded from the TypeScript build configuration `tsconfig.json` to prevent them from breaking the build (due to Preact compatibility type mismatches with standard Radix/Shadcn React typings). Because they were excluded, the IDE language service did not apply path mappings (like `@/lib/utils` or mapping `react` to `preact/compat`), creating path resolution and library-mismatch errors.
 - **Resolution:** 
-  1. Removed the unused UI boilerplate components (`breadcrumb.tsx`, `chart.tsx`, `input-otp.tsx`, `sidebar.tsx`, `toggle-group.tsx`, `select.tsx`) from the project entirely.
+  1. Removed the unused boilerplate components (`breadcrumb.tsx`, `chart.tsx`, `input-otp.tsx`, `sidebar.tsx`, `toggle-group.tsx`, `select.tsx`) from the project entirely.
   2. Cleaned up the `exclude` block in `tsconfig.json` so that the remaining components (like `button.tsx`) are correctly typechecked with active path mappings.
   3. Confirmed compilation passes completely with zero errors (`npx tsc --noEmit` returns exit code 0).
 
-## 81. Inactive Biography Section Text Customization (Paragraphs vs Quotes)
-- **Symptom:** Clicking biography mood tabs ("Dramatisk", "Komisk", "Klassisk") changed the quote and image, but did not update the main biography paragraphs, showing the same text for all sections despite the user configuring custom descriptions in the CMS.
-- **Root Cause:** The Biography component (`Biography.tsx`) rendered the static global translation paragraphs (`p1Post`, `p2`, `p3`) instead of section-specific description strings. The `BioSection` type interface was missing the `description` fields on the frontend, and the CMS UI only had a single non-localized `description` input.
-- **Resolution:**
-  1. Added `description`, `description_sv`, and `description_en` to the `BioSection` interface.
-  2. Replaced the single non-localized `Beskrivning (Description)` field in the CMS section list (`BioSectionsList.tsx`) with two dedicated inputs: `Beskrivning (Svenska)` and `Description (English)`, each equipped with rich-text formatting toolbars.
-  3. Modified `Biography.tsx` to check if a localized description (`description_sv` / `description_en` or the legacy `description` fallback) exists for the active section. If present, it renders it with HTML formatting, otherwise it gracefully falls back to the global biography paragraphs.
+
+
