@@ -18,6 +18,9 @@ export interface BioSection {
   image_caption?: string;
   image_title?: string;
   image_filename?: string;
+  description?: string;
+  description_sv?: string;
+  description_en?: string;
   weight?: number;
 }
 
@@ -186,56 +189,69 @@ export function Biography({
             </div>
 
             <div className={`mt-14 space-y-7 text-bone/75 leading-relaxed ${data.image ? "max-w-xl text-left" : "max-w-2xl text-center mx-auto"}`}>
-              <p className="formatted-text">
-                {t.bio.p1Pre ? (
-                  <>
-                    {t.bio.p1Pre}
-                    {t.bio.p1Link && (
-                      <a
-                        href="https://www.svtplay.se/en-valdsam-karlek"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-ember underline-offset-4 hover:underline"
-                      >
-                        {t.bio.p1Link}
-                      </a>
+              {(lang === "sv" ? (data.description_sv || data.description) : (data.description_en || data.description)) ? (
+                <div 
+                  className="formatted-text prose prose-invert max-w-none text-bone/75"
+                  dangerouslySetInnerHTML={{ 
+                    __html: lang === "sv" 
+                      ? (data.description_sv || data.description || "") 
+                      : (data.description_en || data.description || "") 
+                  }} 
+                />
+              ) : (
+                <>
+                  <p className="formatted-text">
+                    {t.bio.p1Pre ? (
+                      <>
+                        {t.bio.p1Pre}
+                        {t.bio.p1Link && (
+                          <a
+                            href="https://www.svtplay.se/en-valdsam-karlek"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-ember underline-offset-4 hover:underline"
+                          >
+                            {t.bio.p1Link}
+                          </a>
+                        )}
+                        <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
+                      </>
+                    ) : (
+                      <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
                     )}
-                    <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
-                  </>
-                ) : (
-                  <span dangerouslySetInnerHTML={{ __html: t.bio.p1Post }} />
-                )}
-              </p>
-              <p className="formatted-text">
-                {t.bio.p2[1] ? (
-                  <>
-                    {t.bio.p2[0]}
-                    <em className="text-bone">{t.bio.p2[1]}</em>
-                    {t.bio.p2[2]}
-                    <em className="text-bone">{t.bio.p2[3]}</em>
-                    {t.bio.p2[4]}
-                    <em className="text-bone">{t.bio.p2[5]}</em>
-                    {t.bio.p2[6]}
-                    <em className="text-bone">{t.bio.p2[7]}</em>
-                    {t.bio.p2[8]}
-                  </>
-                ) : (
-                  <span dangerouslySetInnerHTML={{ __html: t.bio.p2[0] }} />
-                )}
-              </p>
-              <p className="formatted-text">
-                {t.bio.p3[1] ? (
-                  <>
-                    {t.bio.p3[0]}
-                    <em className="text-bone">{t.bio.p3[1]}</em>
-                    {t.bio.p3[2]}
-                    <span className="text-ember">{t.bio.p3[3]}</span>
-                    {t.bio.p3[4]}
-                  </>
-                ) : (
-                  <span dangerouslySetInnerHTML={{ __html: t.bio.p3[0] }} />
-                )}
-              </p>
+                  </p>
+                  <p className="formatted-text">
+                    {t.bio.p2[1] ? (
+                      <>
+                        {t.bio.p2[0]}
+                        <em className="text-bone">{t.bio.p2[1]}</em>
+                        {t.bio.p2[2]}
+                        <em className="text-bone">{t.bio.p2[3]}</em>
+                        {t.bio.p2[4]}
+                        <em className="text-bone">{t.bio.p2[5]}</em>
+                        {t.bio.p2[6]}
+                        <em className="text-bone">{t.bio.p2[7]}</em>
+                        {t.bio.p2[8]}
+                      </>
+                    ) : (
+                      <span dangerouslySetInnerHTML={{ __html: t.bio.p2[0] }} />
+                    )}
+                  </p>
+                  <p className="formatted-text">
+                    {t.bio.p3[1] ? (
+                      <>
+                        {t.bio.p3[0]}
+                        <em className="text-bone">{t.bio.p3[1]}</em>
+                        {t.bio.p3[2]}
+                        <span className="text-ember">{t.bio.p3[3]}</span>
+                        {t.bio.p3[4]}
+                      </>
+                    ) : (
+                      <span dangerouslySetInnerHTML={{ __html: t.bio.p3[0] }} />
+                    )}
+                  </p>
+                </>
+              )}
             </div>
  
             <dl className={`mt-14 grid grid-cols-3 gap-6 border-t border-bone/10 pt-8 w-full ${data.image ? "max-w-xl" : "max-w-2xl mx-auto"}`}>

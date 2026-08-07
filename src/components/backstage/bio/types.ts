@@ -10,6 +10,8 @@ export interface BioSection {
   image_title?: string;
   image_filename?: string;
   description?: string;
+  description_sv?: string;
+  description_en?: string;
   weight?: number;
 }
 
