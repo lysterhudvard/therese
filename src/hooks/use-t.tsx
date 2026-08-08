@@ -241,6 +241,117 @@ export const setGlobalDbData = (data: any) => {
   dbDataListeners.forEach((lis) => lis(data));
 };
 
+let isFetchingFreshData = false;
+
+const fetchFreshData = async () => {
+  if (typeof window === "undefined" || isFetchingFreshData) return;
+  isFetchingFreshData = true;
+
+  try {
+    const { supabase, isSupabaseConfigured } = await import("../lib/supabase");
+    if (!isSupabaseConfigured()) return;
+
+    const [bioRes, credsRes, reelsRes, seoRes, portRes] = await Promise.all([
+      supabase.from("biography").select("*").eq("id", "main").maybeSingle(),
+      supabase.from("credits").select("*").order("sort_order", { ascending: true }),
+      supabase.from("showreels").select("*").order("sort_order", { ascending: true }),
+      supabase.from("seo_settings").select("*").eq("id", "main").maybeSingle(),
+      supabase.from("portfolio_images").select("*").order("sort_order", { ascending: true })
+    ]);
+
+    const freshDbData: any = {};
+    
+    if (bioRes.data) {
+      freshDbData.biography = bioRes.data;
+      if (bioRes.data.bio_sections) {
+        try {
+          freshDbData.bio_sections = typeof bioRes.data.bio_sections === "string"
+            ? JSON.parse(bioRes.data.bio_sections)
+            : bioRes.data.bio_sections;
+        } catch (_) {}
+      }
+    }
+    
+    if (credsRes.data) {
+      freshDbData.credits = credsRes.data.map((c: any) => {
+        const credit: any = {
+          year: c.year || "—",
+          title: c.title || "",
+          role: { sv: c.role_sv || "", en: c.role_en || "" },
+          type: c.type,
+          category: { sv: c.category_sv || "", en: c.category_en || "" },
+          network: c.network || "",
+          url: c.url || undefined,
+          img: c.img || "",
+          is_current_production: c.is_current_production
+        };
+        if (c.commentary_url) {
+          credit.commentary = {
+            url: c.commentary_url,
+            duration: c.commentary_duration || "0:10",
+            svText: c.commentary_sv || "",
+            enText: c.commentary_en || ""
+          };
+        }
+        if (c.script_scene) {
+          credit.script = {
+            scene: c.script_scene,
+            dialogue: {
+              char: c.script_char || "CHARACTER",
+              line: {
+                sv: c.script_line_sv || "",
+                en: c.script_line_en || ""
+              }
+            }
+          };
+        }
+        return credit;
+      });
+    }
+
+    if (reelsRes.data) {
+      freshDbData.showreels = reelsRes.data.map((r: any) => ({
+        id: r.id || String(r.sort_order),
+        title: { sv: r.title_sv || "", en: r.title_en || "" },
+        sub: { sv: r.sub_sv || "", en: r.sub_en || "" },
+        url: r.url || undefined,
+        vimeoId: r.vimeo_id || undefined,
+        youtubeId: r.youtube_id || undefined,
+        videoType: r.video_type || "vimeo",
+        poster: r.poster || "",
+        sort_order: r.sort_order
+      }));
+    }
+
+    if (seoRes.data) {
+      freshDbData.seo = seoRes.data;
+    }
+
+    if (portRes.data) {
+      freshDbData.portfolioImages = portRes.data.map((p: any) => ({
+        id: p.id,
+        url: p.url,
+        title: p.title || "",
+        alt: p.alt || "",
+        caption: p.caption || "",
+        sort_order: p.sort_order
+      }));
+    }
+
+    setGlobalDbData(freshDbData);
+  } catch (e) {
+    console.warn("Failed to fetch fresh client-side database updates:", e);
+  }
+};
+
+if (typeof window !== "undefined") {
+  if (document.readyState === "complete") {
+    fetchFreshData();
+  } else {
+    window.addEventListener("load", fetchFreshData);
+  }
+}
+
 export const useT = (componentDbData?: any) => {
   const [lang, setLangState] = useState<Lang>(currentLang);
   
