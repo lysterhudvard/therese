@@ -571,5 +571,14 @@ This document details critical bugs, layout errors, and interaction blocks found
   2. Cleaned up the `exclude` block in `tsconfig.json` so that the remaining components (like `button.tsx`) are correctly typechecked with active path mappings.
   3. Confirmed compilation passes completely with zero errors (`npx tsc --noEmit` returns exit code 0).
 
+## 81. Ej anpassningsbart agenturnamn (Schultzberg Agency) i kontaktsektionen
+- **Symptom:** I kontaktsektionen på hemsidan visades den fasta undertexten "Schultzberg Agency" under agentens e-postadress (t.ex. `mia@commercialactors.com`), utan möjlighet att redigera eller ta bort namnet via Backstage CMS.
+- **Root Cause:** Komponenten `Contact.tsx` renderade den statiska översättningssträngen `{t.contact.agentSub}` ("Schultzberg Agency") direkt från `use-t.tsx`. Kontrollpanelen `DashboardContact.tsx` saknade ett inmatningsfält för att lagra och konfigurera agentur- och agentnamnet.
+- **Resolution:** 
+  1. Lagt till ett inmatningsfält för "Agentur / Agentnamn (Undertext)" med ID `klick-contact-agent-name` i `DashboardContact.tsx`. Fältet sparas i kolumnen `contact_links` i Supabase under nyckeln `agentName`.
+  2. Uppdaterat `Contact.tsx` och `use-t.tsx` för att dynamiskt läsa `links.agentName` (med bakåtkompatibel fallback till `agentSub` eller `t.contact.agentSub`). Om fältet lämnas tomt i CMS döljs undertexten helt.
+  3. Uppdaterat databasen i Supabase så att Thereses agentur nu är satt till "Commercial Actors".
+
+
 
 

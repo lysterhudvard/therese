@@ -359,5 +359,11 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Boilerplate File Removal**: Removed unused UI boilerplate files (`chart.tsx`, `input-otp.tsx`, `sidebar.tsx`, `toggle-group.tsx`, `breadcrumb.tsx`, `select.tsx`) which had Preact type compatibility errors.
 - **TypeScript Configuration Optimization**: Cleaned up the `exclude` configuration in `tsconfig.json`, restoring normal typechecking and path mapping resolution for all active components.
 
+### 71. Anpassningsbart Agenturnamn i Kontakt-CMS (Akt VII)
+- **Nytt fält i Backstage CMS**: Lade till inmatningsfältet "Agentur / Agentnamn (Undertext)" med ID `klick-contact-agent-name` i [DashboardContact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/DashboardContact.tsx) under Akt VII: Kontaktinfo. Fältet sparas i `biography.contact_links` under nyckeln `agentName`.
+- **Dynamisk visning på hemsidan**: Uppdaterade [Contact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Contact.tsx) och [use-t.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/hooks/use-t.tsx) så att undertexten under agentens e-postadress dynamiskt hämtar det konfigurerade agenturnamnet (`agentName`) istället för det tidigare statiska "Schultzberg Agency". Om fältet lämnas tomt döljs raden sömlöst.
+- **SEO och Klick-guide Integration**: Uppdaterade [kontakt.astro](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/pages/kontakt.astro) och AI-assistenten i [gemini.ts](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/lib/gemini.ts) för att automatiskt guida användaren till redigering av agenturnamnet.
+
+
 
 

@@ -120,6 +120,11 @@ graph TD
 *   **Current Production Toggle:** A checkbox to set the credit as active (powering Act I automation).
 *   **Commentary Audio & Script Hooks:** Easy upload for mp3 audio commentary overlays and textareas for script dialogue snippets.
 
+### Act VII Dashboard — Kontaktinfo
+*   **Kontaktuppgifter & Agentur:** Inmatningsfält för Agent E-post, Agentur / Agentnamn (undertexten under e-postadressen) och Röst E-post (direktkontakt). Lämna fält tomma för att dölja dem från kontaktsidan.
+*   **Sociala Profiler & Anpassade Länkar:** Länkar till Instagram, Facebook, YouTube, X, IMDb och Wikipedia samt två anpassade länkar med valbara ikoner.
+
+
 ---
 
 ## 5. Implementation Roadmap

@@ -114,6 +114,7 @@ Available element targets (IDs) in the DOM:
 
 - Akt VII: Kontaktinfo targets:
   * "klick-contact-agent-email" (Agent e-post)
+  * "klick-contact-agent-name" (Agentur / Agentnamn)
   * "klick-contact-voice-email" (Röst e-post)
   * "klick-contact-instagram" (Instagram länk)
   * "klick-contact-imdb" (IMDb profil-länk)
@@ -364,12 +365,24 @@ function localFallbackSimulate(prompt: string): GuideResponse {
   }
 
   // 7. Kontaktinfo (Akt VII)
+  if (p.includes("agentur") || p.includes("agentnamn") || p.includes("schultzberg") || p.includes("commercial actors")) {
+    return {
+      message: "Så här ändrar du namnet på din agentur som visas under agentens e-postadress:",
+      steps: [
+        { target: "klick-nav-contact", instruction: "Klicka på 'Akt VII: Kontaktinfo' i sidomenyn." },
+        { target: "klick-contact-agent-name", instruction: "Skriv in namnet på din agentur här (t.ex. Commercial Actors eller Schultzberg Agency)." },
+        { target: "klick-contact-save", instruction: "Klicka på 'Spara ändringar' för att spara." }
+      ]
+    };
+  }
+
   if (p.includes("contact") || p.includes("kontakt") || p.includes("epost") || p.includes("e-post") || p.includes("email") || p.includes("instagram") || p.includes("facebook") || p.includes("imdb") || p.includes("wikipedia") || p.includes("agent") || p.includes("sociala")) {
     return {
       message: "Så här ändrar du din kontaktinformation och dina sociala medier-länkar under Akt VII:",
       steps: [
         { target: "klick-nav-contact", instruction: "Klicka på 'Akt VII: Kontaktinfo' i sidomenyn." },
         { target: "klick-contact-agent-email", instruction: "Ange e-postadressen till din agent i det här fältet." },
+        { target: "klick-contact-agent-name", instruction: "Ange namnet på din agentur som visas under e-posten." },
         { target: "klick-contact-instagram", instruction: "Klistra in eller uppdatera din Instagram-profil här." },
         { target: "klick-contact-save", instruction: "Klicka på 'Spara ändringar' för att spara dina kontaktuppgifter." }
       ]

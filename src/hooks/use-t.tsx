@@ -513,6 +513,19 @@ export const useT = (componentDbData?: any) => {
           console.error("Failed to parse voice settings:", e);
         }
       }
+      if (bio.contact_links) {
+        try {
+          const links = typeof bio.contact_links === "string" ? JSON.parse(bio.contact_links) : bio.contact_links;
+          if (links) {
+            const customAgentName = links.agentName !== undefined ? links.agentName : links.agentSub;
+            if (customAgentName !== undefined) {
+              base.contact.agentSub = customAgentName;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse contact links in useT:", e);
+        }
+      }
     }
     
     return base as Dict;

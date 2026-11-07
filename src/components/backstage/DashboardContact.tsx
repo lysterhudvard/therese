@@ -8,6 +8,7 @@ const LinkIcon = Link2 as any;
 
 export function DashboardContact() {
   const [agentEmail, setAgentEmail] = useState("");
+  const [agentName, setAgentName] = useState("");
   const [voiceEmail, setVoiceEmail] = useState("");
   const [instagram, setInstagram] = useState("");
   const [facebook, setFacebook] = useState("");
@@ -26,7 +27,8 @@ export function DashboardContact() {
   useEffect(() => {
     if (!isSupabaseConfigured()) {
       // Offline fallback values
-      setAgentEmail("jonas@schultzbergagency.com");
+      setAgentEmail("mia@commercialactors.com");
+      setAgentName("Commercial Actors");
       setVoiceEmail("theresejarvheden@gmail.com");
       setInstagram("https://www.instagram.com/theresejarvheden/");
       setFacebook("https://www.facebook.com/therese.jarvhedenfdpersson");
@@ -48,6 +50,7 @@ export function DashboardContact() {
       if (data && data.contact_links) {
         const links = typeof data.contact_links === "string" ? JSON.parse(data.contact_links) : data.contact_links;
         setAgentEmail(links.agentEmail || "");
+        setAgentName(links.agentName !== undefined ? links.agentName : (links.agentSub !== undefined ? links.agentSub : "Schultzberg Agency"));
         setVoiceEmail(links.voiceEmail || "");
         setInstagram(links.instagram || "");
         setFacebook(links.facebook || "");
@@ -64,6 +67,7 @@ export function DashboardContact() {
       } else {
         // Fallback for first time if record has no data
         setAgentEmail("jonas@schultzbergagency.com");
+        setAgentName("Schultzberg Agency");
         setVoiceEmail("theresejarvheden@gmail.com");
         setInstagram("https://www.instagram.com/theresejarvheden/");
         setFacebook("https://www.facebook.com/therese.jarvhedenfdpersson");
@@ -86,6 +90,7 @@ export function DashboardContact() {
     const { error } = await supabase.from("biography").update({
       contact_links: {
         agentEmail,
+        agentName,
         voiceEmail,
         instagram,
         facebook,
@@ -142,8 +147,22 @@ export function DashboardContact() {
               value={agentEmail}
               onChange={(e) => setAgentEmail((e.target as any).value)}
               className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-              placeholder="T.ex: jonas@schultzbergagency.com"
+              placeholder="T.ex: mia@commercialactors.com"
             />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Agentur / Agentnamn (Undertext)</label>
+            <input
+              id="klick-contact-agent-name"
+              type="text"
+              value={agentName}
+              onChange={(e) => setAgentName((e.target as any).value)}
+              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+              placeholder="T.ex: Commercial Actors eller Schultzberg Agency"
+            />
+            <p className="text-[9px] text-bone/40 font-mono">
+              Visas under agentens e-postadress. Lämna tom för att dölja.
+            </p>
           </div>
           <div className="space-y-2">
             <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Röst E-post (Direkt)</label>

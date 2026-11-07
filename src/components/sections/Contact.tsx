@@ -62,6 +62,9 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
   const hasLinks = bioData && bioData.contact_links !== undefined && bioData.contact_links !== null;
 
   const agentEmail = hasLinks ? (links.agentEmail || "") : "jonas@schultzbergagency.com";
+  const agentName = hasLinks 
+    ? (links.agentName !== undefined ? links.agentName : (links.agentSub !== undefined ? links.agentSub : t.contact.agentSub)) 
+    : t.contact.agentSub;
   const voiceEmail = hasLinks ? (links.voiceEmail || "") : "theresejarvheden@gmail.com";
   const instagram = hasLinks ? (links.instagram || "") : "https://www.instagram.com/theresejarvheden/";
   const facebook = hasLinks ? (links.facebook || "") : "https://www.facebook.com/therese.jarvhedenfdpersson";
@@ -218,7 +221,7 @@ export function Contact({ bioData, teaser = false, isSubpage = false }: { bioDat
                   >
                     <Mail size={20} /> {agentEmail}
                   </a>
-                  <div className="mt-1 text-xs text-bone/70">{t.contact.agentSub}</div>
+                  {agentName && <div className="mt-1 text-xs text-bone/70">{agentName}</div>}
                 </div>
               )}
               {voiceEmail && (
