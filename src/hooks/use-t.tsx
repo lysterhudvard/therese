@@ -531,7 +531,7 @@ export const useT = (componentDbData?: any) => {
     return base as Dict;
   }, [dbData, lang]);
 
-  return { lang, setLang, t: mergedT };
+  return { lang, setLang, t: mergedT, dbData };
 };
 
 // Global reactive store for CommentaryPlayer

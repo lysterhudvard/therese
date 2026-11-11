@@ -364,6 +364,12 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Dynamisk visning på hemsidan**: Uppdaterade [Contact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Contact.tsx) och [use-t.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/hooks/use-t.tsx) så att undertexten under agentens e-postadress dynamiskt hämtar det konfigurerade agenturnamnet (`agentName`) istället för det tidigare statiska "Schultzberg Agency". Om fältet lämnas tomt döljs raden sömlöst.
 - **SEO och Klick-guide Integration**: Uppdaterade [kontakt.astro](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/pages/kontakt.astro) och AI-assistenten i [gemini.ts](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/lib/gemini.ts) för att automatiskt guida användaren till redigering av agenturnamnet.
 
+### 72. Klientsynkronisering av Press & Media-texter (/press)
+- **Reaktiv klientside-hämtning**: Uppdaterade [PressContent.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/PressContent.tsx) och [PageIntro.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/ui/PageIntro.tsx) med reaktiva `useState`- och `useEffect`-anrop som hämtar färska `press_page_content`-data direkt från Supabase vid montering.
+- **Borttagna byggtidsspärrar i Astro**: Rensade statiska byggtidsvillkor i [press.astro](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/pages/press.astro) så att Press-öarna alltid monteras och omedelbart speglar alla ändringar som sparats i fliken "Press & Media" i CMS (inklusive agentur, biografi och kontakt).
+- **Reaktiv kontaktinformation**: Uppdaterade [Contact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Contact.tsx) och [use-t.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/hooks/use-t.tsx) så att även kontaktformuläret och kontaktuppgifterna reaktivt lyssnar på live databasuppdateringar.
+
+
 
 
 

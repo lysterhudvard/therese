@@ -51,15 +51,17 @@ type Status =
   | "sent";
 
 export function Contact({ bioData, teaser = false, isSubpage = false }: { bioData?: any, teaser?: boolean, isSubpage?: boolean }) {
-  const { t, lang } = useT();
+  const { t, lang, dbData } = useT();
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", msg: "" });
 
-  const links = typeof bioData?.contact_links === "string" 
-    ? JSON.parse(bioData.contact_links) 
-    : (bioData?.contact_links || {});
+  const activeBio = dbData?.biography || bioData;
 
-  const hasLinks = bioData && bioData.contact_links !== undefined && bioData.contact_links !== null;
+  const links = typeof activeBio?.contact_links === "string" 
+    ? JSON.parse(activeBio.contact_links) 
+    : (activeBio?.contact_links || {});
+
+  const hasLinks = activeBio && activeBio.contact_links !== undefined && activeBio.contact_links !== null;
 
   const agentEmail = hasLinks ? (links.agentEmail || "") : "jonas@schultzbergagency.com";
   const agentName = hasLinks 

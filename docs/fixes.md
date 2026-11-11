@@ -579,6 +579,17 @@ This document details critical bugs, layout errors, and interaction blocks found
   2. Uppdaterat `Contact.tsx` och `use-t.tsx` för att dynamiskt läsa `links.agentName` (med bakåtkompatibel fallback till `agentSub` eller `t.contact.agentSub`). Om fältet lämnas tomt i CMS döljs undertexten helt.
   3. Uppdaterat databasen i Supabase så att Thereses agentur nu är satt till "Commercial Actors".
 
+## 82. Presstexter och Press & Media-ändringar visades inte på frontend (/press)
+- **Symptom:** När användaren uppdaterade texter i CMS under fliken "Press & Media" (t.ex. ändrade agentur till Commercial actors, uppdaterade ingress, kort/lång biografi eller presskontakt) sparades ändringarna i Supabase, men på webbplatsen (`/press`) visades fortfarande de gamla texterna från byggtillfället.
+- **Root Cause:** 
+  1. `press.astro` byggs statiskt. Till skillnad från sektionerna FAQ, Portfolio, Showreels och Voice saknade `PressContent.tsx` och `PageIntro.tsx` en klientsidig `useEffect` som hämtar färska `press_page_content`-data direkt från Supabase vid sidladdning.
+  2. I `press.astro` var komponenterna omslutna av villkorliga renderingar baserade på byggtidsdata (`{pressContentData.ingress && ...}` och `{Object.keys(pressContentData).length > 0 && ...}`).
+- **Resolution:** 
+  1. Uppdaterat `PressContent.tsx` och `PageIntro.tsx` med reaktivt `useState` och `useEffect` som hämtar färsk `press_page_content` direkt från Supabase vid mount, så att alla ändringar i CMS slår igenom omedelbart i webbläsaren.
+  2. Tagit bort de statiska byggtidsvillkoren i `press.astro` så att öarna alltid monteras säkert på klientsidan.
+  3. Lade till `whitespace-pre-line` i `PressContent.tsx` och `PageIntro.tsx` så att styckeindelningar och radbrytningar från CMS-textfälten bevaras naturligt.
+
+
 
 
 

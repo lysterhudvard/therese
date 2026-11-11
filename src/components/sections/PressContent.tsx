@@ -1,22 +1,55 @@
-import React from "react";
-import { Download, Play, FileText, User, Mail } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { FileText, User, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 const MotionDiv = motion.div as any;
 
+export interface PressPageContentData {
+  ingress?: string;
+  pressbilder_text?: string;
+  showreels_text?: string;
+  bio_short?: string;
+  bio_long?: string;
+  presskontakt?: string;
+}
+
 interface PressContentProps {
-  content: {
-    ingress?: string;
-    pressbilder_text?: string;
-    showreels_text?: string;
-    bio_short?: string;
-    bio_long?: string;
-    presskontakt?: string;
-  };
+  content?: PressPageContentData;
   showIngress?: boolean;
 }
 
-export function PressContent({ content, showIngress = true }: PressContentProps) {
+export function PressContent({ content: initialContent = {}, showIngress = false }: PressContentProps) {
+  const [content, setContent] = useState<PressPageContentData>(initialContent);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    let active = true;
+
+    const fetchPressContent = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("biography")
+          .select("press_page_content")
+          .eq("id", "main")
+          .maybeSingle();
+
+        if (error) throw error;
+        if (data?.press_page_content && active) {
+          const parsed = typeof data.press_page_content === "string"
+            ? JSON.parse(data.press_page_content)
+            : data.press_page_content;
+          setContent(parsed || {});
+        }
+      } catch (e) {
+        console.error("Failed to fetch press content client-side:", e);
+      }
+    };
+
+    fetchPressContent();
+    return () => { active = false; };
+  }, []);
+
   if (
     !content.ingress &&
     !content.pressbilder_text &&
@@ -78,7 +111,7 @@ export function PressContent({ content, showIngress = true }: PressContentProps)
                       </h3>
                       <div className="relative">
                         <span className="absolute -top-4 -left-3 text-4xl text-ember/20 font-display">"</span>
-                        <p className="text-bone/80 italic font-light leading-relaxed relative z-10 pl-2">
+                        <p className="text-bone/80 italic font-light leading-relaxed relative z-10 pl-2 whitespace-pre-line">
                           {content.bio_short}
                         </p>
                       </div>
@@ -92,7 +125,7 @@ export function PressContent({ content, showIngress = true }: PressContentProps)
                       </h3>
                       <div className="relative">
                         <span className="absolute -top-4 -left-3 text-4xl text-ember/20 font-display">"</span>
-                        <p className="text-bone/80 italic font-light leading-relaxed relative z-10 pl-2">
+                        <p className="text-bone/80 italic font-light leading-relaxed relative z-10 pl-2 whitespace-pre-line">
                           {content.bio_long}
                         </p>
                       </div>
