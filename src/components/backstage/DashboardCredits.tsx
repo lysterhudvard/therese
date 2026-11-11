@@ -65,6 +65,7 @@ export function DashboardCredits() {
       category_en: "",
       network: "",
       type: "Film",
+      url: "",
       img: "",
       img_alt: "",
       img_caption: "",

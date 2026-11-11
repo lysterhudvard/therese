@@ -369,6 +369,15 @@ This document tracks completed features, animation systems, layout updates, and 
 - **Borttagna byggtidsspärrar i Astro**: Rensade statiska byggtidsvillkor i [press.astro](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/pages/press.astro) så att Press-öarna alltid monteras och omedelbart speglar alla ändringar som sparats i fliken "Press & Media" i CMS (inklusive agentur, biografi och kontakt).
 - **Reaktiv kontaktinformation**: Uppdaterade [Contact.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Contact.tsx) och [use-t.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/hooks/use-t.tsx) så att även kontaktformuläret och kontaktuppgifterna reaktivt lyssnar på live databasuppdateringar.
 
+### 73. Hantering av Videolänk & Ljudklipp för Meriter i CMS (Akt V)
+- **Tydligt videofält i Backstage CMS**: Lade till inmatningsfältet "Videolänk / Titta-länk (YouTube, SVT Play, Vimeo osv.)" med testknapp i [CreditItemCard.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/credits/CreditItemCard.tsx). Fältet är bundet till `credit.url` som sparas i Supabase.
+- **Kombinerade video- och ljudfunktioner per merit**: Säkerställde att varje enskild meritpost i CMS enkelt kan ha både en videolänk (t.ex. YouTube eller SVT Play) och ett direktspelande ljudklipp/röstkommentar (`commentary_url`). Båda visas och samspelar sömlöst på webbplatsen ([Credits.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Credits.tsx)) med en "Titta"-knapp och en "Kommentar"-spelarknapp.
+- **Modularisering för 400-radersregeln**:
+  - Bröt ut röstkommentarer och manusdialog ur [CreditItemCard.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/credits/CreditItemCard.tsx) till den nya underkomponenten [CreditAdvancedSection.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/backstage/credits/CreditAdvancedSection.tsx) (216 rader).
+  - Bröt ut citatanimationen ur [Credits.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Credits.tsx) till [ParallaxQuotes.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/ParallaxQuotes.tsx) (107 rader).
+  - Alla berörda filer är nu strikt under 400 rader.
+- **Automatisk URL-validering**: Lagt till automatisk `https://`-prefixning på blur om användaren klistrar in t.ex. `youtube.com/...` eller `svtplay.se/...`, vilket förhindrar brutna relativa länkar.
+
 
 
 

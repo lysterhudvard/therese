@@ -589,6 +589,16 @@ This document details critical bugs, layout errors, and interaction blocks found
   2. Tagit bort de statiska byggtidsvillkoren i `press.astro` så att öarna alltid monteras säkert på klientsidan.
   3. Lade till `whitespace-pre-line` i `PressContent.tsx` och `PageIntro.tsx` så att styckeindelningar och radbrytningar från CMS-textfälten bevaras naturligt.
 
+## 83. Saknat inmatningsfält för videolänk (URL) i Meriter (Akt V)
+- **Symptom:** I Backstage CMS under Akt V (Meriter) fanns det inget inmatningsfält för videolänk. Exempelvis har "En våldsam kärlek" en länk till SVT Play som visas på hemsidan (som "Titta"-knapp och klickbar titel), men i CMS fanns ingenstans att se, ändra eller lägga till YouTube- eller videolänkar för meriter.
+- **Root Cause:** Komponenten `CreditItemCard.tsx` saknade ett formulärfält för `c.url`, trots att kolumnen `url` fanns i Supabase-tabellen `credits` och sparades i `DashboardCredits.tsx`. Dessutom var `CreditItemCard.tsx` på 508 rader och behövde modulariseras.
+- **Resolution:**
+  1. Lade till ett dedikerat inmatningsfält "Videolänk / Titta-länk (YouTube, SVT Play, Vimeo osv.)" med en "Testa länk"-knapp i `CreditItemCard.tsx`.
+  2. Implementerade automatisk validering som sätter `https://`-prefix om användaren klistrar in adresser utan protokoll (t.ex. `youtube.com/...`).
+  3. Säkerställde att varje meritpost kan ha både videolänk (`url`) och direktuppspelat ljudklipp (`commentary_url`), och att båda knapparna ("Titta" och "Kommentar") visas prydligt tillsammans i tabellens åtgärdskolumn på webbplatsen.
+  4. Modulariserade `CreditItemCard.tsx` genom att bryta ut ljud- och manussektionen till `CreditAdvancedSection.tsx` (216 rader), och bröt ut `ParallaxQuotes.tsx` (107 rader) ur `Credits.tsx`, så att samtliga filer nu respekterar den strikta 400-radersgränsen.
+
+
 
 
 
