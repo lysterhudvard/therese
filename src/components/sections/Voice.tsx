@@ -9,6 +9,9 @@ const Pause = PauseOrig as any;
 const MotionDiv = motion.div as any;
 import { useT, useCommentaryStore } from "../../hooks/use-t";
 import { SpotlightImage } from "../ui/SpotlightImage";
+import { VoiceSample, parseVoiceSamples } from "../../lib/utils";
+
+const DEFAULT_SAMPLE_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
 interface VoiceProps {
   imageUrl?: string;
@@ -16,30 +19,36 @@ interface VoiceProps {
   imageTitle?: string;
   imageCaption?: string;
   sampleUrl?: string;
+  samples?: VoiceSample[];
   bookingEmail?: string;
   teaser?: boolean;
   isSubpage?: boolean;
 }
 
-export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl, bookingEmail, teaser = false, isSubpage = false }: VoiceProps) {
-  const { t } = useT();
+export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl, samples, bookingEmail, teaser = false, isSubpage = false }: VoiceProps) {
+  const { lang, t } = useT();
   const { stopCommentary } = useCommentaryStore();
   const ref = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  
-  const [liveVoice, setLiveVoice] = useState({ 
-    url: imageUrl, 
-    alt: imageAlt, 
-    title: imageTitle, 
+
+  const initialSamples = samples !== undefined
+    ? samples
+    : parseVoiceSamples({ sample_url: sampleUrl }, DEFAULT_SAMPLE_URL);
+
+  const [liveVoice, setLiveVoice] = useState({
+    url: imageUrl,
+    alt: imageAlt,
+    title: imageTitle,
     caption: imageCaption,
-    sampleUrl: sampleUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    samples: initialSamples,
     bookingEmail: bookingEmail || ""
   });
+  const [activeSampleUrl, setActiveSampleUrl] = useState<string | null>(initialSamples[0]?.url || null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
-    
+
     let active = true;
     const fetchVoice = async () => {
       try {
@@ -54,12 +63,17 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
           const vs = typeof data.voice_settings === "string"
             ? JSON.parse(data.voice_settings)
             : data.voice_settings;
+          const isExplicitlyEmpty = Array.isArray(vs?.samples) && vs.samples.length === 0 && !vs.sample_url;
+          const nextSamples = isExplicitlyEmpty
+            ? []
+            : parseVoiceSamples(vs, sampleUrl || DEFAULT_SAMPLE_URL);
+
           setLiveVoice({
             url: vs?.image_url || imageUrl,
             alt: vs?.image_alt || imageAlt,
             title: vs?.image_title || imageTitle,
             caption: vs?.image_caption || imageCaption,
-            sampleUrl: vs?.sample_url || sampleUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            samples: nextSamples,
             bookingEmail: vs?.booking_email || bookingEmail || ""
           });
         }
@@ -67,10 +81,10 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
         console.error("Failed to fetch voice client-side:", e);
       }
     };
-    
+
     fetchVoice();
     return () => { active = false; };
-  }, [imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl]);
+  }, [imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl, bookingEmail]);
 
   // Stop audio if component unmounts
   useEffect(() => {
@@ -81,40 +95,34 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
     };
   }, []);
 
-  // Load audio source when sampleUrl changes (e.g. when database updates state client-side)
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-    }
-  }, [liveVoice.sampleUrl]);
-
   // Sync state if audio ends or is paused elsewhere
   const handleEnded = () => {
     setIsPlaying(false);
   };
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
+  const handleToggleSample = (targetUrl: string) => {
+    if (!audioRef.current || !targetUrl) return;
+    if (isPlaying && activeSampleUrl === targetUrl) {
       audioRef.current.pause();
       setIsPlaying(false);
-    } else {
-      stopCommentary();
-      
-      // Ensure the audio source is loaded if it's currently uninitialized
-      if (audioRef.current.readyState === 0) {
-        audioRef.current.load();
-      }
-
-      audioRef.current.play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((err) => {
-          console.error("Audio playback failed:", err);
-          setIsPlaying(false);
-        });
+      return;
     }
+
+    stopCommentary();
+    if (activeSampleUrl !== targetUrl || !audioRef.current.src) {
+      audioRef.current.src = targetUrl;
+      audioRef.current.load();
+    }
+    setActiveSampleUrl(targetUrl);
+
+    audioRef.current.play()
+      .then(() => {
+        setIsPlaying(true);
+      })
+      .catch((err) => {
+        console.error("Audio playback failed:", err);
+        setIsPlaying(false);
+      });
   };
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -123,12 +131,11 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
 
   return (
     <section id="voice" ref={ref} className={`relative overflow-hidden bg-ink ${isSubpage ? "subpage-section" : ""}`}>
-      {liveVoice.sampleUrl && (
+      {liveVoice.samples.length > 0 && (
         <>
           <div className="sr-only">Röstprov — svensk röstskådespelare Therese Järvheden.</div>
           <audio
             ref={audioRef}
-            src={liveVoice.sampleUrl}
             onEnded={handleEnded}
             title="Röstprov Therese Järvheden"
             preload="metadata"
@@ -154,10 +161,33 @@ export function Voice({ imageUrl, imageAlt, imageTitle, imageCaption, sampleUrl,
               <em className="text-bone">{t.voice.body[1]}</em>
               {t.voice.body[2]}
             </p>
+            {liveVoice.samples.length > 1 && (
+              <div className={`mt-8 flex flex-wrap gap-2.5 ${liveVoice.url ? "" : "justify-center"}`}>
+                {liveVoice.samples.map((sample) => {
+                  const playingThis = isPlaying && activeSampleUrl === sample.url;
+                  const label = lang === "en" ? sample.title_en : sample.title_sv;
+                  return (
+                    <button
+                      key={sample.id}
+                      onClick={() => handleToggleSample(sample.url)}
+                      data-hover
+                      className={`inline-flex items-center gap-2.5 border px-5 py-3 text-[11px] uppercase tracking-[0.25em] font-semibold transition-colors cursor-pointer ${
+                        playingThis
+                          ? "border-bone bg-bone text-ink shadow-lg"
+                          : "border-ember bg-ember/90 text-ink hover:bg-bone hover:border-bone shadow-lg hover:shadow-ember/15"
+                      }`}
+                    >
+                      {playingThis ? <Pause size={13} /> : <Play size={13} className="translate-x-[0.5px]" />}
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div className={`mt-10 flex flex-wrap items-center gap-4 ${liveVoice.url ? "" : "justify-center"}`}>
-              {liveVoice.sampleUrl && (
+              {liveVoice.samples.length === 1 && (
                 <button
-                  onClick={togglePlay}
+                  onClick={() => handleToggleSample(liveVoice.samples[0].url)}
                   data-hover
                   className="group inline-flex items-center gap-3 border border-ember bg-ember text-ink px-7 py-4 text-[11px] uppercase tracking-[0.3em] font-semibold hover:bg-bone hover:border-bone transition-colors cursor-pointer shadow-lg hover:shadow-ember/15"
                 >

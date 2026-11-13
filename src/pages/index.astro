@@ -14,6 +14,7 @@ import { CookieConsent } from '../components/ui/CookieConsent';
 import { setGlobalDbData } from '../hooks/use-t';
 import { getPageData } from '../lib/supabase-server';
 import { getImage } from 'astro:assets';
+import { parseVoiceSamples } from '../lib/utils';
 
 // Server-side fetching from Supabase
 const dbData = await getPageData();
@@ -119,6 +120,7 @@ let voiceImageData = {
   title: "",
   caption: "",
   sampleUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  samples: undefined as any,
   bookingEmail: ""
 };
 if (processedDbData?.biography?.voice_settings) {
@@ -135,6 +137,8 @@ if (processedDbData?.biography?.voice_settings) {
       if (vs.image_caption) voiceImageData.caption = vs.image_caption;
       if (vs.sample_url) voiceImageData.sampleUrl = vs.sample_url;
       if (vs.booking_email) voiceImageData.bookingEmail = vs.booking_email;
+      const isEmpty = Array.isArray(vs.samples) && vs.samples.length === 0 && !vs.sample_url;
+      voiceImageData.samples = isEmpty ? [] : parseVoiceSamples(vs, voiceImageData.sampleUrl);
     }
   } catch (e) {
     console.error("Failed to parse voice settings image:", e);
@@ -195,6 +199,7 @@ if (processedDbData?.biography?.review_quotes) {
     imageTitle={voiceImageData.title}
     imageCaption={voiceImageData.caption}
     sampleUrl={voiceImageData.sampleUrl}
+    samples={voiceImageData.samples}
     bookingEmail={voiceImageData.bookingEmail}
     teaser={true}
   />

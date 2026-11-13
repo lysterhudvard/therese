@@ -1,9 +1,11 @@
 // @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, Volume2, Image } from "lucide-react";
+import { Save, Image } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { MediaPickerModal } from "./MediaPickerModal";
+import { VoiceSample, parseVoiceSamples } from "../../lib/utils";
+import { VoiceSamplesSection } from "./voice/VoiceSamplesSection";
 
 interface VoiceSettings {
   heading_sv: string;
@@ -21,8 +23,16 @@ interface VoiceSettings {
   image_filename?: string;
   image_description?: string;
   sample_url?: string;
+  samples?: VoiceSample[];
   booking_email?: string;
 }
+
+const DEFAULT_SAMPLE = (): VoiceSample => ({
+  id: "default-1",
+  title_sv: "Röstprov",
+  title_en: "Voice Sample",
+  url: "",
+});
 
 export function DashboardVoice() {
   const [settings, setSettings] = useState<VoiceSettings>({
@@ -41,12 +51,13 @@ export function DashboardVoice() {
     image_filename: "",
     image_description: "",
     sample_url: "",
+    samples: [DEFAULT_SAMPLE()],
     booking_email: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
-  const [isAudioPickerOpen, setIsAudioPickerOpen] = useState(false);
+  const [activeAudioSampleId, setActiveAudioSampleId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -66,10 +77,12 @@ export function DashboardVoice() {
           const parsed = typeof data.voice_settings === "string" 
             ? JSON.parse(data.voice_settings) 
             : data.voice_settings;
-            
+          const resolvedSamples = parseVoiceSamples(parsed);
+
           setSettings((prev) => ({
             ...prev,
-            ...parsed
+            ...parsed,
+            samples: resolvedSamples.length > 0 ? resolvedSamples : [DEFAULT_SAMPLE()],
           }));
         }
       } catch (e) {
@@ -96,13 +109,29 @@ export function DashboardVoice() {
       return;
     }
 
+    const cleanSamples = (settings.samples || [])
+      .filter((s) => s.url && s.url.trim())
+      .map((s, idx) => ({
+        ...s,
+        title_sv: s.title_sv || s.title_en || `Röstprov ${idx + 1}`,
+        title_en: s.title_en || s.title_sv || `Voice Sample ${idx + 1}`,
+        url: s.url.trim(),
+      }));
+
+    const payload: VoiceSettings = {
+      ...settings,
+      samples: cleanSamples,
+      sample_url: cleanSamples[0]?.url || "",
+    };
+
     try {
       const { error } = await supabase
         .from("biography")
-        .update({ voice_settings: settings })
+        .update({ voice_settings: payload })
         .eq("id", "main");
 
       if (error) throw error;
+      setSettings((prev) => ({ ...prev, ...payload, samples: cleanSamples.length > 0 ? cleanSamples : [DEFAULT_SAMPLE()] }));
       toast.success("Akt VI (Röstinställningar) har sparats i Supabase!");
       alert("Akt VI (Röstinställningar) har sparats framgångsrikt!");
     } catch (err: any) {
@@ -135,151 +164,78 @@ export function DashboardVoice() {
       </div>
 
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
-        <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Volume2 size={14} className="text-ember" /> Röst Texter
+        <h3 className="text-xs uppercase tracking-widest text-bone font-mono border-b border-bone/5 pb-2">
+          Röst Texter
         </h3>
 
-        {/* Rubrik */}
+        {/* Rubrik, CTA och Demo info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Rubrik (Svenska)</label>
-            <input
-              type="text"
-              id="klick-voice-heading-sv"
-              value={settings.heading_sv}
-              onChange={(e) => handleChange("heading_sv", (e.target as any).value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Heading (English)</label>
-            <input
-              type="text"
-              id="klick-voice-heading-en"
-              value={settings.heading_en}
-              onChange={(e) => handleChange("heading_en", (e.target as any).value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-          </div>
+          {[
+            { key: "heading_sv" as const, id: "klick-voice-heading-sv", label: "Rubrik (Svenska)" },
+            { key: "heading_en" as const, id: "klick-voice-heading-en", label: "Heading (English)" },
+            { key: "cta_sv" as const, id: "klick-voice-cta-sv", label: "Knapptext (Svenska)" },
+            { key: "cta_en" as const, label: "Button Text (English)" },
+            { key: "demo_sv" as const, label: "Demo Information (Svenska)" },
+            { key: "demo_en" as const, label: "Demo Info (English)" },
+          ].map((field) => (
+            <div key={field.key} className="space-y-2">
+              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">{field.label}</label>
+              <input
+                type="text"
+                id={field.id}
+                value={(settings[field.key] as string) || ""}
+                onChange={(e) => handleChange(field.key, (e.target as any).value)}
+                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+              />
+            </div>
+          ))}
         </div>
 
         {/* Beskrivning */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Beskrivningstext (Svenska)</label>
-            <textarea
-              id="klick-voice-body-sv"
-              value={settings.body_sv}
-              onChange={(e) => handleChange("body_sv", (e.target as any).value)}
-              rows={4}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Description Body (English)</label>
-            <textarea
-              id="klick-voice-body-en"
-              value={settings.body_en}
-              onChange={(e) => handleChange("body_en", (e.target as any).value)}
-              rows={4}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
-            />
-          </div>
-        </div>
-
-        {/* CTA och Demo info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Knapptext (Svenska)</label>
-            <input
-              type="text"
-              id="klick-voice-cta-sv"
-              value={settings.cta_sv}
-              onChange={(e) => handleChange("cta_sv", (e.target as any).value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Button Text (English)</label>
-            <input
-              type="text"
-              value={settings.cta_en}
-              onChange={(e) => handleChange("cta_en", (e.target as any).value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Demo Information (Svenska)</label>
-            <input
-              type="text"
-              value={settings.demo_sv}
-              onChange={(e) => handleChange("demo_sv", (e.target as any).value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Demo Info (English)</label>
-            <input
-              type="text"
-              value={settings.demo_en}
-              onChange={(e) => handleChange("demo_en", (e.target as any).value)}
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-            />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Boknings-E-post (E-postlänk för Boka röst)</label>
-            <input
-              type="email"
-              id="klick-voice-booking-email"
-              value={settings.booking_email || ""}
-              onChange={(e) => handleChange("booking_email", (e.target as any).value)}
-              placeholder="exempel@domän.se (lämna tom för att skrolla till kontaktformuläret på startsidan)"
-              className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-            />
-          </div>
-        </div>
-      </div>
-
-
-      {/* Röstprov (Audio Sample) */}
-      <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
-        <h3 className="text-xs uppercase tracking-widest text-bone font-mono flex items-center gap-1.5 border-b border-bone/5 pb-2">
-          <Volume2 size={14} className="text-ember" /> Röstprov (Audio-ljudfil)
-        </h3>
-
-        <div className="space-y-4">
-          <p className="text-[10px] text-bone/40 font-mono uppercase tracking-wider">
-            Välj en ljudinspelning (.mp3, .wav, etc.) som besökare kan spela upp på hemsidan under Akt VI.
-          </p>
-          <div className="space-y-2">
-            <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Ljudfils-URL</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                id="klick-voice-sample-url"
-                value={settings.sample_url || ""}
-                onChange={(e) => handleChange("sample_url", (e.target as any).value)}
-                placeholder="Skriv in ljudfilens URL eller klicka på Välj Ljud för att hämta från mediebiblioteket"
-                className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
+          {[
+            { key: "body_sv" as const, id: "klick-voice-body-sv", label: "Beskrivningstext (Svenska)" },
+            { key: "body_en" as const, id: "klick-voice-body-en", label: "Description Body (English)" },
+          ].map((field) => (
+            <div key={field.key} className="space-y-2">
+              <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">{field.label}</label>
+              <textarea
+                id={field.id}
+                value={(settings[field.key] as string) || ""}
+                onChange={(e) => handleChange(field.key, (e.target as any).value)}
+                rows={4}
+                className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember resize-none"
               />
-              <button
-                type="button"
-                onClick={() => setIsAudioPickerOpen(true)}
-                className="px-3 py-2 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-bone text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
-              >
-                Välj Ljud
-              </button>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {settings.sample_url && (
-            <div className="pt-2">
-              <span className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono mb-2">Förhandslyssna på röstprov</span>
-              <audio src={settings.sample_url} controls className="max-w-md w-full" />
-            </div>
-          )}
+        <div className="space-y-2">
+          <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Boknings-E-post (E-postlänk för Boka röst)</label>
+          <input
+            type="email"
+            id="klick-voice-booking-email"
+            value={settings.booking_email || ""}
+            onChange={(e) => handleChange("booking_email", (e.target as any).value)}
+            placeholder="exempel@domän.se (lämna tom för att skrolla till kontaktformuläret på startsidan)"
+            className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+          />
         </div>
       </div>
+
+
+      {/* Röstprov (Audio Samples) */}
+      <VoiceSamplesSection
+        samples={settings.samples || []}
+        onChangeSamples={(samples) =>
+          setSettings((prev) => ({
+            ...prev,
+            samples,
+            sample_url: samples[0]?.url || "",
+          }))
+        }
+        onPickAudio={(sampleId) => setActiveAudioSampleId(sampleId)}
+      />
 
       {/* Röst Bild */}
       <div className="bg-stage/5 border border-bone/10 p-6 rounded-sm space-y-6">
@@ -310,49 +266,23 @@ export function DashboardVoice() {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bild Alt-text (SEO)</label>
-                <input
-                  type="text"
-                  value={settings.image_alt || ""}
-                  onChange={(e) => handleChange("image_alt", (e.target as any).value)}
-                  placeholder="t.ex. Therese Järvheden — röstskådespelerska"
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Titel (Title Tag)</label>
-                <input
-                  type="text"
-                  value={settings.image_title || ""}
-                  onChange={(e) => handleChange("image_title", (e.target as any).value)}
-                  placeholder="t.ex. Therese Järvheden Röst"
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Bildtext (Caption)</label>
-                <input
-                  type="text"
-                  value={settings.image_caption || ""}
-                  onChange={(e) => handleChange("image_caption", (e.target as any).value)}
-                  placeholder="Kort bildbeskrivning..."
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Sökoptimerat Filnamn</label>
-                <input
-                  type="text"
-                  value={settings.image_filename || ""}
-                  onChange={(e) => handleChange("image_filename", (e.target as any).value)}
-                  placeholder="ex. therese-rost.webp"
-                  className="w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-                />
-              </div>
+              {[
+                { key: "image_alt" as const, label: "Bild Alt-text (SEO)", placeholder: "t.ex. Therese Järvheden — röstskådespelerska" },
+                { key: "image_title" as const, label: "Titel (Title Tag)", placeholder: "t.ex. Therese Järvheden Röst" },
+                { key: "image_caption" as const, label: "Bildtext (Caption)", placeholder: "Kort bildbeskrivning..." },
+                { key: "image_filename" as const, label: "Sökoptimerat Filnamn", placeholder: "ex. therese-rost.webp", mono: true },
+              ].map((field) => (
+                <div key={field.key} className="space-y-2">
+                  <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">{field.label}</label>
+                  <input
+                    type="text"
+                    value={(settings[field.key] as string) || ""}
+                    onChange={(e) => handleChange(field.key, (e.target as any).value)}
+                    placeholder={field.placeholder}
+                    className={`w-full bg-stage/35 border border-bone/10 text-bone px-3 py-2 rounded-sm text-xs focus:outline-none focus:border-ember${field.mono ? " font-mono" : ""}`}
+                  />
+                </div>
+              ))}
 
               <div className="sm:col-span-2 space-y-2">
                 <label className="block text-[8px] uppercase tracking-widest text-bone/45 font-mono">Beskrivning (Description - WordPress-stil)</label>
@@ -421,14 +351,20 @@ export function DashboardVoice() {
       />
 
       <MediaPickerModal
-        isOpen={isAudioPickerOpen}
-        onClose={() => setIsAudioPickerOpen(false)}
+        isOpen={Boolean(activeAudioSampleId)}
+        onClose={() => setActiveAudioSampleId(null)}
         onSelect={(url) => {
-          setSettings((prev) => ({
-            ...prev,
-            sample_url: url
-          }));
-          setIsAudioPickerOpen(false);
+          setSettings((prev) => {
+            const nextSamples = (prev.samples || []).map((s) =>
+              s.id === activeAudioSampleId ? { ...s, url } : s
+            );
+            return {
+              ...prev,
+              samples: nextSamples,
+              sample_url: nextSamples[0]?.url || "",
+            };
+          });
+          setActiveAudioSampleId(null);
         }}
         typeFilter="audio"
       />

@@ -8,45 +8,22 @@ const MotionButton = motion.button as any;
 const MotionH3 = motion.h3 as any;
 const MotionForm = motion.form as any;
 
-import { Play, Pause, Volume2, VolumeX, Maximize2, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize2, X, ArrowUpRight } from "lucide-react";
 import { type VideoItem } from "./../ShowreelsData";
+import { parseVideoSource } from "../../../lib/utils";
+import { stopCommentary } from "../../../hooks/use-t";
+
+export { parseVideoSource } from "../../../lib/utils";
 
 interface TheaterPlayerProps {
   isEnlarged: boolean;
   setIsEnlarged: (enlarged: boolean) => void;
   activeVideo: VideoItem;
   lang: "sv" | "en";
-}
-
-export function parseVideoSource(item: VideoItem) {
-  let vimeoId = item.vimeoId || "";
-  let youtubeId = item.youtubeId || "";
-  let url = item.url || "";
-  let type = "VIDEO";
-
-  // Check if URL is a YouTube link
-  const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/||user\/(?:[^\/]+)\/)|youtu\.be\/|youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/;
-  const ytMatch = url.match(ytRegex);
-  
-  // Check if URL is a Vimeo link
-  const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
-  const vimeoMatch = url.match(vimeoRegex);
-
-  if (ytMatch) {
-    youtubeId = ytMatch[1];
-    type = "YOUTUBE";
-    vimeoId = "";
-  } else if (vimeoMatch) {
-    vimeoId = vimeoMatch[1];
-    type = "VIMEO";
-    youtubeId = "";
-  } else if (vimeoId) {
-    type = "VIMEO";
-  } else if (youtubeId) {
-    type = "YOUTUBE";
-  }
-
-  return { type, vimeoId, youtubeId, url };
+  modalOnly?: boolean;
+  playlist?: VideoItem[];
+  onSelectVideo?: (video: VideoItem) => void;
+  headerLabel?: string;
 }
 
 function getDurationAndType(item: VideoItem) {
@@ -71,13 +48,17 @@ export function TheaterPlayer({
   setIsEnlarged,
   activeVideo,
   lang,
+  modalOnly = false,
+  playlist,
+  onSelectVideo,
+  headerLabel,
 }: TheaterPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [isTransitionComplete, setIsTransitionComplete] = useState(false);
+  const [isTransitionComplete, setIsTransitionComplete] = useState(modalOnly);
   const [mounted, setMounted] = useState(false);
 
   const { type, vimeoId: parsedVimeoId, youtubeId: parsedYoutubeId } = parseVideoSource(activeVideo);
@@ -89,15 +70,20 @@ export function TheaterPlayer({
     setMounted(true);
   }, []);
 
-  // Lock scroll bar and hide main page content when enlarged
+  // Lock scroll bar, hide main page content, stop audio commentary, and bind Escape when enlarged
   useEffect(() => {
     if (typeof document === "undefined") return;
     const mainEl = document.querySelector("main");
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsEnlarged(false);
+    };
     if (isEnlarged) {
+      stopCommentary();
       document.body.style.overflow = "hidden";
       if (mainEl) {
         mainEl.style.visibility = "hidden";
       }
+      window.addEventListener("keydown", onKeyDown);
     } else {
       document.body.style.overflow = "";
       if (mainEl) {
@@ -109,12 +95,17 @@ export function TheaterPlayer({
       if (mainEl) {
         mainEl.style.visibility = "";
       }
+      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isEnlarged]);
+  }, [isEnlarged, setIsEnlarged]);
 
   // Handle transition completion delay
   useEffect(() => {
     if (isEnlarged) {
+      if (modalOnly) {
+        setIsTransitionComplete(true);
+        return;
+      }
       setIsTransitionComplete(false);
       const timer = setTimeout(() => {
         setIsTransitionComplete(true);
@@ -123,7 +114,7 @@ export function TheaterPlayer({
     } else {
       setIsTransitionComplete(false);
     }
-  }, [isEnlarged]);
+  }, [isEnlarged, modalOnly]);
 
   // Sync state when active video changes
   useEffect(() => {
@@ -215,6 +206,93 @@ export function TheaterPlayer({
     setProgress(100);
   };
 
+  const modalPortal =
+    mounted && isEnlarged
+      ? createPortal(
+          <AnimatePresence>
+            <MotionDiv
+              layoutId={modalOnly ? undefined : "theater-player-canvas"}
+              data-no-spotlight
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed inset-0 z-[99999] bg-black/98 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 md:p-12 cursor-zoom-out"
+              onClick={() => setIsEnlarged(false)}
+            >
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setIsEnlarged(false); }}
+                aria-label="Close video"
+                className="absolute right-4 top-4 md:right-6 md:top-6 lg:right-8 lg:top-8 z-[999999] flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/40 text-bone backdrop-blur transition hover:border-white/50 hover:bg-black/60 cursor-pointer"
+              >
+                <X className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+
+              <div className="relative w-[92vw] sm:w-[90vw] md:w-[86vw] max-w-[1400px] flex flex-col cursor-default animate-fadeIn" onClick={(e) => e.stopPropagation()}>
+                <div className="flex justify-between items-baseline mb-3 font-sans text-xs uppercase tracking-[0.3em] text-white/40 select-none px-1">
+                  <span>{lang === "sv" ? "SPELAS NU" : "NOW PLAYING"}</span>
+                  <span className="font-display text-sm sm:text-base italic tracking-normal text-bone uppercase">
+                    {headerLabel || (modalOnly ? activeVideo.title[lang] : "SHOWREEL — THERESE JÄRVHEDEN")}
+                  </span>
+                </div>
+
+                <div className="relative w-full aspect-video shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden bg-black border border-white/5">
+                  {!isTransitionComplete ? (
+                    <div className="w-full h-full relative bg-black">
+                      {activeVideo.poster && (
+                        <MotionImg initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} src={activeVideo.poster} alt="Preparing screen..." className="w-full h-full object-cover select-none absolute inset-0" />
+                      )}
+                    </div>
+                  ) : (
+                    <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="w-full h-full absolute inset-0 z-10 bg-black">
+                      {type === "VIMEO" ? (
+                        <iframe key={parsedVimeoId} src={`https://player.vimeo.com/video/${parsedVimeoId}?autoplay=1&muted=0&badge=0&autopause=0`} className="w-full h-full border-0 absolute inset-0 z-10" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
+                      ) : type === "YOUTUBE" ? (
+                        <iframe key={parsedYoutubeId} src={`https://www.youtube.com/embed/${parsedYoutubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`} className="w-full h-full border-0 absolute inset-0 z-10" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                      ) : (
+                        <video key={activeVideo.url} ref={videoRef} src={activeVideo.url} poster={activeVideo.poster} onClick={togglePlay} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded} playsInline controls className="w-full h-full object-cover select-none cursor-pointer" />
+                      )}
+                    </MotionDiv>
+                  )}
+
+                  <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02] z-20" />
+                  <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-b from-black/15 to-transparent pointer-events-none z-20" />
+                  <div className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-t from-black/15 to-transparent pointer-events-none z-20" />
+                </div>
+
+                {playlist && playlist.length > 1 && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2 px-1">
+                    <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-bone/45 mr-2">{lang === "sv" ? "Videor:" : "Videos:"}</span>
+                    {playlist.map((item, idx) => {
+                      const srcInfo = parseVideoSource(item);
+                      const isCurrent = item.id === activeVideo.id;
+                      const label = item.title[lang] || `${idx + 1}`;
+                      if (srcInfo.type === "EXTERNAL") {
+                        return (
+                          <a key={item.id} href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-bone/20 bg-stage/30 text-bone/80 hover:border-ember hover:text-ember text-[10px] font-mono uppercase tracking-wider transition-colors">
+                            <ArrowUpRight size={11} />
+                            <span>{label}</span>
+                          </a>
+                        );
+                      }
+                      return (
+                        <button key={item.id} type="button" onClick={() => onSelectVideo?.(item)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer ${isCurrent ? "border-ember bg-ember text-ink font-bold" : "border-bone/20 bg-stage/30 text-bone/80 hover:border-ember hover:text-ember"}`}>
+                          <Play size={10} fill={isCurrent ? "currentColor" : "none"} />
+                          <span>{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </MotionDiv>
+          </AnimatePresence>,
+          document.body
+        )
+      : null;
+
+  if (modalOnly) {
+    return modalPortal;
+  }
+
   return (
     <div className="relative mx-auto w-full h-full aspect-[16/9] md:aspect-[21/9]">
       {/* Inline Preview Canvas */}
@@ -234,7 +312,6 @@ export function TheaterPlayer({
             ) : (
               <div className="w-full h-full bg-stage/10 transition duration-[1500ms] group-hover:scale-105" />
             )}
-            {/* Glowing play symbol */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-colors duration-[1500ms]">
               <span className="flex items-center gap-5 text-xs uppercase tracking-[0.4em] text-bone font-sans select-none">
                 <span className="grid h-20 w-20 place-items-center rounded-full border border-bone/70 transition duration-[500ms] group-hover:scale-110 group-hover:border-bone group-hover:bg-bone group-hover:text-ink">
@@ -246,7 +323,6 @@ export function TheaterPlayer({
               </span>
             </div>
 
-            {/* Bottom info overlays */}
             <div className="absolute bottom-4 left-5 right-5 flex items-baseline justify-between font-sans text-[10px] uppercase tracking-[0.32em] text-white/50 select-none">
               <span>Therese Järvheden</span>
               <span>
@@ -258,17 +334,14 @@ export function TheaterPlayer({
             </div>
           </div>
 
-          {/* Film Grain overlay */}
           <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02] z-20" />
 
-          {/* Technical Monitor Overlay */}
           <div className="absolute top-4 left-6 pointer-events-none flex flex-col font-mono text-[9px] tracking-wider text-bone/60 space-y-0.5 z-20">
             <div>REEL // {activeVideo.genre}</div>
             <div className="text-[8px] text-bone/40">{activeVideo.specs}</div>
           </div>
         </MotionDiv>
       ) : (
-        // Blank placeholder inline to preserve space and aspect ratio during playback
         <div className="w-full h-full bg-black/40 shadow-inner flex items-center justify-center border border-bone/5">
           <div className="text-center space-y-2">
             <div className="text-[9px] uppercase tracking-[0.3em] text-bone/30 font-mono animate-pulse-slow">
@@ -278,110 +351,7 @@ export function TheaterPlayer({
         </div>
       )) as any)}
 
-      {/* Enlarged Theater Mode Modal via React Portal */}
-      {mounted && isEnlarged ? createPortal(
-        <AnimatePresence>
-          <MotionDiv
-            layoutId="theater-player-canvas"
-            data-no-spotlight
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[99999] bg-black/98 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 md:p-12 cursor-zoom-out"
-            onClick={() => setIsEnlarged(false)}
-          >
-            {/* Close Button relative to viewport */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsEnlarged(false);
-              }}
-              aria-label="Close video"
-              className="absolute right-4 top-4 md:right-6 md:top-6 lg:right-8 lg:top-8 z-[999999] flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/40 text-bone backdrop-blur transition hover:border-white/50 hover:bg-black/60 cursor-pointer"
-            >
-              <X className="h-5 w-5" strokeWidth={1.5} />
-            </button>
-
-            <div
-              className="relative w-[92vw] sm:w-[90vw] md:w-[86vw] max-w-[1400px] flex flex-col cursor-default animate-fadeIn"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header Bar */}
-              <div className="flex justify-between items-baseline mb-3 font-sans text-xs uppercase tracking-[0.3em] text-white/40 select-none px-1">
-                <span>SPELAS NU</span>
-                <span className="font-display text-sm sm:text-base italic tracking-normal text-bone uppercase">
-                  SHOWREEL — THERESE JÄRVHEDEN
-                </span>
-              </div>
-
-              {/* Widescreen Screen Canvas */}
-              <div className="relative w-full aspect-video shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden bg-black border border-white/5">
-                {!isTransitionComplete ? (
-                  // Poster image fading to black background during scale-up
-                  <div className="w-full h-full relative bg-black">
-                    {activeVideo.poster ? (
-                      <MotionImg
-                        initial={{ opacity: 1 }}
-                        animate={{ opacity: 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        src={activeVideo.poster}
-                        alt="Preparing screen..."
-                        className="w-full h-full object-cover select-none absolute inset-0"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-black" />
-                    )}
-                  </div>
-                ) : (
-                  // Video starts playing only after layout scale-up is completed
-                  <MotionDiv
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.4 }}
-                    className="w-full h-full absolute inset-0 z-10 bg-black"
-                  >
-                    {type === "VIMEO" ? (
-                      <iframe
-                        src={`https://player.vimeo.com/video/${parsedVimeoId}?autoplay=1&muted=0&badge=0&autopause=0`}
-                        className="w-full h-full border-0 absolute inset-0 z-10"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : type === "YOUTUBE" ? (
-                      <iframe
-                        src={`https://www.youtube.com/embed/${parsedYoutubeId}?autoplay=1&rel=0&modestbranding=1&controls=1`}
-                        className="w-full h-full border-0 absolute inset-0 z-10"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : (
-                      <video
-                        ref={videoRef}
-                        src={activeVideo.url}
-                        poster={activeVideo.poster}
-                        onClick={togglePlay}
-                        onTimeUpdate={handleTimeUpdate}
-                        onLoadedMetadata={handleLoadedMetadata}
-                        onEnded={handleEnded}
-                        playsInline
-                        controls
-                        className="w-full h-full object-cover select-none cursor-pointer"
-                      />
-                    )}
-                  </MotionDiv>
-                )}
-
-                {/* Film Grain overlay */}
-                <div className="absolute inset-0 pointer-events-none bg-grain opacity-[0.02] z-20" />
-
-                {/* Letterbox widescreen shadow lines */}
-                <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-b from-black/15 to-transparent pointer-events-none z-20" />
-                <div className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-t from-black/15 to-transparent pointer-events-none z-20" />
-              </div>
-            </div>
-          </MotionDiv>
-        </AnimatePresence>,
-        document.body
-      ) : null}
+      {modalPortal}
     </div>
   );
 }

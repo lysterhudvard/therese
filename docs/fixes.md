@@ -598,6 +598,14 @@ This document details critical bugs, layout errors, and interaction blocks found
   3. Säkerställde att varje meritpost kan ha både videolänk (`url`) och direktuppspelat ljudklipp (`commentary_url`), och att båda knapparna ("Titta" och "Kommentar") visas prydligt tillsammans i tabellens åtgärdskolumn på webbplatsen.
   4. Modulariserade `CreditItemCard.tsx` genom att bryta ut ljud- och manussektionen till `CreditAdvancedSection.tsx` (216 rader), och bröt ut `ParallaxQuotes.tsx` (107 rader) ur `Credits.tsx`, så att samtliga filer nu respekterar den strikta 400-radersgränsen.
 
+## 84. Utökning av Meriter (videofönster & videolista) och Röstprov (flera ljudprover) med kodåteranvändning
+- **Bakgrund:** Användaren önskade att videolänkar under Meriter (t.ex. YouTube) skulle spelas upp direkt i samma biosalongsmodal som Showreels, med stöd för flera videor per merit samt flera ljudprover under Röstprov — utan duplicerad kod eller databasmigrering.
+- **Lösning:**
+  1. Centraliserade videoparsning (`parseVideoSource`, `parseCreditVideos`, `serializeCreditVideos`), meritradmappning (`mapCreditRow`), röstprovsparsning (`parseVoiceSamples`) och listomflyttning (`moveArrayItem`) i [utils.ts](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/lib/utils.ts).
+  2. Återanvände [TheaterPlayer.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/showreels/TheaterPlayer.tsx) i [Credits.tsx](file:///c:/Users/Huawei/Desktop/My%20Projects/AI%20Projects/Therese/jarvheden/src/components/sections/Credits.tsx) via `modalOnly` och `playlist`-props, samt undvek SSR-layoutkonflikter när `layoutId` utelämnas i `modalOnly`-läge.
+  3. Lagrar multipla meritvideor bakåtkompatibelt i befintlig `credits.url`-kolumn (enskild länk som ren sträng, flera/namngivna länkar som JSON-lista) och multipla röstprover i befintlig JSONB-kolumn `biography.voice_settings.samples` (med automatisk synk av `sample_url`).
+  4. Uppdaterade samtliga modifierade komponenter och behöll samtliga filer strikt under 400 rader.
+
 
 
 

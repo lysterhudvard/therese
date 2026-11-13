@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Play as PlayOrig, Pause as PauseOrig } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { mapCreditRow, parseCreditVideos, parseVideoSource } from "../../lib/utils";
 import { useT, useCommentaryStore, playCommentary, stopCommentary } from "../../hooks/use-t";
 import { type Credit, type FilterKey } from "../../types";
+import { type VideoItem } from "./ShowreelsData";
+import { TheaterPlayer } from "./showreels/TheaterPlayer";
 
 import { ParallaxQuotes } from "./ParallaxQuotes";
 export { ParallaxQuotes } from "./ParallaxQuotes";
 
+const Play = PlayOrig as any;
+const Pause = PauseOrig as any;
 const MotionDiv = motion.div as any;
-const MotionLi = motion.li as any;
 const MotionTr = motion.tr as any;
 
 export function Credits({
@@ -44,41 +48,7 @@ export function Credits({
 
         if (error) throw error;
         if (data && Array.isArray(data) && activeSync) {
-          const fetched = data.map((c: any) => {
-            const credit: any = {
-              year: c.year || "—",
-              title: c.title || "",
-              role: { sv: c.role_sv || "", en: c.role_en || "" },
-              type: c.type,
-              category: { sv: c.category_sv || "", en: c.category_en || "" },
-              network: c.network || "",
-              url: c.url || undefined,
-              img: c.img || "",
-              is_current_production: c.is_current_production
-            };
-            if (c.commentary_url) {
-              credit.commentary = {
-                url: c.commentary_url,
-                duration: c.commentary_duration || "0:10",
-                svText: c.commentary_sv || "",
-                enText: c.commentary_en || ""
-              };
-            }
-            if (c.script_scene) {
-              credit.script = {
-                scene: c.script_scene,
-                dialogue: {
-                  char: c.script_char || "CHARACTER",
-                  line: {
-                    sv: c.script_line_sv || "",
-                    en: c.script_line_en || ""
-                  }
-                }
-              };
-            }
-            return credit;
-          });
-          setLiveCredits(fetched);
+          setLiveCredits(data.map(mapCreditRow));
         }
       } catch (e) {
         console.error("Failed to fetch credits client-side:", e);
@@ -93,6 +63,32 @@ export function Credits({
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [showAllCredits, setShowAllCredits] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeVideoState, setActiveVideoState] = useState<{ active: VideoItem; playlist: VideoItem[] } | null>(null);
+
+  const openCreditVideos = (c: Credit, startIndex = 0) => {
+    const videos = parseCreditVideos(c.url);
+    if (videos.length === 0) return;
+    const playlist: VideoItem[] = videos.map((v, idx) => {
+      const label = v.title || (videos.length > 1 ? `${c.title} (${idx + 1})` : c.title);
+      return {
+        id: `${c.title}-${idx}-${v.url}`,
+        title: { sv: label, en: label },
+        sub: c.role,
+        url: v.url,
+        poster: c.img || "",
+        genre: c.type.toUpperCase(),
+        specs: c.year,
+        glow: "rgba(235, 94, 40, 0.15)",
+      };
+    });
+    const selected = playlist[startIndex] || playlist[0];
+    const srcInfo = parseVideoSource(selected);
+    if (srcInfo.isPlayableInModal) {
+      setActiveVideoState({ active: selected, playlist });
+    } else if (srcInfo.url) {
+      window.open(srcInfo.url, "_blank", "noopener,noreferrer");
+    }
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -101,30 +97,6 @@ export function Credits({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  const defaultQuotes = useMemo(() => lang === "sv" ? [
-      "en närvaro som river ner väggar",
-      "en av fyra kvinnor vi får följa",
-      "skånsk röst — varm, rå, omedelbar",
-      "drama som hon känner extra starkt för",
-      "närvarande, sårbar, exakt",
-  ] : [
-      "a presence that tears down walls",
-      "one of four women we follow",
-      "Scanian voice — warm, raw, immediate",
-      "drama she feels especially strongly about",
-      "present, vulnerable, precise",
-  ], [lang]);
-  const parsedReviewQuotes = useMemo(() => {
-    if (reviewQuotes && Array.isArray(reviewQuotes)) {
-      return reviewQuotes.map((q: any) => {
-        if (typeof q === "string") return q;
-        return lang === "sv" ? q.sv : q.en;
-      });
-    }
-    return undefined;
-  }, [reviewQuotes, lang]);
-  const activeQuotes = parsedReviewQuotes || defaultQuotes;
 
   const rows = useMemo(
     () => (filter === "Alla" ? liveCredits : liveCredits.filter((c) => c.type === filter)),
@@ -145,7 +117,7 @@ export function Credits({
   return (
     <section id="credits" ref={ref} className={`relative px-6 pb-20 md:px-12 md:pb-48 ${isSubpage ? "pt-6 md:pt-12" : "pt-20 md:pt-48"}`}>
       <MotionDiv style={{ opacity: exitOpacity, scale: exitScale }} className="w-full h-full">
-        <ParallaxQuotes quotes={activeQuotes} />
+        <ParallaxQuotes reviewQuotes={reviewQuotes} lang={lang} />
 
 
         <div className="relative mx-auto max-w-7xl">
@@ -190,9 +162,15 @@ export function Credits({
             </thead>
             <tbody className="block w-full">
             <AnimatePresence initial={false}>
-              {visibleRows.map((c, i) => (
+              {visibleRows.map((c, i) => {
+                const videos = parseCreditVideos(c.url);
+                const firstEmbedIdx = videos.findIndex((v) => parseVideoSource({ url: v.url }).isPlayableInModal);
+                const hasModalVideo = firstEmbedIdx !== -1;
+                const actionIdx = hasModalVideo ? firstEmbedIdx : 0;
+
+                return (
                 <MotionTr
-                  key={c.title}
+                  key={`${c.title}-${i}`}
                   layout
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -208,16 +186,21 @@ export function Credits({
                     </td>
                     <td className="col-span-7 lg:col-span-5 block">
                       <div className="font-display text-xl sm:text-2xl lg:text-3xl text-bone transition-all flex flex-wrap items-center gap-3">
-                        {c.url ? (
-                          <a
-                            href={c.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            data-hover
-                            className="hover:text-ember transition-colors duration-300"
-                          >
-                            {c.title}
-                          </a>
+                        {videos.length > 0 ? (
+                          hasModalVideo ? (
+                            <button
+                              type="button"
+                              onClick={() => openCreditVideos(c, actionIdx)}
+                              data-hover
+                              className="text-left hover:text-ember transition-colors duration-300 cursor-pointer"
+                            >
+                              {c.title}
+                            </button>
+                          ) : (
+                            <a href={videos[0].url} target="_blank" rel="noreferrer" data-hover className="hover:text-ember transition-colors duration-300">
+                              {c.title}
+                            </a>
+                          )
                         ) : (
                           <span>{c.title}</span>
                         )}
@@ -225,6 +208,26 @@ export function Credits({
                       <div className="mt-1 text-xs text-bone/65 group-hover:text-bone/85 transition-colors duration-300">
                         {c.role[lang]}
                       </div>
+                      {videos.length > 1 && (
+                        <div className="mt-2.5 flex flex-wrap gap-1.5">
+                          {videos.map((v, vIdx) => {
+                            const isModal = parseVideoSource({ url: v.url }).isPlayableInModal;
+                            const label = v.title || `Video ${vIdx + 1}`;
+                            const chipCls = "inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border border-bone/15 bg-stage/30 hover:border-ember hover:text-ember text-[10px] font-mono text-bone/75 transition-colors";
+                            return isModal ? (
+                              <button key={`${v.url}-${vIdx}`} type="button" onClick={(e) => { e.stopPropagation(); openCreditVideos(c, vIdx); }} data-hover className={`${chipCls} cursor-pointer`}>
+                                <Play size={9} fill="currentColor" />
+                                <span>{label}</span>
+                              </button>
+                            ) : (
+                              <a key={`${v.url}-${vIdx}`} href={v.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} data-hover className={chipCls}>
+                                <ArrowUpRight size={10} />
+                                <span>{label}</span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
                     </td>
                     <td className="hidden lg:block lg:col-span-2 text-[11px] uppercase tracking-[0.25em] text-bone/65 group-hover:text-bone/90 transition-colors duration-300">
                       {c.category[lang]}
@@ -233,38 +236,39 @@ export function Credits({
                       {c.network}
                     </td>
                     <td className="col-span-3 lg:col-span-2 flex flex-col items-end gap-2 justify-center block">
-                      {c.url ? (
+                      {videos.length > 0 && (hasModalVideo ? (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); openCreditVideos(c, actionIdx); }}
+                          data-hover
+                          aria-label={lang === "sv" ? `Titta på ${c.title}` : `Watch ${c.title}`}
+                          className="relative inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto px-0 sm:px-4 py-0 sm:py-1.5 border border-ember/40 bg-ember/5 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-ember hover:bg-ember hover:text-ink rounded-sm shadow-md shadow-ember/5 hover:shadow-ember/15 transition-all duration-300 after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer cursor-pointer"
+                        >
+                          <Play size={10} fill="currentColor" className="shrink-0" />
+                          <span className="hidden sm:inline ml-1.5">{lang === "sv" ? "Titta" : "Watch"}{videos.length > 1 ? ` (${videos.length})` : ""}</span>
+                        </button>
+                      ) : (
                         <a
-                          href={c.url}
+                          href={videos[0].url}
                           target="_blank"
                           rel="noreferrer"
                           data-hover
                           aria-label={lang === "sv" ? `Titta på ${c.title}` : `Watch ${c.title}`}
-                          className="relative inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto px-0 sm:px-4 py-0 sm:py-1.5 border border-ember/40 bg-ember/5 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-ember hover:bg-ember hover:text-ink transition-colors rounded-sm shadow-md shadow-ember/5 hover:shadow-ember/15 transition-all duration-300 after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer"
+                          className="relative inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto px-0 sm:px-4 py-0 sm:py-1.5 border border-ember/40 bg-ember/5 text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-ember hover:bg-ember hover:text-ink rounded-sm shadow-md shadow-ember/5 hover:shadow-ember/15 transition-all duration-300 after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer"
                         >
                           <ArrowUpRight size={13} className="shrink-0" />
-                          <span className="hidden sm:inline ml-1">
-                            {lang === "sv" ? "Titta" : "Watch"}
-                          </span>
+                          <span className="hidden sm:inline ml-1">{lang === "sv" ? "Titta" : "Watch"}</span>
                         </a>
-                      ) : null}
-                      {c.commentary ? (
+                      ))}
+                      {c.commentary && (
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             const comm = c.commentary;
                             if (!comm) return;
-                            if (activeCommentaryUrl === comm.url) {
-                              stopCommentary();
-                            } else {
-                              playCommentary({
-                                title: c.title,
-                                role: c.role[lang],
-                                url: comm.url,
-                                text: lang === "sv" ? comm.svText : comm.enText,
-                              });
-                            }
+                            if (activeCommentaryUrl === comm.url) stopCommentary();
+                            else playCommentary({ title: c.title, role: c.role[lang], url: comm.url, text: lang === "sv" ? comm.svText : comm.enText });
                           }}
                           data-hover
                           className={`relative inline-flex items-center justify-center w-8 h-8 sm:w-auto sm:h-auto px-0 sm:px-4 py-0 sm:py-1.5 rounded-sm border transition-all duration-300 font-mono text-[10px] font-bold uppercase tracking-[0.2em] shadow-md after:absolute after:content-[''] after:inset-[-8px] after:cursor-pointer ${
@@ -274,34 +278,20 @@ export function Credits({
                           }`}
                         >
                           <span className="relative flex items-center justify-center shrink-0">
-                            {activeCommentaryUrl === c.commentary.url ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="14" y="4" width="4" height="16" rx="1" />
-                                <rect x="6" y="4" width="4" height="16" rx="1" />
-                              </svg>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[0.5px]">
-                                <polygon points="6 3 20 12 6 21 6 3" />
-                              </svg>
-                            )}
+                            {activeCommentaryUrl === c.commentary.url ? <Pause size={11} fill="currentColor" /> : <Play size={11} fill="currentColor" className="translate-x-[0.5px]" />}
                           </span>
                           <span className="hidden sm:inline ml-1.5">
-                            {activeCommentaryUrl === c.commentary.url
-                              ? lang === "sv"
-                                ? "Spelar"
-                                : "Playing"
-                              : lang === "sv"
-                                ? "Kommentar"
-                                : "Commentary"}
+                            {activeCommentaryUrl === c.commentary.url ? (lang === "sv" ? "Spelar" : "Playing") : (lang === "sv" ? "Kommentar" : "Commentary")}
                           </span>
                         </button>
-                      ) : null}
+                      )}
                     </td>
                     <td className="col-span-12 text-xs text-bone/55 lg:hidden group-hover:text-bone/80 transition-colors duration-300 block">
                       {c.network} · {c.category[lang]}
                     </td>
                 </MotionTr>
-              ))}
+                );
+              })}
             </AnimatePresence>
             </tbody>
           </table>
@@ -366,6 +356,21 @@ export function Credits({
           )}
         </AnimatePresence>
       </MotionDiv>
+      {activeVideoState && (
+        <TheaterPlayer
+          modalOnly
+          isEnlarged={true}
+          setIsEnlarged={(open) => {
+            if (!open) setActiveVideoState(null);
+          }}
+          activeVideo={activeVideoState.active}
+          playlist={activeVideoState.playlist}
+          onSelectVideo={(vid) =>
+            setActiveVideoState((prev) => (prev ? { ...prev, active: vid } : null))
+          }
+          lang={lang}
+        />
+      )}
     </section>
   );
 }

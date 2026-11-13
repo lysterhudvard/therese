@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Trash2,
   Star,
@@ -6,9 +6,16 @@ import {
   ArrowDown,
   Video,
   ExternalLink,
+  Plus,
 } from "lucide-react";
 import { CreditRow } from "./types";
 import { CreditAdvancedSection } from "./CreditAdvancedSection";
+import {
+  CreditVideoItem,
+  moveArrayItem,
+  parseCreditVideos,
+  serializeCreditVideos,
+} from "../../../lib/utils";
 
 interface CreditItemCardProps {
   c: CreditRow;
@@ -37,6 +44,21 @@ export function CreditItemCard({
   isUploadingAudio,
   setActivePickerId,
 }: CreditItemCardProps) {
+  const [videos, setVideos] = useState<CreditVideoItem[]>(() => {
+    const parsed = parseCreditVideos(c.url);
+    return parsed.length > 0 ? parsed : [{ title: "", url: "" }];
+  });
+
+  useEffect(() => {
+    const parsed = parseCreditVideos(c.url);
+    setVideos(parsed.length > 0 ? parsed : [{ title: "", url: "" }]);
+  }, [c.id]);
+
+  const syncVideos = (next: CreditVideoItem[]) => {
+    setVideos(next);
+    updateCredit(c.id, "url", serializeCreditVideos(next));
+  };
+
   return (
     <div
       id={index === 0 ? "klick-credits-row-0" : undefined}
@@ -149,102 +171,118 @@ export function CreditItemCard({
 
       {/* Translated role & category details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-bone/5 pt-3">
-        {/* Swedish values */}
-        <div className="space-y-3">
-          <span className="text-[8px] font-mono text-ember uppercase tracking-wider">🇸🇪 SVENSKA</span>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Roll</label>
-              <input
-                type="text"
-                value={c.role_sv}
-                onChange={(e) => updateCredit(c.id, "role_sv", (e.target as any).value)}
-                placeholder="Huvudroll..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                Kategori (detaljerad)
-              </label>
-              <input
-                type="text"
-                value={c.category_sv}
-                onChange={(e) => updateCredit(c.id, "category_sv", (e.target as any).value)}
-                placeholder="Humorserie..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* English values */}
-        <div className="space-y-3">
-          <span className="text-[8px] font-mono text-bone/40 uppercase tracking-wider">🇬🇧 ENGLISH</span>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">Role</label>
-              <input
-                type="text"
-                value={c.role_en}
-                onChange={(e) => updateCredit(c.id, "role_en", (e.target as any).value)}
-                placeholder="Lead role..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                Category (detailed)
-              </label>
-              <input
-                type="text"
-                value={c.category_en}
-                onChange={(e) => updateCredit(c.id, "category_en", (e.target as any).value)}
-                placeholder="Comedy series..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
-              />
+        {([
+          { tag: "🇸🇪 SVENSKA", tagClass: "text-ember", rField: "role_sv", cField: "category_sv", rLabel: "Roll", cLabel: "Kategori (detaljerad)", rPh: "Huvudroll...", cPh: "Humorserie..." },
+          { tag: "🇬🇧 ENGLISH", tagClass: "text-bone/40", rField: "role_en", cField: "category_en", rLabel: "Role", cLabel: "Category (detailed)", rPh: "Lead role...", cPh: "Comedy series..." },
+        ] as const).map((l) => (
+          <div key={l.tag} className="space-y-3">
+            <span className={`text-[8px] font-mono ${l.tagClass} uppercase tracking-wider`}>{l.tag}</span>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">{l.rLabel}</label>
+                <input
+                  type="text"
+                  value={(c as any)[l.rField]}
+                  onChange={(e) => updateCredit(c.id, l.rField, (e.target as any).value)}
+                  placeholder={l.rPh}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">{l.cLabel}</label>
+                <input
+                  type="text"
+                  value={(c as any)[l.cField]}
+                  onChange={(e) => updateCredit(c.id, l.cField, (e.target as any).value)}
+                  placeholder={l.cPh}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1.5 rounded-sm text-[11px] focus:outline-none focus:border-ember"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
 
-      {/* Video / Watch URL */}
-      <div className="border-t border-bone/5 pt-3 space-y-1">
-        <div className="flex items-center justify-between">
+      {/* Video / Watch URL List */}
+      <div className="border-t border-bone/5 pt-3 space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <label className="block text-[8px] uppercase tracking-widest text-bone/50 font-mono flex items-center gap-1.5">
             <Video size={12} className="text-ember" />
-            Videolänk / Titta-länk (YouTube, SVT Play, Vimeo osv.)
+            Videolänkar / Titta-länkar (YouTube, Vimeo, .mp4 spelas i fönster — SVT Play öppnas i flik)
           </label>
-          <span className="text-[8px] font-mono text-bone/35">
-            Skapar en "Titta"-knapp på sajten
-          </span>
+          <button
+            type="button"
+            onClick={() => syncVideos([...videos, { title: "", url: "" }])}
+            className="inline-flex items-center gap-1 px-2.5 py-1 bg-ember/10 hover:bg-ember/20 border border-ember/30 text-ember text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors cursor-pointer"
+          >
+            <Plus size={10} />
+            Lägg till video
+          </button>
         </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={c.url || ""}
-            onChange={(e) => updateCredit(c.id, "url", (e.target as any).value)}
-            onBlur={(e) => {
-              const trimmed = (e.currentTarget?.value || "").trim();
-              if (trimmed && !/^https?:\/\//i.test(trimmed)) {
-                updateCredit(c.id, "url", `https://${trimmed}`);
-              }
-            }}
-            placeholder="T.ex. https://www.youtube.com/watch?v=... eller https://www.svtplay.se/..."
-            className="flex-1 bg-stage/35 border border-bone/10 text-bone px-3 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-          />
-          {c.url && (
-            <a
-              href={c.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-ember text-[9px] font-mono uppercase tracking-wider rounded-sm transition-colors flex items-center gap-1 cursor-pointer shrink-0"
-              title="Öppna videolänk i ny flik för att testa"
-            >
-              <ExternalLink size={11} />
-              Testa länk
-            </a>
-          )}
+        <div className="space-y-2">
+          {videos.map((vid, vIdx) => (
+            <div key={vIdx} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center bg-stage/20 p-2 rounded-sm border border-bone/5">
+              <div className="md:col-span-4">
+                <input
+                  type="text"
+                  value={vid.title || ""}
+                  onChange={(e) => {
+                    const next = videos.map((item, idx) => (idx === vIdx ? { ...item, title: (e.target as any).value } : item));
+                    syncVideos(next);
+                  }}
+                  placeholder={videos.length > 1 ? `Titel (t.ex. Klipp ${vIdx + 1})` : "Etikett (valfri, t.ex. Trailer)"}
+                  className="w-full bg-stage/35 border border-bone/10 text-bone px-2.5 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember"
+                />
+              </div>
+              <div className="md:col-span-8 flex gap-1.5 items-center">
+                <input
+                  type="text"
+                  value={vid.url}
+                  onChange={(e) => {
+                    const next = videos.map((item, idx) => (idx === vIdx ? { ...item, url: (e.target as any).value } : item));
+                    syncVideos(next);
+                  }}
+                  onBlur={(e) => {
+                    const trimmed = (e.currentTarget?.value || "").trim();
+                    if (trimmed && !/^https?:\/\//i.test(trimmed)) {
+                      const next = videos.map((item, idx) => (idx === vIdx ? { ...item, url: `https://${trimmed}` } : item));
+                      syncVideos(next);
+                    }
+                  }}
+                  placeholder="https://www.youtube.com/watch?v=... eller https://www.svtplay.se/..."
+                  className="flex-1 bg-stage/35 border border-bone/10 text-bone px-2.5 py-1.5 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
+                />
+                {vid.url && (
+                  <a href={vid.url} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-bone/5 hover:bg-bone/10 border border-bone/10 text-ember rounded-sm transition-colors shrink-0" title="Testa länk i ny flik">
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+                {videos.length > 1 && (["up", "down"] as const).map((dir) => (
+                  <button
+                    key={dir}
+                    type="button"
+                    disabled={dir === "up" ? vIdx === 0 : vIdx === videos.length - 1}
+                    onClick={() => syncVideos(moveArrayItem(videos, vIdx, dir))}
+                    className="p-1.5 border border-bone/10 hover:border-ember text-bone/60 hover:text-ember disabled:opacity-20 rounded-sm cursor-pointer"
+                    title={dir === "up" ? "Flytta upp" : "Flytta ner"}
+                  >
+                    {dir === "up" ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const filtered = videos.filter((_, idx) => idx !== vIdx);
+                    syncVideos(filtered.length > 0 ? filtered : [{ title: "", url: "" }]);
+                  }}
+                  className="p-1.5 text-bone/40 hover:text-red-400 transition-colors cursor-pointer"
+                  title="Ta bort videolänk"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -274,54 +312,23 @@ export function CreditItemCard({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                Alt-Text (SEO)
-              </label>
-              <input
-                type="text"
-                value={c.img_alt || ""}
-                onChange={(e) => updateCredit(c.id, "img_alt", (e.target as any).value)}
-                placeholder="Alt-text för Google..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                Titel (Title Tag)
-              </label>
-              <input
-                type="text"
-                value={c.img_title || ""}
-                onChange={(e) => updateCredit(c.id, "img_title", (e.target as any).value)}
-                placeholder="Titel..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                Bildtext (Caption)
-              </label>
-              <input
-                type="text"
-                value={c.img_caption || ""}
-                onChange={(e) => updateCredit(c.id, "img_caption", (e.target as any).value)}
-                placeholder="Bildtext..."
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember"
-              />
-            </div>
-            <div>
-              <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
-                Sökoptimerat Filnamn
-              </label>
-              <input
-                type="text"
-                value={c.img_filename || ""}
-                onChange={(e) => updateCredit(c.id, "img_filename", (e.target as any).value)}
-                placeholder="ex. therese-merit.webp"
-                className="w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember font-mono"
-              />
-            </div>
+            {([
+              { field: "img_alt", label: "Alt-Text (SEO)", placeholder: "Alt-text för Google...", mono: false },
+              { field: "img_title", label: "Titel (Title Tag)", placeholder: "Titel...", mono: false },
+              { field: "img_caption", label: "Bildtext (Caption)", placeholder: "Bildtext...", mono: false },
+              { field: "img_filename", label: "Sökoptimerat Filnamn", placeholder: "ex. therese-merit.webp", mono: true },
+            ] as const).map(({ field, label, placeholder, mono }) => (
+              <div key={field}>
+                <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">{label}</label>
+                <input
+                  type="text"
+                  value={(c as any)[field] || ""}
+                  onChange={(e) => updateCredit(c.id, field, (e.target as any).value)}
+                  placeholder={placeholder}
+                  className={`w-full bg-stage/35 border border-bone/10 text-bone px-2 py-1 rounded-sm text-xs focus:outline-none focus:border-ember ${mono ? "font-mono" : ""}`}
+                />
+              </div>
+            ))}
             <div className="sm:col-span-2">
               <label className="block text-[8px] uppercase tracking-widest text-bone/40 font-mono mb-1">
                 Beskrivning (Description - WordPress-stil)

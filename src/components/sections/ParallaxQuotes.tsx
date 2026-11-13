@@ -1,9 +1,42 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const MotionDiv = motion.div as any;
 
-export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
+const DEFAULT_QUOTES = {
+  sv: [
+    "en närvaro som river ner väggar",
+    "en av fyra kvinnor vi får följa",
+    "skånsk röst — varm, rå, omedelbar",
+    "drama som hon känner extra starkt för",
+    "närvarande, sårbar, exakt",
+  ],
+  en: [
+    "a presence that tears down walls",
+    "one of four women we follow",
+    "Scanian voice — warm, raw, immediate",
+    "drama she feels especially strongly about",
+    "present, vulnerable, precise",
+  ],
+};
+
+export function ParallaxQuotes({
+  quotes,
+  reviewQuotes,
+  lang = "sv",
+}: {
+  quotes?: string[];
+  reviewQuotes?: any[];
+  lang?: "sv" | "en";
+}) {
+  const activeQuotes = useMemo(() => {
+    if (quotes) return quotes;
+    if (reviewQuotes && Array.isArray(reviewQuotes)) {
+      return reviewQuotes.map((q: any) => (typeof q === "string" ? q : lang === "sv" ? q.sv : q.en));
+    }
+    return DEFAULT_QUOTES[lang];
+  }, [quotes, reviewQuotes, lang]);
+
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
 
@@ -72,7 +105,7 @@ export function ParallaxQuotes({ quotes }: { quotes: string[] }) {
 
   return (
     <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden select-none">
-      {quotes.slice(0, 5).map((q, i) => {
+      {activeQuotes.slice(0, 5).map((q, i) => {
         const layout = quoteLayouts[i] || quoteLayouts[0];
 
         return (
