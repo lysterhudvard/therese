@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DashboardHero } from "./DashboardHero";
 import { DashboardBio } from "./DashboardBio";
 import { DashboardPortfolio } from "./DashboardPortfolio";
@@ -25,6 +25,7 @@ type TabType = "hero" | "bio" | "portfolio" | "showreels" | "credits" | "voice" 
 export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("hero");
   const [isConfigured, setIsConfigured] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
   
   const HomeIcon = Home as any;
   const LogOutIcon = LogOut as any;
@@ -33,6 +34,43 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
   useEffect(() => {
     setIsConfigured(isSupabaseConfigured());
   }, []);
+
+  // Auto-expand all CMS textareas as content grows so text is never clipped or scrolled
+  useEffect(() => {
+    const container = mainRef.current;
+    if (!container) return;
+
+    const resizeTextarea = (el: HTMLTextAreaElement) => {
+      el.style.overflowY = "hidden";
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    };
+
+    const resizeAll = () => {
+      container.querySelectorAll("textarea").forEach((el) => resizeTextarea(el));
+    };
+
+    const handleInput = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (target && target.tagName === "TEXTAREA") {
+        resizeTextarea(target as HTMLTextAreaElement);
+      }
+    };
+
+    resizeAll();
+    const raf = requestAnimationFrame(resizeAll);
+    const observer = new MutationObserver(() => requestAnimationFrame(resizeAll));
+    observer.observe(container, { childList: true, subtree: true });
+    container.addEventListener("input", handleInput);
+    window.addEventListener("resize", resizeAll);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      container.removeEventListener("input", handleInput);
+      window.removeEventListener("resize", resizeAll);
+    };
+  }, [activeTab]);
 
   const navigationItems = [
     { id: "hero", label: "Akt I: Ridåuppgång", icon: Star },
@@ -152,7 +190,39 @@ export function BackstageDashboard({ onLogout }: BackstageDashboardProps) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto max-h-screen relative z-10">
+      <main ref={mainRef} className="backstage-cms flex-1 p-6 md:p-12 overflow-y-auto max-h-screen relative z-10">
+        <style>{`
+          .backstage-cms label { color: rgba(244, 241, 234, 0.85) !important; }
+          .backstage-cms [class*="text-bone/4"],
+          .backstage-cms [class*="text-bone/5"] { color: rgba(244, 241, 234, 0.75) !important; }
+          .backstage-cms input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+          .backstage-cms textarea,
+          .backstage-cms select {
+            color: #f4f1ea !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-width: 1px !important;
+            border-style: solid !important;
+            border-color: rgba(244, 241, 234, 0.28) !important;
+          }
+          .backstage-cms input::placeholder,
+          .backstage-cms textarea::placeholder {
+            color: rgba(244, 241, 234, 0.45) !important;
+          }
+          .backstage-cms input:focus,
+          .backstage-cms textarea:focus,
+          .backstage-cms select:focus {
+            border-color: #d97757 !important;
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 0 0 1px rgba(217, 119, 87, 0.35);
+          }
+          .backstage-cms [class*="border-ember"] {
+            border-color: rgba(217, 119, 87, 0.78) !important;
+          }
+          .backstage-cms [class*="bg-stage/5"][class*="border"] {
+            border-color: rgba(217, 119, 87, 0.55) !important;
+            box-shadow: 0 0 0 1px rgba(217, 119, 87, 0.12);
+          }
+        `}</style>
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Missing .env credentials Warning */}
           {!isConfigured && (
